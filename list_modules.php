@@ -115,7 +115,7 @@ foreach(scandir(IDIR . "/systems/") AS $id => $folder)
 		
 		foreach(scandir(IDIR . "/systems/{$folder}") AS $id => $module)
 		{
-			if(
+			if (
 				$module[0] != '.'
 				AND $module != 'index.html'
 				AND substr($module, 0 -3) != 'bck'

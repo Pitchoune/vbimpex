@@ -109,15 +109,20 @@ class ImpExController
 
 		if (forcesqlmode)
 		{
-			$Db_object->query("set sql_mode = ''");
+			$Db_object->query("
+				SET sql_mode = ''
+			");
 		}
 
-		$session_db = $Db_object->query("SELECT data FROM {$targettableprefix}datastore WHERE title = 'ImpExSession'");
+		$session_db = $Db_object->query("
+			SELECT data
+			FROM " . $targettableprefix . "datastore
+			WHERE title = 'ImpExSession'
+		");
 
-		// TODO: switch on database type.
-		if (mysql_num_rows($session_db))
+		if ($Db_object->num_rows($session_db))
 		{
-			$session_data = mysql_result($session_db, 0, 'data');
+			$session_data = $Db_object->result($session_db, 0, 'data');
 		}
 
 		if ($session_data)
@@ -146,12 +151,13 @@ class ImpExController
 
 		if (forcesqlmode)
 		{
-			$Db_object->query("set sql_mode = ''");
+			$Db_object->query("SET sql_mode = ''");
 		}
 
 		$Db_object->query("
 			REPLACE INTO " . $targettableprefix . "datastore (title, data)
-			VALUES ('ImpExSession', '" . addslashes(serialize($ImpExSession)) . "')
+			VALUES
+				('ImpExSession', '" . $Db_object->escape_string(serialize($ImpExSession)) . "')
 		");
 	}
 }

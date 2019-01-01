@@ -52,7 +52,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @var    array
 	*/
-	var $_elementtypes = array ('mandatory' , 'nonmandatory');
+	var $_elementtypes = array ('mandatory', 'nonmandatory');
 
 	/**
 	* Object data type
@@ -168,9 +168,9 @@ class ImpExData extends ImpExDatabase
 	{
 		$targetdatabasetype = $sessionobject->get_session_var('targetdatabasetype');
 		$targettableprefix = $sessionobject->get_session_var('targettableprefix');
-		// TODO: Include files with the data objects and checking functions, faster and less dB over head ?
-		$this->_datatype=$type;
-		$this->_producttype=$product;
+
+		$this->_datatype = $type;
+		$this->_producttype = $product;
 
 		$this->_values = $this->create_data_type(
 				$Db_object,
@@ -185,7 +185,7 @@ class ImpExData extends ImpExDatabase
 			$sessionobject->add_error(
 				'fatal',
 				'ImpExData',
-				"ImpExData contructor failed trying to construct a $type object",
+				'ImpExData constructor failed trying to construct a ' . $type . 'object',
 				'Does the database user have modify permissions? Is it a valid connection? Are all the tables ok?'
 			);
 		}
@@ -208,14 +208,14 @@ class ImpExData extends ImpExDatabase
 
 		if (!$this->_values[$this->_datatype]['mandatory'])
 		{
-			echo "No valid entries in vbfields.php for this type<br />Datatype: {$this->_datatype}";
+			echo 'No valid entries in vbfields.php for this type<br />Datatype: ' . $this->_datatype;
 			exit;
 		}
 
 		foreach (($this->_values[$this->_datatype]['mandatory']) AS $key => $value)
 		{
 			// Guest user hack
-			if($key == 'userid' OR $key == 'bloguserid' AND $value == 0)
+			if ($key == 'userid' OR $key == 'bloguserid' AND $value == 0)
 			{
 				continue;
 			}
@@ -226,7 +226,7 @@ class ImpExData extends ImpExDatabase
 				return false;
 			}
 
-			if($this->_values[$this->_datatype]['dictionary'][$key] == 'return true;')
+			if ($this->_values[$this->_datatype]['dictionary'][$key] == 'return true;')
 			{
 				$return_state = true;
 			}
@@ -236,7 +236,7 @@ class ImpExData extends ImpExDatabase
 				// Create a lambda function with the dictionary contents of the dB to check the data
 				$check_data = create_function('$data', $this->_values[$this->_datatype]['dictionary'][$key]);
 
-				if(!$check_data($value))
+				if (!$check_data($value))
 				{
 					$this->_failedon = $key;
 					return false;
@@ -255,7 +255,7 @@ class ImpExData extends ImpExDatabase
 					$this->_values[$this->_datatype]['nonmandatory'][$key] = ''; // Empty it for the SQL so the database will default to the field default
 				}
 
-				if($this->_values[$this->_datatype]['dictionary'][$key] == 'return true;')
+				if ($this->_values[$this->_datatype]['dictionary'][$key] == 'return true;')
 				{
 					$return_state = true;
 				}
@@ -265,7 +265,7 @@ class ImpExData extends ImpExDatabase
 					// Create a lambda function with the dictionary contents of the dB to check the data
 					$check_data = create_function('$data', $this->_values[$this->_datatype]['dictionary'][$key]);
 
-					if(!$check_data($value))
+					if (!$check_data($value))
 					{
 						$this->_failedon = $key;
 						return false;
@@ -291,7 +291,7 @@ class ImpExData extends ImpExDatabase
 
 		foreach ($this->_elementtypes AS $name => $type)
 		{
-			if(is_array($this->_values[$this->_datatype][$type]))
+			if (is_array($this->_values[$this->_datatype][$type]))
 			{
 				foreach ($this->_values[$this->_datatype][$type] AS $key => $value)
 				{
@@ -299,7 +299,7 @@ class ImpExData extends ImpExDatabase
 					{
 						$nullelements++;
 					}
-				$totalelements++;
+					$totalelements++;
 				}
 			}
 		}

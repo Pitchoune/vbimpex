@@ -37,17 +37,17 @@ class ImpExDisplay extends ImpExFunction
 
 	var $_target_versions = array (
 		'forum' => array(
-			'400' 		=> 'vBulletin 4.0.* - 4.1.*',
-			'360' 		=> 'vBulletin 3.7.* &amp; 3.8.*',
+			'400' 		=> 'vBulletin 4.0.* - 4.2.*',
+			'360' 		=> 'vBulletin 3.6.* - 3.8.*',
 			'350' 		=> 'vBulletin 3.5.*',
 			'309' 		=> 'vBulletin 3.0.*'
 			),
 		'blog' => array(
 			'blog10' 	=> 'vBulletin Blog 1.0.*',
-			'blog40' 	=> 'vBulletin Blog 4.0.* - 4.1.*'
+			'blog40' 	=> 'vBulletin Blog 4.0.* - 4.2.*'
 			),
 		'cms' => array(
-			'cms10' 	=> 'vBulletin Suite CMS 4.0.* - 4.1.*'
+			'cms10' 	=> 'vBulletin Suite CMS 4.0.* - 4.2.*'
 			),
 		);
 
@@ -167,7 +167,7 @@ class ImpExDisplay extends ImpExFunction
 	{
 		return "
 			<tr class=\"thead\">
-				<td colspan=\"$colspan\">" . $this->iif($htmlise, htmlspecialchars($title), $title) . "</td>
+				<td colspan=\"$colspan\">" . ($htmlise ? htmlspecialchars($title) : $title) . "</td>
 			</tr>";
 	}
 
@@ -188,6 +188,66 @@ class ImpExDisplay extends ImpExFunction
 	}
 
 	/**
+	* HTML Page code - single table header
+	*
+	* @param	boolean	Whether or not to place a <br /> before the opening table tag
+	* @param	string	Width for the <table> - default = '90%'
+	* @param	integer	Width in pixels for the table's 'cellspacing' attribute
+	* @param	boolean Whether to collapse borders in the table
+	*/
+	function table_header($echobr = true, $width = '90%', $cellspacing = 0, $id = '', $border_collapse = false)
+	{
+		$return_string = '';
+
+		if ($echobr)
+		{
+			$return_string .= '<br />';
+		}
+
+		$id_html = ($id == '' ? '' : " id=\"$id\"");
+
+		$return_string .= "\n<table cellpadding=\"1\" cellspacing=\"$cellspacing\" border=\"0\" align=\"center\" width=\"$width\" style=\"border-collapse:" . ($border_collapse ? 'collapse' : 'separate') . "\" class=\"tblborder\"$id_html>";
+
+		return $return_string;
+	}
+
+	/**
+	* HTML Page code - single table footer
+	*
+	* @param	integer	Column span of the optional table row to be printed
+	* @param	string	If specified, creates an additional table row with this code as its contents
+	* @param	string	Tooltip for optional table row
+	* @param	boolean	Whether or not to close the <form> tag
+	*/
+	function table_footer($colspan = 2, $rowhtml = '', $tooltip = '', $echoform = true)
+	{
+		$return_string = '';
+
+		if ($rowhtml)
+		{
+			$tooltip = ($tooltip != '' ? " title=\"$tooltip\"" : '');
+
+			if ($tableadded)
+			{
+				$return_string .= "<tr>\n\t<td class=\"tfoot\"" . ($colspan != 1 ? " colspan=\"$colspan\"" : '') . " align=\"center\"$tooltip>$rowhtml</td>\n</tr>\n";
+			}
+			else
+			{
+				$return_string .= "<p align=\"center\"$tooltip>$rowhtml</p>\n";
+			}
+		}
+
+		$return_string .= "\n</table>";
+
+		if ($echoform)
+		{
+			$return_string .= "</form>\n\n";
+		}
+
+		return $return_string;
+	}
+
+	/**
 	* HTML Page code - form header
 	*
 	* @param	string	mixed	The target of the form
@@ -199,13 +259,11 @@ class ImpExDisplay extends ImpExFunction
 	*/
 	function do_form_header($phpscript, $action, $uploadform = 0, $addtable = 1, $name = 'name')
 	{
-		$return_string ='';
-		$return_string = "\n<form action=\"$phpscript.php\" " . $this->iif($uploadform, "ENCTYPE=\"multipart/form-data\" ", '') . " name=\"$name\" method=\"post\">";
+		$return_string = '';
+		$return_string .= "\n<form action=\"$phpscript.php\" " . ($uploadform ? "ENCTYPE=\"multipart/form-data\" " : "") . " name=\"$name\" method=\"post\">";
 
-		if ($addtable == 1)
-		{
-			$return_string .= "\n<table cellpadding=\"1\" cellspacing=\"0\" border=\"0\" align=\"center\" width=\"90%\" class=\"tblborder\">";
-		}
+		$return_string .= ($addtable == 1 ? '\n<table cellpadding=\"1\" cellspacing=\"0\" border=\"0\" align=\"center\" width=\"90%\" class=\"tblborder\">' : '');
+
 		return $return_string;
 	}
 
@@ -214,7 +272,7 @@ class ImpExDisplay extends ImpExFunction
 	*
 	* @param	string	mixed	The submit name
 	* @param	string	mixed	The reset name
-	* @param	int		mixed	The collum span width
+	* @param	int		mixed	The column span width
 	* @param	string	mixed	Text for the back button ( onclick="history.back(1)" )
 	*
 	* @return	string 	mixed	The formed HTML
@@ -224,18 +282,20 @@ class ImpExDisplay extends ImpExFunction
 		$tableadded = 1;
 		$return_string = '';
 
-		$return_string = $this->iif($tableadded == 1, "\n\t<tr id='submitrow'>\n\t<td colspan='$colspan' align='center'>", "<p><center>");
+		$return_string .= ($tableadded == 1 ? "\n\t<tr id='submitrow'>\n\t<td colspan='$colspan' align='center'>" : "<p><center>");
 		$return_string .= "\n\t<p id='submitrow'>\n\t<input type=\"submit\" value=\"   $submitname   \" accesskey=\"s\" />";
 
 		if ($resetname != '')
 		{
 			$return_string .= "\n\t<input type=\"reset\" value=\"   $resetname   \" />\n";
 		}
+
 		if ($goback != '')
 		{
 			$return_string .= "\n\t<input type=\"button\" value=\"   $goback   \" onclick=\"history.back(1)\" />\n";
 		}
-		$return_string .= $this->iif($tableadded == 1, "</p></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n", "</p></center>\n");
+
+		$return_string .= ($tableadded == 1 ? "</p></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n" : "</p></center>\n");
 		$return_string .= "\n</form>";
 
 		return $return_string;
@@ -253,7 +313,7 @@ class ImpExDisplay extends ImpExFunction
 	*/
 	function make_description($text, $htmlise = 0)
 	{
-		$return_string = "<tr class='" . $this->get_row_bg() . "' valign='top'><td colspan='2'>" . $this->iif($htmlise == 0, $text, htmlspecialchars($text)) . "</td></tr>\n";
+		$return_string = "<tr class='" . $this->get_row_bg() . "' valign='top'><td colspan='2'>" . ($htmlise == 0 ? $text : htmlspecialchars($text)) . "</td></tr>\n";
 		return $return_string;
 	}
 
@@ -292,9 +352,9 @@ class ImpExDisplay extends ImpExFunction
 		$string =
 			"<tr class='" . $this->get_row_bg() . "' valign='top'>" .
 			"<td><p>$title</p></td>\n<td><p>Yes<input type='radio' name='$name' value='1' " .
-			$this->iif($value == 1 OR ($name == 'pmpopup' AND $value == 2), 'checked="checked"', '') . " /> No <input type='radio' name='$name' value='0' " .
-			$this->iif($value == 0, 'checked="checked"', '') . ' />' .
-			$this->iif($value == 2 AND $name == 'customtitle', " User Set (no html)<input type='radio' name='$name' value='2' checked=\"checked\" />", '') .
+			($value == 1 OR ($name == 'pmpopup' AND $value == 2) ? 'checked="checked"' : "") . " /> No <input type='radio' name='$name' value='0' " .
+			($value == 0 ? 'checked="checked"' : '') . ' />' .
+			($value == 2 AND $name == 'customtitle' ? " User Set (no html)<input type='radio' name='$name' value='2' checked=\"checked\" />" : "") .
 			"</p></td>\n</tr>";
 
 		return $string;
@@ -337,22 +397,26 @@ class ImpExDisplay extends ImpExFunction
 		for ($i = 1; $i <= $num_modules - 3; $i++)
 		{
 
-// TODO: The clean up modules, loaded in index
-#			// Look for the final two
-#			if ($i == $num_modules -2)
-#			{
-#				$position = '901';
-#			}
-#			elseif ($i == $num_modules -1)
-#			{
-#				$position = '910';
-#			}
-#			else
-#			{
+			// TODO: The clean up modules, loaded in index
+			// Look for the final two
+			/*
+			if ($i == $num_modules -2)
+			{
+				$position = '901';
+			}
+			elseif ($i == $num_modules -1)
+			{
+				$position = '910';
+			}
+			else
+			{*/
 				$position = str_pad($i, 3, '0', STR_PAD_LEFT);
-#			}
+			
+			//}
+			
 
 			$taken = 0;
+
 			if ($this->_screenbasic['displaylinks'] == 'TRUE')
 			{
 				if (intval($sessionobject->return_stats($position, '_time_taken')) > 60)
@@ -370,7 +434,7 @@ class ImpExDisplay extends ImpExFunction
 						<td class=\"alt2\">
 							<form action=\"index.php\" method=\"post\" style=\"display:inline\">
 								<input type=\"hidden\" name=\"module\" value=\"$position\" />
-								<input type=\"submit\" value=\"" . $this->iif(($sessionobject->get_session_var($position) == 'FINISHED'), $this->phrases['redo'], $this->phrases['start_module']) . "\" />
+								<input type=\"submit\" value=\"" . (($sessionobject->get_session_var($position) == 'FINISHED') ? $this->phrases['redo'] : $this->phrases['start_module']) . "\" />
 							</form>
 						</td>
 						<td class=\"alt1\">" . $sessionobject->return_stats($position, '_objects_done') . "</td>
@@ -497,10 +561,10 @@ class ImpExDisplay extends ImpExFunction
 	function choose_system(&$sessionobject)
 	{
 		$return  = $this->do_form_header('index', 'post');
-		$return .= $this->make_table_header('');
+		$return .= $this->make_table_header($this->phrases['title']);
 		$return .= $this->make_hidden_code('module', '000');
 		$form .= $this->phrases['select_system'] . '   <select name="system">';
-		$each = '<hr><h4 align="center">' . $this->phrases['installed_systems'] . '</h4><table width="100%">';
+		$each = '<hr /><h4 align="center">' . $this->phrases['installed_systems'] . '</h4><table width="100%">';
 
 
 		$systems_list = array();
@@ -555,7 +619,7 @@ class ImpExDisplay extends ImpExFunction
 		$each .= '</tr><tr>';
 
 		$i = 1;
-			$rows = 0;
+		$rows = 0;
 
 		foreach ($systems_list AS $product => $product_array)
 		{
@@ -588,7 +652,7 @@ class ImpExDisplay extends ImpExFunction
 		}
 
 		$form .= '</select>';
-		$each .= '</table>';
+		$each .= '</tr></table>';
 
 		$to = $this->phrases['select_target_system'] . '<select name="targetsystem">';
 
@@ -643,8 +707,8 @@ class ImpExDisplay extends ImpExFunction
 
 
 	/**
-	* Outputs the content of the headder before index.php is called, ensures that
-	* the <html <head <body tags are out putted correctly and not disrupted by an echo() etc
+	* Outputs the content of the header before index.php is called, ensures that
+	* the <html <head <body tags are outputted correctly and not disrupted by an echo() etc
 	*
 	* Output is augmented by object state and internal flags
 	*
@@ -655,9 +719,6 @@ class ImpExDisplay extends ImpExFunction
 	function display_now($screentext)
 	{
 		$string = $this->page_header();
-
-		// TODO: Where do we want the modules status ? Probally here and update the interface to be all nice and groovy :)
-		// $string .= $this->display_modules();
 
 		$this->_screenbasic['displaymodules'] = 'FALSE';
 
@@ -768,7 +829,7 @@ class ImpExDisplay extends ImpExFunction
 	*/
 	function module_finished($modulestring, $seconds, $successful, $failed)
 	{
-		if($seconds <= 1)
+		if ($seconds <= 1)
 		{
 			return "<p align=\"center\">{$this->phrases['module']} <b>{$modulestring}</b>. <i>{$this->phrases['successful']}</i>, : 1 {$this->phrases['second']}.</p>
 					<p align=\"center\"> {$this->phrases['successful']}: <b>$successful</b>. {$this->phrases['failed']}: <b>$failed</b>.</p>";
@@ -794,6 +855,7 @@ class ImpExDisplay extends ImpExFunction
 
 			echo '<p align="center" class="smallfont"><a href="' . $gotopage . '" onclick="clearTimeout(timerID);"></a></p>';
 			echo "\n<script type=\"text/javascript\">\n";
+
 			if ($timeout == 0)
 			{
 				echo "window.location=\"$gotopage\";";
@@ -817,12 +879,9 @@ class ImpExDisplay extends ImpExFunction
 
 	function print_redirect_001($gotopage, $timeout = 0.5)
 	{
-		$rt = '';
-		$rt .= '<div align="center">';
-		$rt .= '<FORM METHOD="LINK" ACTION="'.$gotopage.'">';
-		$rt .= '<INPUT TYPE="submit" VALUE="' . $this->phrases['continue'] . '">';
-		$rt .= '</FORM>';
-		$rt .= '</div>';
+		$rt = '<br />';
+		$rt .= $this->do_form_header('index', '');
+		$rt .= $this->do_form_footer($this->phrases['continue'], '');
 		echo $rt;
 	}
 
@@ -831,14 +890,11 @@ class ImpExDisplay extends ImpExFunction
 	{
 		$to = $count+$startat;
 
-		$rt =  "<h4>{$this->phrases['importing']} {$count} {$datatypename}</h4>";
-		$rt .= "<p><b>{$this->phrases['from']}</b> : {$startat} ::  <b>{$this->phrases['to']}</b> : {$to} </p>";
+		$rt =  '<h4>' . $this->phrases['importing'] . ' ' . $count . ' ' . $datatypename . '</h4>';
+		$rt .= '<p><b>' . $this->phrases['from'] . '</b> : ' . $startat . ' ::  <b>' . $this->phrases['to'] . '</b> : ' . $to . ' </p>';
 
 		echo $rt;
 	}
-
-
-
 }
 
 class CLI_ImpExDisplay extends ImpExDisplay
@@ -873,6 +929,4 @@ class CLI_ImpExDisplay extends ImpExDisplay
 	function print_redirect($gotopage, $timeout = 0.5) { return true; }
 }
 
-
-/*======================================================================*/
 ?>

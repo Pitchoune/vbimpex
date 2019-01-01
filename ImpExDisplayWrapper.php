@@ -25,14 +25,13 @@ class ImpExDisplayWrapper extends ImpExDisplay
 {
 	function ImpExDisplayWrapper()
 	{
+		require_once(DIR . '/includes/functions.php');
+		require_once(DIR . '/includes/adminfunctions.php');
 	}
 
 	function call($function_name, $params = null)
 	{
-		require_once('./includes/functions.php');
-		require_once('./includes/adminfunctions.php');
-		
-		// If NULL set it to an empty array
+		// If NULL, set it to an empty array
 		$params = (is_null($params) == true ? array() : $params);
 		
 		return call_user_func_array($function_name, $params);
@@ -41,6 +40,16 @@ class ImpExDisplayWrapper extends ImpExDisplay
 	function display_now($var)
 	{
 		echo $var;
+	}
+
+	function table_header($echobr = true, $width = '90%', $cellspacing = 0, $id = '', $border_collapse = false)
+	{
+		$this->call('print_table_start', array($echobr, $width, $cellspacing, $id, $border_collapse));
+	}
+
+	function table_footer($colspan = 2, $rowhtml = '', $tooltip = '', $echoform = true)
+	{
+		$this->call('print_table_footer', array($colspan, $rowhtml, $tooltip, $echoform));
 	}
 
 	function page_header()
@@ -67,10 +76,12 @@ class ImpExDisplayWrapper extends ImpExDisplay
 			$outtitle = $this->_screenbasic['title'];
 		}
 
-		$this->call('print_cp_header', array($outtitle, $this->_screenbasic['autosubmit'] != '0' ? 'document.name.submit();' : ''));
+		$style = '<style type="text/css">.isucc { color: green; } .ifail { color: red; }</style>';
+
+		$this->call('print_cp_header', array($outtitle, $this->_screenbasic['autosubmit'] != '0' ? 'document.name.submit();' : '', $style));
 		$this->_screenbasic['donehead'] = 'TRUE';
 
-		$string .= '<style type="text/css">.isucc { color: green; } .ifail { color: red; }</style>';
+		
 
 		$string .= "\n" . '<b>' . $this->phrases['build_version'] . $this->_build_version . '</b>';
 		
@@ -111,6 +122,11 @@ class ImpExDisplayWrapper extends ImpExDisplay
 	}
 
 	function do_form_footer($submitname = '', $resetname = '_default_', $colspan = 2, $goback = '', $extra = '')
+	{
+		$this->call('print_submit_row', array($submitname , $resetname , $colspan , $goback , $extra));
+	}
+
+	function do_form_footer_no_reset($submitname = 'Submit', $colspan = 2, $goback = '')
 	{
 		$this->call('print_submit_row', array($submitname , $resetname , $colspan , $goback , $extra));
 	}

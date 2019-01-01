@@ -67,24 +67,28 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$result = $Db_object->query("
 					SELECT fieldname, vbmandatory, defaultvalue, dictionary
 					FROM " . $tableprefix . "vbfields
 					WHERE tablename = '" . $type . "'
-					AND product='{$product}'
+						AND product='" . $product . "'
 					ORDER BY vbmandatory
 				");
+
 				while ($line = $Db_object->fetch_array($result))
 				{
 						if ($line['vbmandatory'] == 'Y')
 						{
 							$returnarray["$type"]['mandatory']["$line[fieldname]"] =  $line['defaultvalue'];
 						}
+
 						if ($line['vbmandatory'] == 'N' || $line['vbmandatory'] == 'A')
 						{
 							$returnarray["$type"]['nonmandatory']["$line[fieldname]"] = $line['defaultvalue'];
 						}
+
 						$returnarray["$type"]['dictionary']["$line[fieldname]"] = $line['dictionary'];
 				}
 				return $returnarray;
@@ -122,8 +126,9 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$rows = $Db_object->query("DESCRIBE {$tableprefix}{$tablename} $importname");
+				$rows = $Db_object->query("DESCRIBE " . $tableprefix . $tablename . " " . $importname . "");
 
 				if ($Db_object->num_rows($rows))
 				{
@@ -133,15 +138,23 @@ class ImpExDatabaseCore extends ImpExFunction
 				{
 					$olderror = $Db_object->reporterror;
 					$Db_object->reporterror = 0;
+
 					if ($type == 'BIGINT')
 					{
-						$Db_object->query("ALTER TABLE " . $tableprefix . $tablename . " ADD COLUMN " . $importname . " BIGINT NOT NULL DEFAULT 0");
+						$Db_object->query("
+							ALTER TABLE " . $tableprefix . $tablename . "
+							ADD COLUMN " . $importname . " BIGINT NOT NULL DEFAULT 0
+						");
 					}
 					else
 					{
-						$Db_object->query("ALTER TABLE " . $tableprefix . $tablename . " ADD COLUMN " . $importname . " VARCHAR(255) NOT NULL DEFAULT '0'");
+						$Db_object->query("
+							ALTER TABLE " . $tableprefix . $tablename . "
+							ADD COLUMN " . $importname . " VARCHAR(255) NOT NULL DEFAULT '0'
+						");
 					}
-					$haserror = $Db_object->geterrno();
+
+					$haserror = $Db_object->errno();
 					$Db_object->reporterror = $olderror;
 
 					if (!$haserror)
@@ -171,9 +184,9 @@ class ImpExDatabaseCore extends ImpExFunction
 
 	function add_importids(&$Db_object, &$databasetype, &$tableprefix, &$displayobject, &$sessionobject)
 	{
-		foreach ($this->_import_ids as $id => $table_array)
+		foreach ($this->_import_ids AS $id => $table_array)
 		{
-			foreach ($table_array as $tablename => $column)
+			foreach ($table_array AS $tablename => $column)
 			{
 				if ($this->add_import_id($Db_object, $databasetype, $tableprefix, $tablename, $column))
 				{
@@ -181,7 +194,7 @@ class ImpExDatabaseCore extends ImpExFunction
 				}
 				else
 				{
-					$sessionobject->add_error(substr(get_class($this) , -3), $displayobject->phrases['table_alter_fail'], $displayobject->phrases['table_alter_fail_rem']);
+					$sessionobject->add_error(substr(get_class($this), -3), $displayobject->phrases['table_alter_fail'], $displayobject->phrases['table_alter_fail_rem']);
 				}
 			}
 		}	
@@ -205,8 +218,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$does_user_exist = $Db_object->query_first("SELECT userid, usergroupid FROM " . $tableprefix . "user WHERE userid = '$userid'");
+				$does_user_exist = $Db_object->query_first("
+					SELECT userid, usergroupid
+					FROM " . $tableprefix . "user
+					WHERE userid = $userid
+				");
 
 				if ($does_user_exist['userid'])
 				{
@@ -218,8 +236,8 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					$Db_object->query("
 						UPDATE " . $tableprefix . "user
-						SET importuserid = {$importuserid}
-						WHERE userid = {$userid}
+						SET importuserid = " . $importuserid . "
+						WHERE userid = $userid
 					");
 
 					return ($Db_object->affected_rows() > 0);
@@ -258,40 +276,53 @@ class ImpExDatabaseCore extends ImpExFunction
 	function add_index($Db_object, $databasetype, $tableprefix, $tablename)
 	{
 		// Check that there is not a empty value
-		if(empty($tablename)) { return false; }
-
-		if ($databasetype == 'mysql')
-		{
-			$check_sql = "SHOW KEYS FROM `" .
-			$tableprefix . $tablename . "`";
-
-			$keys = $Db_object->query($check_sql);
-
-			while ($key = $Db_object->fetch_array($keys))
-			{
-				if($key['Key_name'] == "import" . $tablename . "_index")
-				{
-					return true;
-				}
-			}
-
-			$sql = "
-			ALTER TABLE `" .
-			$tableprefix . $tablename . "`
-			ADD INDEX `import" . $tablename . "_index` ( `import" . $tablename . "id` )
-			";
-
-			return $Db_object->query($sql);
-		}
-		else
+		if (empty($tablename))
 		{
 			return false;
+		}
+
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$keys = $Db_object->query("
+					SHOW KEYS
+					FROM " . $tableprefix . $tablename . "
+				");
+
+				while ($key = $Db_object->fetch_array($keys))
+				{
+					if ($key['Key_name'] == "import" . $tablename . "_index")
+					{
+						return true;
+					}
+				}
+
+				return $Db_object->query("
+					ALTER TABLE " . $tableprefix . $tablename . "
+					ADD INDEX `import" . $tablename . "_index` (`import" . $tablename . "id`)
+				");
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
 	function check_product_installed($Db_target, $target_db_type, $target_table_prefix, $product)
 	{
 		$tables = false;
+
 		switch (strtolower($product))
 		{
 			case 'blog':
@@ -306,9 +337,9 @@ class ImpExDatabaseCore extends ImpExFunction
 			}
 		}
 
-		foreach($tables AS $table_array)
+		foreach ($tables AS $table_array)
 		{
-			foreach($table_array AS $tablename => $importid)
+			foreach ($table_array AS $tablename => $importid)
 			{
 				// If one is missing return false
 				if (!$this->check_table($Db_target, $target_db_type, $target_table_prefix, $tablename))
@@ -351,8 +382,12 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$rows = $Db_object->query("SELECT text FROM {$tableprefix}phrase WHERE varname LIKE '%_{$profiletitle}'");
+				$rows = $Db_object->query("
+					SELECT text
+					FROM " . $tableprefix . "phrase WHERE varname LIKE '%_" . $profiletitle . "
+				");
 
 				if ($Db_object->num_rows($rows) > 0)
 				{
@@ -361,23 +396,44 @@ class ImpExDatabaseCore extends ImpExFunction
 				else
 				{
 
-					$displayorder = $Db_object->query_first("SELECT displayorder FROM {$tableprefix}profilefield
-						ORDER BY displayorder DESC LIMIT 1
+					$displayorder = $Db_object->query_first("
+						SELECT displayorder
+						FROM " . $tableprefix . "profilefield
+						ORDER BY displayorder DESC
+						LIMIT 1
 					");
 
 					$neworder = intval($displayorder['displayorder']) + 1;
 
-					$Db_object->query("INSERT INTO {$tableprefix}profilefield (displayorder) VALUES ({$neworder})");
+					$Db_object->query("
+						INSERT INTO " . $tableprefix . "profilefield
+							(displayorder)
+						VALUES
+							(" . $neworder . ")");
 
 					if ($Db_object->affected_rows())
 					{
 						$fieldid = $Db_object->insert_id();
 
 						$Db_object->reporterror = 0;
-						$Db_object->query("ALTER TABLE {$tableprefix}userfield ADD field{$fieldid} mediumtext");
+						$Db_object->query("
+							ALTER TABLE " . $tableprefix . "userfield
+							ADD field" . $fieldid . " mediumtext
+						");
 
-						$Db_object->query("INSERT INTO {$tableprefix}phrase (varname, fieldname, text, product) VALUES ('field{$fieldid}_title', 'cprofilefield', '{$profiletitle}', 'vbulletin')");
-						$Db_object->query("INSERT INTO {$tableprefix}phrase (varname, fieldname, text, product) VALUES ('field{$fieldid}_desc', 'cprofilefield', '{$profiletitle}', 'vbulletin')");
+						$Db_object->query("
+							INSERT INTO " . $tableprefix . "phrase
+								(varname, fieldname, text, product)
+							VALUES
+								('field" . $fieldid . "_title', 'cprofilefield', '" . $profiletitle . "', 'vbulletin')
+						");
+
+						$Db_object->query("
+							INSERT INTO " . $tableprefix . "phrase
+								(varname, fieldname, text, product)
+							VALUES
+								('field" . $fieldid . "_desc', 'cprofilefield', '" . $profiletitle . "', 'vbulletin')
+						");
 						return true;
 					}
 					else
@@ -416,20 +472,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['user'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importuserid FROM {$tableprefix}user WHERE importuserid=" . intval(trim($this->get_value('mandatory', 'importuserid'))));
+					$there = $Db_object->query_first("
+						SELECT importuserid
+						FROM " . $tableprefix . "user
+						WHERE importuserid = " . intval(trim($this->get_value('mandatory', 'importuserid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-				// TODO: Still need to check and see if all the current usersnames being imported are unique
-				if(strtolower($this->get_value('mandatory', 'username')) == 'admin')
+				// TODO: Still need to check and see if all the current usernames being imported are unique
+				if (strtolower($this->get_value('mandatory', 'username')) == 'admin')
 				{
 					$this->set_value('mandatory', 'username', 'admin_old');
 				}
@@ -438,12 +499,16 @@ class ImpExDatabaseCore extends ImpExFunction
 				if ($this->_auto_email_associate)
 				{
 					// Do a search for the email address to find the user to match this imported one to :
-					$email_match = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "user WHERE email='". addslashes($this->get_value('mandatory', 'email')) . "'");
+					$email_match = $Db_object->query_first("
+						SELECT userid
+						FROM " . $tableprefix . "user
+						WHERE email = '" . $Db_object->escape_string($this->get_value('mandatory', 'email')) . "'
+					");
 
 
 					if ($email_match)
 					{
-						if($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $email_match["userid"]))
+						if ($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $email_match["userid"]))
 						{
 							// We matched the email address and associated propperly
 							$result['automerge'] = true;
@@ -467,11 +532,15 @@ class ImpExDatabaseCore extends ImpExFunction
 				if ($this->_auto_userid_associate)
 				{
 					// Do a search for the email address to find the user to match this imported one to :
-					$userid_match = $Db_object->query_first("SELECT userid FROM {$tableprefix}userid WHERE userid=". intval($this->get_value('mandatory', 'importuserid')));
+					$userid_match = $Db_object->query_first("
+						SELECT userid
+						FROM " . $tableprefix . "userid
+						WHERE userid = " . intval($this->get_value('mandatory', 'importuserid')) . "
+					");
 
 					if ($userid_match)
 					{
-						if($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $userid_match["userid"]))
+						if ($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $userid_match["userid"]))
 						{
 							// We matched the userid address and associated propperly
 							$result['automerge'] = true;
@@ -492,14 +561,18 @@ class ImpExDatabaseCore extends ImpExFunction
 				}
 
 				// If there is a dupe username pre_pend "imported_"
-				$double_name = $Db_object->query("SELECT username FROM " . $tableprefix . "user WHERE username LIKE '". addslashes($this->get_value('mandatory', 'username')) . "'");
+				$double_name = $Db_object->query("
+					SELECT username
+					FROM " . $tableprefix . "user
+					WHERE username LIKE '". $Db_object->escape_string($this->get_value('mandatory', 'username')) . "'
+				");
 
-				if($Db_object->num_rows($double_name))
+				if ($Db_object->num_rows($double_name))
 				{
 					$this->set_value('mandatory', 'username', 'imported_' . $this->get_value('mandatory', 'username'));
 				}
 
-				$sql = "
+				$userdone = $Db_object->query("
 					INSERT INTO	" . $tableprefix . "user
 					(
 						username, email, usergroupid,
@@ -523,28 +596,28 @@ class ImpExDatabaseCore extends ImpExFunction
 					)
 					VALUES
 					(
-						'" . addslashes($this->get_value('mandatory', 'username')) . "',
-						'" . addslashes($this->get_value('mandatory', 'email')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'username')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'email')) . "',
 						'" . $this->get_value('mandatory', 'usergroupid') . "',
 						'" . $this->get_value('mandatory', 'importuserid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'password')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'salt')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'password')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'salt')) . "',
 						'" . $this->get_value('nonmandatory', 'passworddate') . "',
 						'" . $this->get_value('nonmandatory', 'options') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'homepage')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'homepage')) . "',
 						'" . $this->get_value('nonmandatory', 'posts') . "',
 						'" . $this->get_value('nonmandatory', 'joindate') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'icq')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'icq')) . "',
 						'" . $this->get_value('nonmandatory', 'daysprune') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'aim')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'aim')) . "',
 						'" . $this->get_value('nonmandatory', 'membergroupids') . "',
 						'" . $this->get_value('nonmandatory', 'displaygroupid') . "',
 						'" . $this->get_value('nonmandatory', 'styleid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'parentemail')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'yahoo')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'parentemail')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'yahoo')) . "',
 						'" . $this->get_value('nonmandatory', 'showvbcode') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'usertitle')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'customtitle')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'usertitle')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'customtitle')) . "',
 						'" . $this->get_value('nonmandatory', 'lastvisit') . "',
 						'" . $this->get_value('nonmandatory', 'lastactivity') . "',
 						'" . $this->get_value('nonmandatory', 'lastpost') . "',
@@ -561,7 +634,7 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('nonmandatory', 'ipaddress') . "',
 						'" . $this->get_value('nonmandatory', 'referrerid') . "',
 						'" . $this->get_value('nonmandatory', 'languageid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'msn')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'msn')) . "',
 						'" . $this->get_value('nonmandatory', 'emailstamp') . "',
 						'" . $this->get_value('nonmandatory', 'threadedmode') . "',
 						'" . $this->get_value('nonmandatory', 'pmtotal') . "',
@@ -577,24 +650,36 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('nonmandatory', 'infractiongroupid') . "',
 						'" . $this->get_value('nonmandatory', 'adminoptions') . "'
 					)
-				";
-
-				$userdone = $Db_object->query($sql);
+				");
 				$userid = $Db_object->insert_id();
 
 				if ($userdone)
 				{
-					$exists = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "usertextfield WHERE userid = $userid");
+					$exists = $Db_object->query_first("
+						SELECT userid
+						FROM " . $tableprefix . "usertextfield
+						WHERE userid = $userid
+					");
 
 					if (!$exists)
 					{
-						if (!$Db_object->query("INSERT INTO " . $tableprefix . "usertextfield (userid) VALUES ($userid)"))
+						if (!$Db_object->query("
+							INSERT INTO " . $tableprefix . "usertextfield
+								(userid)
+							VALUES
+								($userid)
+						"))
 						{
 							$this->_failedon = "usertextfield fill";
 							return false;
 						}
 
-						if (!$Db_object->query("INSERT INTO " . $tableprefix . "userfield (userid) VALUES ($userid)"))
+						if (!$Db_object->query("
+							INSERT INTO " . $tableprefix . "userfield
+								(userid)
+							VALUES
+								($userid)
+						"))
 						{
 							$this->_failedon = "userfield fill";
 							return false;
@@ -603,7 +688,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if ($this->_has_default_values)
 					{
-						foreach ($this->get_default_values() as  $key => $value)
+						foreach ($this->get_default_values() AS $key => $value)
 						{
 							if ($key != 'signature')
 							{
@@ -616,9 +701,13 @@ class ImpExDatabaseCore extends ImpExFunction
 						}
 					}
 
-					if (array_key_exists('signature',$this->_default_values))
+					if (array_key_exists('signature', $this->_default_values))
 					{
-						if (!$Db_object->query("UPDATE " . $tableprefix . "usertextfield SET signature='" . addslashes($this->_default_values['signature']) . "' WHERE userid='" . $userid ."'"))
+						if (!$Db_object->query("
+							UPDATE " . $tableprefix . "usertextfield SET
+								signature = '" . $Db_object->escape_string($this->_default_values['signature']) . "'
+							WHERE userid = " . $userid . "
+						"))
 						{
 							$this->_failedon = "usertextfield SET signature";
 							return false;
@@ -627,17 +716,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if ($this->get_value('nonmandatory', 'usernote') != NULL)
 					{
-						$sql = "
+						$Db_object->query("
 							INSERT INTO	" . $tableprefix . "usernote
-							(
-								userid, posterid, username, dateline, message, title, allowsmilies, importusernoteid
-							)
+								(userid, posterid, username, dateline, message, title, allowsmilies, importusernoteid)
 							VALUES
-							(
-								{$userid}, 0, '', " . time() . ", '" . addslashes($this->get_value('nonmandatory', 'usernote')) . "', 'Imported Note', 0, 1
-							)
-							";
-						$Db_object->query($sql);
+								(" . $userid . ", 0, '', " . time() . ", '" . $Db_object->escape_string($this->get_value('nonmandatory', 'usernote')) . "', 'Imported Note', 0, 1)
+							");
 					}
 				}
 				else
@@ -688,8 +772,14 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("UPDATE {$tableprefix}thread	SET pollid={$vb_poll_id} WHERE pollid={$import_poll_id}	AND importthreadid > 0");
+				$Db_object->query("
+					UPDATE " . $tableprefix . "thread SET
+						pollid = " . $vb_poll_id  . "
+					WHERE pollid = " . $import_poll_id . "
+						AND importthreadid > 0
+				");
 
 				if ($Db_object->affected_rows())
 				{
@@ -730,24 +820,33 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['smilie'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importsmilieid FROM {$tableprefix}smilie WHERE importsmilieid=" . intval(trim($this->get_value('mandatory', 'importsmilieid'))));
+					$there = $Db_object->query_first("
+						SELECT importsmilieid
+						FROM " . $tableprefix . "smilie
+						WHERE importsmilieid = " . intval(trim($this->get_value('mandatory', 'importsmilieid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-				$smilie_path = ($prepend_path == true ?'images/smilies/' : '');
+				$smilie_path = ($prepend_path == true ? 'images/smilies/' : '');
 
-				$update = $Db_object->query_first("SELECT smilieid FROM " . $tableprefix . "smilie WHERE smilietext = '". addslashes($this->get_value('mandatory', 'smilietext')) . "'");
+				$update = $Db_object->query_first("
+					SELECT smilieid
+					FROM " . $tableprefix . "smilie
+					WHERE smilietext = '". $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "'
+				");
 
 				if (!$update)
 				{
-					$sql = "
+					$Db_object->query("
 						INSERT INTO	" . $tableprefix . "smilie
 						(
 							title, smilietext, smiliepath,
@@ -755,14 +854,14 @@ class ImpExDatabaseCore extends ImpExFunction
 						)
 						VALUES
 						(
-							'" . addslashes($this->get_value('nonmandatory', 'title')) . "',
-							'" . addslashes($this->get_value('mandatory', 'smilietext')) . "',
-							'" . $smilie_path . addslashes($this->get_value('nonmandatory', 'smiliepath')) . "',
+							'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+							'" . $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "',
+							'" . $smilie_path . $Db_object->escape_string($this->get_value('nonmandatory', 'smiliepath')) . "',
 							'" . $this->get_value('nonmandatory', 'imagecategoryid') . "',
 							'" . $this->get_value('nonmandatory', 'displayorder') . "',
 							'" . $this->get_value('mandatory', 'importsmilieid') . "'
 						)
-					";
+					");
 				}
 				else
 				{
@@ -773,17 +872,16 @@ class ImpExDatabaseCore extends ImpExFunction
 					}
 					else
 					{
-						$title = "'" . addslashes($this->get_value('nonmandatory', 'title')) . "'";
+						$title = "'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "'";
 					}
-					$sql = "
+					$Db_object->query("
 						UPDATE " . $tableprefix . "smilie SET
 							title = $title,
 							smiliepath = '" . $smilie_path . $this->get_value('nonmandatory', 'smiliepath') . "'
-						WHERE smilietext = '" . addslashes($this->get_value('mandatory', 'smilietext')) . "'
-					";
+						WHERE smilietext = '" . $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "'
+					");
 				}
 
-				$Db_object->query($sql);
 				return ($Db_object->affected_rows() > 0);
 			}
 
@@ -818,12 +916,17 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['poll'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importpollid FROM {$tableprefix}poll WHERE importpollid=" . intval(trim($this->get_value('mandatory', 'importpollid'))));
+					$there = $Db_object->query_first("
+						SELECT importpollid
+						FROM " . $tableprefix . "poll
+						WHERE importpollid = " . intval(trim($this->get_value('mandatory', 'importpollid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -840,9 +943,9 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importpollid') . "',
-						'" . addslashes($this->get_value('mandatory', 'question')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'question')) . "',
 						'" . $this->get_value('mandatory', 'dateline') . "',
-						'" . addslashes($this->get_value('mandatory', 'options')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'options')) . "',
 						'" . $this->get_value('mandatory', 'votes') . "',
 						'" . $this->get_value('nonmandatory', 'active') . "',
 						'" . $this->get_value('nonmandatory', 'numberoptions') . "',
@@ -877,21 +980,27 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['phrase'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importphraseid FROM {$tableprefix}phrase WHERE importphraseid=" . intval(trim($this->get_value('mandatory', 'importphraseid'))));
+					$there = $Db_object->query_first("
+						SELECT importphraseid
+						FROM " . $tableprefix . "phrase
+						WHERE importphraseid = " . intval(trim($this->get_value('mandatory', 'importphraseid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-
 				// Check for duplicate key :: name_lang_type
-				$sql = "SELECT phraseid FROM {$tableprefix}phrase WHERE	varname='" . $this->get_value('mandatory','varname') . "' ";
-				$there = $Db_object->query_first($sql);
+				$there = $Db_object->query_first("
+					SELECT phraseid
+					FROM " . $tableprefix . "phrase
+					WHERE varname = '" . $this->get_value('mandatory', 'varname') . "'");
 
 				if ($there['phraseid'])
 				{
@@ -902,23 +1011,24 @@ class ImpExDatabaseCore extends ImpExFunction
 
 
 				$Db_object->query("
-					INSERT INTO {$tableprefix}phrase
+					INSERT INTO " . $tableprefix . "phrase
 					(
 						importphraseid, varname, fieldname, text, languageid, product, username, dateline, version
 					)
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importphraseid') . "',
-						'" . $this->get_value('mandatory','varname') . "',
-						'" . $this->get_value('mandatory','fieldname') . "',
-						'" . addslashes($this->get_value('mandatory','text')) . "',
-						'" . $this->get_value('nonmandatory','languageid') . "',
-						'" . $this->get_value('nonmandatory','product') . "',
-						'" . addslashes($this->get_value('nonmandatory','username')) . "',
-						'" . $this->get_value('nonmandatory','dateline') . "',
-						'" . $this->get_value('nonmandatory','version') . "'
+						'" . $this->get_value('mandatory', 'varname') . "',
+						'" . $this->get_value('mandatory', 'fieldname') . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'text')) . "',
+						'" . $this->get_value('nonmandatory', 'languageid') . "',
+						'" . $this->get_value('nonmandatory', 'product') . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'username')) . "',
+						'" . $this->get_value('nonmandatory', 'dateline') . "',
+						'" . $this->get_value('nonmandatory', 'version') . "'
 					)
 				");
+
 				if ($Db_object->affected_rows())
 				{
 					return $Db_object->insert_id();
@@ -949,12 +1059,17 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['subscription'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importsubscriptionid FROM {$tableprefix}subscription WHERE importsubscriptionid=" . intval(trim($this->get_value('mandatory', 'importsubscriptionid'))));
+					$there = $Db_object->query_first("
+						SELECT importsubscriptionid
+						FROM " . $tableprefix . "subscription
+						WHERE importsubscriptionid = " . intval(trim($this->get_value('mandatory', 'importsubscriptionid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -962,7 +1077,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 
 				$Db_object->query("
-					INSERT INTO {$tableprefix}subscription
+					INSERT INTO " . $tableprefix . "subscription
 					(
 						importsubscriptionid, cost, membergroupids, active, options, varname, adminoptions, displayorder, forums, nusergroupid
 					)
@@ -975,11 +1090,12 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('mandatory', 'options') . "',
 						'" . $this->get_value('mandatory', 'varname') . "',
 						'" . $this->get_value('mandatory', 'adminoptions') . "',
-						'" . $this->get_value('nonmandatory','displayorder') . "',
-						'" . $this->get_value('nonmandatory','forums') . "',
-						'" . $this->get_value('nonmandatory','nusergroupid') . "'
+						'" . $this->get_value('nonmandatory', 'displayorder') . "',
+						'" . $this->get_value('nonmandatory', 'forums') . "',
+						'" . $this->get_value('nonmandatory', 'nusergroupid') . "'
 					)
 				");
+
 				if ($Db_object->affected_rows())
 				{
 					return $Db_object->insert_id();
@@ -1004,26 +1120,29 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 	}
 
-
 	function import_subscriptionlog($Db_object, $databasetype, $tableprefix)
 	{
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['subscriptionlog'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importsubscriptionlogid FROM {$tableprefix}subscriptionlog WHERE importsubscriptionlogid=" . intval(trim($this->get_value('mandatory', 'importsubscriptionlogid'))));
+					$there = $Db_object->query_first("
+						SELECT importsubscriptionlogid
+						FROM " . $tableprefix . "subscriptionlog
+						WHERE importsubscriptionlogid = " . intval(trim($this->get_value('mandatory', 'importsubscriptionlogid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-
 				$Db_object->query("
-					INSERT INTO {$tableprefix}subscriptionlog
+					INSERT INTO " . $tableprefix . "subscriptionlog
 					(
 						importsubscriptionlogid, subscriptionid, userid, pusergroupid, status, regdate, expirydate
 					)
@@ -1038,6 +1157,7 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('mandatory', 'expirydate') . "'
 					)
 				");
+
 				if ($Db_object->affected_rows())
 				{
 					return $Db_object->insert_id();
@@ -1083,13 +1203,16 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 
 				$avatar_qry = $Db_object->query("
-					SELECT avatarid FROM " . $tableprefix . "avatar WHERE
-					importavatarid = " . $this->get_value('mandatory','importavatarid')) ;
+					SELECT avatarid
+					FROM " . $tableprefix . "avatar WHERE
+					importavatarid = " . $this->get_value('mandatory', 'importavatarid') . "
+				");
 
-				if ($avatar_info = $Db_object->fetch_array($avatar_qry) )
+				if ($avatar_info = $Db_object->fetch_array($avatar_qry))
 				{
 					if ($avatar_info['avatarid'])
 					{
@@ -1100,73 +1223,84 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				break;
 			}
+
 			default :
 			{
 				return false;
 			}
 		}
 
-		//first we need to save the file.
+		// first we need to save the file.
 		$file_contents = $this->vb_file_get_contents($sourcefile);
+
 		if (!$file_contents)
 		{
-			return "File $sourcefile is either missing, empty, or hidden<br />\n";
+			return 'File ' . $sourcefile . ' is either missing, empty, or hidden<br />\n';
 		}
 
 		if (!$this->vb_file_save_contents($targetfile, $file_contents))
 		{
-			return "The file create/save command failed. Please check the target folder location and permissions.<br />\n";
+			return 'The file create/save command failed. Please check the target folder location and permissions.<br />\n';
 		}
 
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli';
 			{
 				//If we already have a record we'll update it.
-				$sql = "SELECT avatarid FROM " . $tableprefix .
-				"avatar WHERE avatarpath ='" .
-				addslashes($this->get_value('nonmandatory','avatarpath')) . "'";
-				$current_file_qry = $Db_object->query($sql);
+				$current_file_qry = $Db_object->query("
+					SELECT avatarid
+					FROM " . $tableprefix . "avatar
+					WHERE avatarpath = '" . $Db_object->escape_string($this->get_value('nonmandatory', 'avatarpath')) . "'
+				");
 
 				if ($current_file_qry)
 				{
 					$current_data = $Db_object->fetch_array($details_list);
+
 					if ($current_data AND intval($current_data['avatarid']))
 					{
 						$Db_object->query("
 							UPDATE " . $tableprefix . "avatar
-					set title = '" . addslashes($this->get_value('nonmandatory','title')) . "',
-						minimumposts = 0,
-						imagecategoryid = " . $this->get_value('nonmandatory','imagecategoryid')  . ",
-						importavatarid = " .
-						$this->get_value('mandatory','importavatarid')  . "
-						WHERE avatarid = " . $current_data['avatarid']);
+							SET
+								title = '" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+								minimumposts = 0,
+								imagecategoryid = " . $this->get_value('nonmandatory', 'imagecategoryid')  . ",
+								importavatarid = " . $this->get_value('mandatory', 'importavatarid')  . "
+							WHERE avatarid = " . $current_data['avatarid'] . "
+						");
+
 						return $current_data['avatarid'];
 					}
 				}
+
 				$Db_object->query("
 					INSERT INTO " . $tableprefix . "avatar
-				(
-					title,
-					minimumposts,
-					avatarpath,
-					imagecategoryid,
-					displayorder,
-					importavatarid
-				)
-				VALUES
-				(
-					'" . addslashes($this->get_value('nonmandatory','title')) . "',
-					0, '" .
-				addslashes($this->get_value('nonmandatory','avatarpath')) . "',
-					" . $this->get_value('nonmandatory','imagecategoryid')  . ", 1, " .
-				$this->get_value('mandatory','importavatarid')  . ") "
-				);
+						(
+							title,
+							minimumposts,
+							avatarpath,
+							imagecategoryid,
+							displayorder,
+							importavatarid
+						)
+					VALUES
+						(
+							'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+							0,
+							'" . $Db_object->escape_string($this->get_value('nonmandatory', 'avatarpath')) . "',
+							" . $this->get_value('nonmandatory','imagecategoryid')  . ",
+							1,
+							" . $this->get_value('mandatory','importavatarid')  . "
+						)
+				");
 
 				$avatarid = $Db_object->insert_id();
 				return $avatarid;
 			}
-			default :
+
+			default:
 			{
 				return false;
 			}
@@ -1197,17 +1331,22 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (!$vb_thread_id)
 				{
-					$thread_exsists = $Db_object->query("SELECT threadid FROM " . $tableprefix . "thread WHERE importthreadid='". $import_thread_id ."'");
+					$thread_exsists = $Db_object->query("
+						SELECT threadid
+						FROM " . $tableprefix . "thread
+						WHERE importthreadid = '" . $import_thread_id . "'
+					");
 
 					if ($Db_object->num_rows($thread_exsists))
 					{
-						#echo "<h1>'" . $import_thread_id . "'</h1>";
 						$Db_object->query("
-							UPDATE " . $tableprefix . "thread
-							SET pollid = {$vb_poll_id} WHERE importthreadid = {$import_thread_id}
+							UPDATE " . $tableprefix . "thread SET
+								pollid = " . $vb_poll_id . "
+							WHERE importthreadid = " . $import_thread_id . "
 						");
 
 						return true;
@@ -1224,21 +1363,22 @@ class ImpExDatabaseCore extends ImpExFunction
 					{
 						return false;
 					}
+
 					$Db_object->query("
-							UPDATE " . $tableprefix . "thread
-							SET pollid = {$vb_poll_id} WHERE threadid = {$import_thread_id}
-						");
+						UPDATE " . $tableprefix . "thread SET
+							pollid = " . $vb_poll_id . "
+						WHERE threadid = " . $import_thread_id . "
+					");
 
-						// Its not the &import_thread_id its the vB one
-						if ($Db_object->affected_rows())
-						{
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-
+					// Its not the &import_thread_id its the vB one
+					if ($Db_object->affected_rows())
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 			}
 
@@ -1274,38 +1414,37 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// if $vote_option == 0 then it wasn't possiable to get hold of the pollvote.voteoption
 
-				if(!empty($poll_voters_array))
+				if (!empty($poll_voters_array))
 				{
 					foreach ($poll_voters_array AS $vb_user_id => $vote_option)
 					{
-						if(empty($vb_user_id))
+						if (empty($vb_user_id))
 						{
 							continue;
 						}
 
 						if ($vote_option == 0 OR empty($vote_option))
 						{
-							$sql = "
+							$Db_object->query("
 								INSERT INTO " . $tableprefix . "pollvote
 									(pollid, userid)
 								VALUES
-									('$vb_poll_id', '$vb_user_id')
-							";
+									(" . $vb_poll_id . ", " . $vb_user_id . ")
+							");
 						}
 						else
 						{
-							$sql = "
-							INSERT INTO " . $tableprefix . "pollvote
-								(pollid, userid, voteoption)
-							VALUES
-								('$vb_poll_id', '$vb_user_id', '$vote_option')
-							";
+							$Db_object->query("
+								INSERT INTO " . $tableprefix . "pollvote
+									(pollid, userid, voteoption)
+								VALUES
+									(" . $vb_poll_id . ", " . $vb_user_id . ", " . $vote_option . ")
+							");
 						}
-
-						$Db_object->query($sql);
 					}
 					return true;
 				}
@@ -1335,30 +1474,34 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['attachment'] === false))
 				{
-					$there = $Db_object->query_first("SELECT attachmentid FROM {$tableprefix}attachment WHERE importattachmentid=" . intval(trim($this->get_value('mandatory', 'importattachmentid'))));
+					$there = $Db_object->query_first("
+						SELECT attachmentid
+						FROM " . $tableprefix . "attachment
+						WHERE importattachmentid = " . intval(trim($this->get_value('mandatory', 'importattachmentid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-				if($import_post_id)
+				if ($import_post_id)
 				{
-					if($this->get_value('nonmandatory', 'postid'))
+					if ($this->get_value('nonmandatory', 'postid'))
 					{
 						// Get the real post id
 						$post_id = $Db_object->query_first("
 							SELECT postid, threadid, userid
 							FROM " . $tableprefix . "post
-							WHERE
-							importpostid = " . $this->get_value('nonmandatory', 'postid'));
+							WHERE importpostid = " . $this->get_value('nonmandatory', 'postid'));
 
-						if(empty($post_id['postid']))
+						if (empty($post_id['postid']))
 						{
 							// Its not there to be attached through.
 							return false;
@@ -1372,19 +1515,26 @@ class ImpExDatabaseCore extends ImpExFunction
 				}
 				else
 				{
-					$sql ="
-					SELECT userid, postid, threadid
-					FROM " . $tableprefix . "post
-					WHERE postid = " . $this->get_value('nonmandatory', 'postid');
-
-					$post_id = $Db_object->query_first($sql);
+					$Db_object->query_first("
+						SELECT userid, postid, threadid
+						FROM " . $tableprefix . "post
+						WHERE postid = " . $this->get_value('nonmandatory', 'postid') . "
+					");
 				}
 
 				// Update the post attach
-				$Db_object->query("UPDATE " . $tableprefix . "post SET attach = attach+1 WHERE postid = " . $post_id['postid']);
+				$Db_object->query("
+					UPDATE " . $tableprefix . "post SET
+						attach = attach+1
+					WHERE postid = " . $post_id['postid'] . "
+				");
 
 				// Update the thread attach
-				$Db_object->query("UPDATE " . $tableprefix . "thread SET attach = attach+1 WHERE threadid = " . $post_id['threadid']);
+				$Db_object->query("
+					UPDATE " . $tableprefix . "thread SET
+						attach = attach+1
+					WHERE threadid = " . $post_id['threadid'] . "
+				");
 
 
 				// Ok, so now where is it going ......
@@ -1407,7 +1557,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importattachmentid') . "',
-						'" . addslashes($this->get_value('mandatory', 'filename')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'filename')) . "',
 						'',
 						'" . $this->get_value('nonmandatory', 'dateline')  . "',
 						'" . $this->get_value('nonmandatory', 'visible')  . "',
@@ -1427,11 +1577,10 @@ class ImpExDatabaseCore extends ImpExFunction
 					case '0':	// Straight into the dB
 					{
 						$Db_object->query("
-							UPDATE " . $tableprefix . "attachment
-							SET
-							filedata = '" . addslashes($this->get_value('mandatory', 'filedata')) . "',
-							filesize = " . intval($this->get_value('nonmandatory', 'filesize'))  . "
-							WHERE attachmentid = {$attachment_id}
+							UPDATE " . $tableprefix . "attachment SET
+								filedata = '" . $Db_object->escape_string($this->get_value('mandatory', 'filedata')) . "',
+								filesize = " . intval($this->get_value('nonmandatory', 'filesize'))  . "
+							WHERE attachmentid = " . $attachment_id ."
 						");
 
 						return $attachment_id;
@@ -1441,7 +1590,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					{
 						$full_path = $this->fetch_attachment_path($post_id['userid'], $attachpath, false, $attachment_id);
 
-						if($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
+						if ($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
 						{
 							if ($fp = fopen($full_path, 'wb'))
 							{
@@ -1449,13 +1598,12 @@ class ImpExDatabaseCore extends ImpExFunction
 								fclose($fp);
 								$filesize = filesize($full_path);
 
-								if($filesize)
+								if ($filesize)
 								{
 									$Db_object->query("
-										UPDATE " . $tableprefix . "attachment
-										SET
-										filesize = " . intval($this->get_value('nonmandatory', 'filesize'))  . "
-										WHERE attachmentid = {$attachment_id}
+										UPDATE " . $tableprefix . "attachment SET
+											filesize = " . intval($this->get_value('nonmandatory', 'filesize'))  . "
+										WHERE attachmentid = " . $attachment_id . "
 									");
 
 									return $attachment_id;
@@ -1477,13 +1625,12 @@ class ImpExDatabaseCore extends ImpExFunction
 								fclose($fp);
 								$filesize = filesize($full_path);
 
-								if($filesize)
+								if ($filesize)
 								{
 									$Db_object->query("
-										UPDATE " . $tableprefix . "attachment
-										SET
-										filesize = " . $this->get_value('nonmandatory', 'filesize')  . "
-										WHERE attachmentid = {$attachment_id}
+										UPDATE " . $tableprefix . "attachment SET
+											filesize = " . $this->get_value('nonmandatory', 'filesize')  . "
+										WHERE attachmentid = " . $attachment_id . "
 									");
 
 									return $attachment_id;
@@ -1521,12 +1668,11 @@ class ImpExDatabaseCore extends ImpExFunction
 			if ($this->get_value('nonmandatory', 'postid'))
 			{
 				// Get the real blog id
-				$sql = "
+				$blog_id = $Db_object->query_first("
 					SELECT blogid AS contentid, userid
 					FROM " . $tableprefix . "blog
-					WHERE importblogid = " . $this->get_value('nonmandatory', 'postid');
-
-				$blog_id = $Db_object->query_first($sql);
+					WHERE importblogid = " . $this->get_value('nonmandatory', 'postid') . "
+				");
 			}
 			else
 			{
@@ -1535,12 +1681,11 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 		else
 		{
-			$sql = "
+			$blog_id = $Db_object->query_first("
 				SELECT blogid AS contentid, userid
 				FROM " . $tableprefix . "blog
-				WHERE blogid = " . $this->get_value('nonmandatory', 'postid');
-
-			$blog_id = $Db_object->query_first($sql);
+				WHERE blogid = " . $this->get_value('nonmandatory', 'postid') . "
+			");
 		}
 		return $blog_id;
 	}
@@ -1552,11 +1697,11 @@ class ImpExDatabaseCore extends ImpExFunction
 			if ($this->get_value('nonmandatory', 'postid'))
 			{
 				// Get the real article id
-				$sql = "
+				$content = $Db_object->query_first("
 					SELECT nodeid AS contentid, userid
 					FROM " . $tableprefix . "cms_node
-					WHERE importcmsnodeid = " . $this->get_value('nonmandatory', 'postid');
-				$content = $Db_object->query_first($sql);
+					WHERE importcmsnodeid = " . $this->get_value('nonmandatory', 'postid') . "
+				");
 			}
 			else
 			{
@@ -1565,10 +1710,11 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 		else
 		{
-			$sql = "
+			$content = $Db_object->query_first("
 				SELECT nodeid AS contentid, userid
-				WHERE nodeid = " . $this->get_value('nonmandatory', 'postid');
-			$content = $Db_object->query_first($sql);
+				FROM " . $tableprefix . "cms_node
+				WHERE nodeid = " . $this->get_value('nonmandatory', 'postid') . "
+			");
 		}
 		return $content;
 	}
@@ -1580,12 +1726,11 @@ class ImpExDatabaseCore extends ImpExFunction
 			if ($this->get_value('nonmandatory', 'postid'))
 			{
 				// Get the real post id
-				$sql = "
+				$post_id = $Db_object->query_first("
 					SELECT postid AS contentid, userid
-					FROM {$tableprefix}post
-					WHERE importpostid = " . $this->get_value('nonmandatory', 'postid');
-
-				$post_id = $Db_object->query_first($sql);
+					FROM " . $tableprefix . "post
+					WHERE importpostid = " . $this->get_value('nonmandatory', 'postid') . "
+				");
 			}
 			else
 			{
@@ -1594,12 +1739,11 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 		else
 		{
-			$sql = "
+			$post_id = $Db_object->query_first("
 				SELECT postid AS contentid, userid
-				FROM {$tableprefix}post
-				WHERE postid = " . $this->get_value('nonmandatory', 'postid');
-
-			$post_id = $Db_object->query_first($sql);
+				FROM " . $tableprefix . "post
+				WHERE postid = " . $this->get_value('nonmandatory', 'postid') . "
+			");
 		}
 		return $post_id;
 	}
@@ -1609,7 +1753,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 		/*
 		 Flow :
-			1) Get the post if if we don't have it
+			1) Get the post if we don't have it
 			2) Update the attach count on post table
 			3) Find the target location of the data (file system or database), default to database
 			4) Write the data to the store and get the auto_inc id
@@ -1621,39 +1765,66 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch($parenttype)
 		{
 			case 'post':
+			{
 				if (!($content = $this->import_vb4_attachment_post($Db_object, $databasetype, $tableprefix, $import_content_id)))
 				{
 					return false;
 				}
+
 				if (!($contenttypeid = $this->get_contenttypeid($Db_object, $databasetype, $tableprefix, 'vbulletin', 'Post')))
 				{
 					return false;
 				}
-				$Db_object->query("UPDATE " . $tableprefix . "post SET attach = attach + 1 WHERE postid = " . $content['contentid']);
+
+				$Db_object->query("
+					UPDATE " . $tableprefix . "post SET
+						attach = attach + 1
+					WHERE postid = " . $content['contentid'] . "
+				");
+
 				break;
+			}
+
 			case 'blog':
+			{
 				if (!($content = $this->import_vb4_attachment_entry($Db_object, $databasetype, $tableprefix, $import_content_id)))
 				{
 					return false;
 				}
+
 				if (!($contenttypeid = $this->get_contenttypeid($Db_object, $databasetype, $tableprefix, 'vbblog', 'BlogEntry')))
 				{
 					return false;
 				}
-				$Db_object->query("UPDATE " . $tableprefix . "blog SET attach = attach + 1 WHERE blogid = " . $content['contentid']);
+
+				$Db_object->query("
+					UPDATE " . $tableprefix . "blog SET
+						attach = attach + 1
+					WHERE blogid = " . $content['contentid'] . "
+				");
+
 				break;
+			}
+
 			case 'cms':
+			{
 				if (!($content = $this->import_vb4_attachment_article($Db_object, $databasetype, $tableprefix, $import_content_id)))
 				{
 					return false;
 				}
+
 				if (!($contenttypeid = $this->get_contenttypeid($Db_object, $databasetype, $tableprefix, 'vbcms', 'Article')))
 				{
 					return false;
 				}
+
 				break;
+			}
+
 			default:
+			{
 				return false;
+			}
 		}
 
 		// Ok, so now where is it going ......
@@ -1662,8 +1833,6 @@ class ImpExDatabaseCore extends ImpExFunction
 
 		$extension = $this->get_value('mandatory', 'filename');
 		$extension = substr($extension, strpos($extension, '.') + 1);
-
-		#echo "attach file " . intval($attachfile);
 
 		// Put something into the filedata table and get the auto_inc #
 		// Check if filedata exists first
@@ -1677,29 +1846,29 @@ class ImpExDatabaseCore extends ImpExFunction
 			$filesize = strlen($filedata);
 		}
 
-		$sql = "
+		$result = $Db_object->query_first("
 			SELECT filedataid
-			FROM {$tableprefix}filedata
-			WHERE
-				filehash = '" . addslashes($filehash) . "'
-					AND
-				userid = '" . intval($content['userid']) . "'
-		";
-		$result = $Db_object->query_first($sql);
+			FROM " . $tableprefix . "filedata
+			WHERE filehash = '" . $Db_object->escape_string($filehash) . "'
+				AND userid = '" . intval($content['userid']) . "'
+		");
+
 		$filedataid = $result ? $result['filedataid'] : 0;
+
 		if ($filedataid)
 		{
 			$Db_object->query("
-				UPDATE {$tableprefix}filedata
-				SET refcount = refcount + 1
-				WHERE filedataid = {$filedataid}
+				UPDATE " . $tableprefix . "filedata SET
+					refcount = refcount + 1
+				WHERE filedataid = " . $filedataid . "
 			");
+
 			$insert = false;
 		}
 		else
 		{
-			$sql = "
-				INSERT INTO {$tableprefix}filedata
+			$Db_object->query("
+				INSERT INTO " . $tableprefix . "filedata
 				(
 					importfiledataid,
 					userid,
@@ -1719,15 +1888,14 @@ class ImpExDatabaseCore extends ImpExFunction
 					" . @time() . ",
 					" . @time() . ",
 					" . intval($filesize) . ",
-					'" . addslashes($filehash) . "',
-					'" . addslashes($extension) . "',
+					'" . $Db_object->escape_string($filehash) . "',
+					'" . $Db_object->escape_string($extension) . "',
 					" . intval($this->get_value('nonmandatory', 'height')) . ",
 					" . intval($this->get_value('nonmandatory', 'width')) . ",
 					1
 				)
-			";
+			");
 
-			$Db_object->query($sql);
 			$insert = true;
 			$filedataid = $Db_object->insert_id();
 		}
@@ -1738,13 +1906,11 @@ class ImpExDatabaseCore extends ImpExFunction
 			{
 				case '0':	// Straight into the dB
 				{
-					$sql = "
-						UPDATE {$tableprefix}filedata
-						SET filedata = '" . addslashes($this->get_value('mandatory', 'filedata')) . "'
+					$Db_object->query("
+						UPDATE " . $tableprefix . "filedata SET
+							filedata = '" . $Db_object->escape_string($this->get_value('mandatory', 'filedata')) . "'
 						WHERE filedataid = $filedataid
-					";
-
-					$Db_object->query($sql);
+					");
 
 					break;
 				}
@@ -1753,7 +1919,7 @@ class ImpExDatabaseCore extends ImpExFunction
 				{
 					$full_path = $this->fetch_attachment_path($content['userid'], $attachpath, false, $filedataid);
 
-					if($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
+					if ($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
 					{
 						if ($fp = fopen($full_path, 'wb'))
 						{
@@ -1773,7 +1939,7 @@ class ImpExDatabaseCore extends ImpExFunction
 				{
 					$full_path = $this->fetch_attachment_path($content['userid'], $attachpath, true, $filedataid);
 
-					if($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
+					if ($this->vbmkdir(substr($full_path, 0, strrpos($full_path, '/'))))
 					{
 						if ($fp = fopen($full_path, 'wb'))
 						{
@@ -1810,11 +1976,8 @@ class ImpExDatabaseCore extends ImpExFunction
 		*/
 
 		$caption = $this->get_value('nonmandatory', 'caption') ? $this->get_value('nonmandatory', 'caption') : $this->get_value('mandatory', 'filename');
-		if (
-				$this->get_value('nonmandatory', 'visible') == 'visible'
-					OR
-				$this->get_value('nonmandatory', 'visible') == 'moderation'
-		)
+
+		if ($this->get_value('nonmandatory', 'visible') == 'visible' OR $this->get_value('nonmandatory', 'visible') == 'moderation')
 		{
 			$state = $this->get_value('nonmandatory', 'visible');
 		}
@@ -1843,17 +2006,17 @@ class ImpExDatabaseCore extends ImpExFunction
 			VALUES
 			(
 				'" . $this->get_value('mandatory', 'importattachmentid') . "',
-				'" . addslashes($this->get_value('mandatory', 'filename')) . "',
+				'" . $Db_object->escape_string($this->get_value('mandatory', 'filename')) . "',
 				'" . intval($content['userid']) . "',
 				'" . $this->get_value('nonmandatory', 'dateline')  . "',
 				'" . $this->get_value('nonmandatory', 'counter')  . "',
 				0,
-				'" . addslashes($caption) . "',
+				'" . $Db_object->escape_string($caption) . "',
 				'" . $state . "',
 				" . intval($content['contentid'])  . ",
 				" . $filedataid . ",
-				$contenttypeid,
-				'" . addslashes($this->get_value('nonmandatory', 'settings')) . "',
+				" . $contenttypeid . ",
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'settings')) . "',
 				" . intval($this->get_value('nonmandatory', 'displayorder')) . "
 			)
 		");
@@ -1871,22 +2034,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		$search = array(
 			'#\[attach(=right|=left|=config)?\](' . $importattachmentid . ')\[/attach\]#i'
 		);
+
 		$replace = array(
 			'[ATTACH\\1]' . $attachmentid . '[/ATTACH]',
 		);
 
-	/*	echo_array($search);
-		echo_array($replace);
-		echo $text;
-	*/
-
 		$text = preg_replace($search, $replace, $text);
 
-	/*
-		echo '<hr />';
-		echo $text;
-		echo  '<hr /><hr />';
-	 */
 		return $text;
 	}
 
@@ -1900,85 +2054,203 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($parenttype)
 		{
 			case 'post':
+			{
 				$post = $this->fetch_content_attach_post($Db_object, $databasetype, $tableprefix, $contentid);
 				$pagetext = $this->replace_attach_text($post['pagetext'], $attachmentid, $importattachmentid);
 				$this->write_content_attach_post($Db_object, $databasetype, $tableprefix, $contentid, $pagetext);
 				break;
+			}
+
 			case 'cms':
+			{
 				$article = $this->fetch_content_attach_cms($Db_object, $databasetype, $tableprefix, $contentid, $contenttypeid);
 				$pagetext = $this->replace_attach_text($article['pagetext'], $attachmentid, $importattachmentid);
 				$previewtext = $this->replace_attach_text($article['pagetext'], $attachmentid, $importattachmentid);
 				$this->write_content_attach_cms($Db_object, $databasetype, $tableprefix, $article['contentid'], $pagetext, $previewtext);
 				break;
+			}
+
 			case 'blog':
+			{
 				$blog = $this->fetch_content_attach_blog($Db_object, $databasetype, $tableprefix, $contentid);
 				$pagetext = $this->replace_attach_text($blog['pagetext'], $attachmentid, $importattachmentid);
 				$this->write_content_attach_blog($Db_object, $databasetype, $tableprefix, $blog['blogtextid'], $pagetext);
 				break;
+			}
 		}
 	}
 
 	function write_content_attach_post(&$Db_object, &$databasetype, &$tableprefix, $postid, $pagetext)
 	{
-		$Db_object->query("
-			UPDATE {$tableprefix}post
-			SET pagetext = '" . addslashes($pagetext) . "'
-			WHERE postid = " . intval($postid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$Db_object->query("
+					UPDATE " . $tableprefix . "post SET
+						pagetext = '" . $Db_object->escape_string($pagetext) . "'
+					WHERE postid = " . intval($postid) . "
+				");
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	function fetch_content_attach_post(&$Db_object, &$databasetype, &$tableprefix, $postid)
 	{
-		$post = $Db_object->query_first("
-			SELECT pagetext
-			FROM {$tableprefix}post
-			WHERE postid = " . intval($postid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$post = $Db_object->query_first("
+					SELECT pagetext
+					FROM " . $tableprefix . "post
+					WHERE postid = " . intval($postid) . "
+				");
+			}
 
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 		return $post;
 	}
 
 	function write_content_attach_cms(&$Db_object, &$databasetype, &$tableprefix, $contentid, $pagetext, $previewtext)
 	{
-		$Db_object->query("
-			UPDATE {$tableprefix}cms_article
-			SET pagetext = '" . addslashes($pagetext) . "',
-				previewtext = '" . addslashes($previewtext) . "'
-			WHERE contentid = " . intval($contentid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$Db_object->query("
+					UPDATE " . $tableprefix . "cms_article SET
+						pagetext = '" . $Db_object->escape_string($pagetext) . "',
+						previewtext = '" . $Db_object->escape_string($previewtext) . "'
+					WHERE contentid = " . intval($contentid) . "
+				");
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	function fetch_content_attach_cms(&$Db_object, &$databasetype, &$tableprefix, $contentid, $contenttypeid)
 	{
-		$article = $Db_object->query_first("
-			SELECT a.contentid, a.pagetext, a.previewtext
-			FROM {$tableprefix}cms_node AS n
-			INNER JOIN {$tableprefix}cms_article AS a ON (a.contentid = n.contentid)
-			WHERE nodeid = " . intval($contentid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$article = $Db_object->query_first("
+					SELECT a.contentid, a.pagetext, a.previewtext
+					FROM " . $tableprefix . "cms_node AS n
+						INNER JOIN " . $tableprefix . "cms_article AS a ON (a.contentid = n.contentid)
+					WHERE nodeid = " . intval($contentid) . "
+				");
+			}
 
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 		return $article;
 	}
 
 	function write_content_attach_blog(&$Db_object, &$databasetype, &$tableprefix, $blogtextid, $pagetext)
 	{
-		$Db_object->query("
-			UPDATE {$tableprefix}blog_text
-			SET pagetext = '" . addslashes($pagetext) . "'
-			WHERE blogtextid = " . intval($blogtextid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$Db_object->query("
+					UPDATE " . $tableprefix . "blog_text SET
+						pagetext = '" . $Db_object->escape_string($pagetext) . "'
+					WHERE blogtextid = " . intval($blogtextid) . "
+				");
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	function fetch_content_attach_blog(&$Db_object, &$databasetype, &$tableprefix, $blogid)
 	{
-		$blog = $Db_object->query_first("
-			SELECT bt.pagetext, bt.blogtextid
-			FROM {$tableprefix}blog AS b
-			INNER JOIN {$tableprefix}blog_text AS bt ON (b.firstblogtextid = bt.blogtextid)
-			WHERE
-				b.blogid = " . intval($blogid) . "
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$blog = $Db_object->query_first("
+					SELECT bt.pagetext, bt.blogtextid
+					FROM " . $tableprefix . "blog AS b
+						INNER JOIN " . $tableprefix . "blog_text AS bt ON (b.firstblogtextid = bt.blogtextid)
+					WHERE b.blogid = " . intval($blogid) . "
+				");
+			}
 
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 		return $blog;
 	}
 
@@ -1996,13 +2268,18 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli';
 			{
 			// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['usergroup'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importusergroupid FROM {$tableprefix}usergroup WHERE importusergroupid=" . intval(trim($this->get_value('mandatory', 'importusergroupid'))));
+					$there = $Db_object->query_first("
+						SELECT importusergroupid
+						FROM " . $tableprefix . "usergroup
+						WHERE importusergroupid = " . intval(trim($this->get_value('mandatory', 'importusergroupid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -2024,33 +2301,34 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importusergroupid') . "',
-						'" . addslashes($this->get_value('nonmandatory','title')) . "',
-						'" . addslashes($this->get_value('nonmandatory','description')) . "',
-						'" . addslashes($this->get_value('nonmandatory','usertitle')) . "',
-						'" . $this->get_value('nonmandatory','passwordexpires') . "',
-						'" . $this->get_value('nonmandatory','passwordhistory') . "',
-						'" . $this->get_value('nonmandatory','pmquota') . "',
-						'" . $this->get_value('nonmandatory','pmsendmax') . "',
-						'" . addslashes($this->get_value('nonmandatory','opentag')) . "',
-						'" . addslashes($this->get_value('nonmandatory','closetag')) . "',
-						'" . $this->get_value('nonmandatory','canoverride') . "',
-						'" . $this->get_value('nonmandatory','ispublicgroup') . "',
-						'" . $this->get_value('nonmandatory','forumpermissions') . "',
-						'" . $this->get_value('nonmandatory','pmpermissions') . "',
-						'" . $this->get_value('nonmandatory','calendarpermissions') . "',
-						'" . $this->get_value('nonmandatory','wolpermissions') . "',
-						'" . $this->get_value('nonmandatory','adminpermissions') . "',
-						'" . $this->get_value('nonmandatory','genericpermissions') . "',
-						'" . $this->get_value('nonmandatory','genericoptions') . "',
-						'" . $this->get_value('nonmandatory','attachlimit') . "',
-						'" . $this->get_value('nonmandatory','avatarmaxwidth') . "',
-						'" . $this->get_value('nonmandatory','avatarmaxheight') . "',
-						'" . $this->get_value('nonmandatory','avatarmaxsize') . "',
-						'" . $this->get_value('nonmandatory','profilepicmaxwidth') . "',
-						'" . $this->get_value('nonmandatory','profilepicmaxheight') . "',
-						'" . $this->get_value('nonmandatory','profilepicmaxsize') . "'
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'usertitle')) . "',
+						'" . $this->get_value('nonmandatory', 'passwordexpires') . "',
+						'" . $this->get_value('nonmandatory', 'passwordhistory') . "',
+						'" . $this->get_value('nonmandatory', 'pmquota') . "',
+						'" . $this->get_value('nonmandatory', 'pmsendmax') . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'opentag')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'closetag')) . "',
+						'" . $this->get_value('nonmandatory', 'canoverride') . "',
+						'" . $this->get_value('nonmandatory', 'ispublicgroup') . "',
+						'" . $this->get_value('nonmandatory', 'forumpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'pmpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'calendarpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'wolpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'adminpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'genericpermissions') . "',
+						'" . $this->get_value('nonmandatory', 'genericoptions') . "',
+						'" . $this->get_value('nonmandatory', 'attachlimit') . "',
+						'" . $this->get_value('nonmandatory', 'avatarmaxwidth') . "',
+						'" . $this->get_value('nonmandatory', 'avatarmaxheight') . "',
+						'" . $this->get_value('nonmandatory', 'avatarmaxsize') . "',
+						'" . $this->get_value('nonmandatory', 'profilepicmaxwidth') . "',
+						'" . $this->get_value('nonmandatory', 'profilepicmaxheight') . "',
+						'" . $this->get_value('nonmandatory', 'profilepicmaxsize') . "'
 					)
 				");
+
 				if ($Db_object->affected_rows())
 				{
 					return $Db_object->insert_id();
@@ -2090,13 +2368,18 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['pmtext'] === false))
 				{
-					$there = $Db_object->query_first("SELECT pmtextid FROM {$tableprefix}pmtext WHERE importpmid=" . trim($this->get_value('mandatory', 'importpmid')));
+					$there = $Db_object->query_first("
+						SELECT pmtextid
+						FROM " . $tableprefix . "pmtext
+						WHERE importpmid = " . trim($this->get_value('mandatory', 'importpmid')) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -2113,10 +2396,10 @@ class ImpExDatabaseCore extends ImpExFunction
 					(
 						'" . $this->get_value('mandatory', 'importpmid') . "',
 						'" . $this->get_value('mandatory', 'fromuserid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
-						'" . addslashes($this->get_value('mandatory', 'message')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'message')) . "',
 						'" . $this->get_value('mandatory', 'touserarray') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'fromusername')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'fromusername')) . "',
 						'" . $this->get_value('nonmandatory', 'iconid') . "',
 						'" . $this->get_value('nonmandatory', 'dateline') . "',
 						'" . $this->get_value('nonmandatory', 'showsignature') . "',
@@ -2164,21 +2447,26 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				/*
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['pm'] === false))
 				{
-					$there = $Db_object->query_first("SELECT pmid FROM {$tableprefix}pm WHERE importpmid=" . intval(trim($this->get_value('mandatory', 'importpmid'))));
+					$there = $Db_object->query_first("
+						SELECT pmid
+						FROM " . $tableprefix . "pm
+						WHERE importpmid = " . intval(trim($this->get_value('mandatory', 'importpmid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 				*/
 
-				if(!$this->get_value('mandatory', 'importpmid') OR $this->get_value('mandatory', 'importpmid') == '!##NULL##!')
+				if (!$this->get_value('mandatory', 'importpmid') OR $this->get_value('mandatory', 'importpmid') == '!##NULL##!')
 				{
 					$importpmid = 1;
 				}
@@ -2266,17 +2554,23 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['avatar'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importavatarid FROM {$tableprefix}avatar WHERE importavatarid=" . intval(trim($this->get_value('mandatory', 'importavatarid'))));
+					$there = $Db_object->query_first("
+						SELECT importavatarid
+						FROM " . $tableprefix . "avatar
+						WHERE importavatarid = " . intval(trim($this->get_value('mandatory', 'importavatarid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
+
 				$Db_object->query("
 					INSERT INTO " . $tableprefix . "avatar
 					(
@@ -2285,7 +2579,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importavatarid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
 						'" . $this->get_value('nonmandatory', 'minimumposts') . "',
 						'" . $this->get_value('nonmandatory', 'avatarpath') . "',
 						'" . $this->get_value('nonmandatory', 'imagecategoryid') . "',
@@ -2332,38 +2626,42 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['customavatar'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importcustomavatarid FROM {$tableprefix}customavatar WHERE importcustomavatarid=" . intval(trim($this->get_value('mandatory', 'importcustomavatarid'))));
+					$there = $Db_object->query_first("
+						SELECT importcustomavatarid
+						FROM " . $tableprefix . "customavatar
+						WHERE importcustomavatarid = " . intval(trim($this->get_value('mandatory', 'importcustomavatarid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
-				#$size = getimagesize($this->get_value('nonmandatory', 'filedata'));
 
-				if(!$width = $this->get_value('nonmandatory', 'width'))
+				if (!$width = $this->get_value('nonmandatory', 'width'))
 				{
 					$width = 80;
 				}
 
-				if(!$height = $this->get_value('nonmandatory', 'height'))
+				if (!$height = $this->get_value('nonmandatory', 'height'))
 				{
 					$height = 80;
 				}
 
-				if(!$file_sz = $this->get_value('nonmandatory', 'filesize'))
+				if (!$file_sz = $this->get_value('nonmandatory', 'filesize'))
 				{
-					if(!$file_sz = @filesize($this->get_value('nonmandatory', 'filedata')))
+					if (!$file_sz = @filesize($this->get_value('nonmandatory', 'filedata')))
 					{
 						$file_sz = 0;
 					}
 				}
 
-				$sql ="
+				if ($Db_object->query("
 					REPLACE INTO " . $tableprefix . "customavatar
 					(
 						importcustomavatarid, userid, filedata, dateline, filename, visible, filesize, width, height
@@ -2374,15 +2672,13 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('nonmandatory', 'userid') . "',
 						'" . $this->get_value('nonmandatory', 'filedata') . "',
 						'" . $this->get_value('nonmandatory', 'dateline') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'filename')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'filename')) . "',
 						'" . $this->get_value('nonmandatory', 'visible') . "',
 						'" . $file_sz . "',
 						'" . $width . "',
 						'" . $height . "'
 					)
-				";
-
-				if ($Db_object->query($sql))
+				"))
 				{
 					return true;
 				}
@@ -2430,14 +2726,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				if ($Db_object->query_first("SELECT userid FROM {$tableprefix}usertextfield WHERE userid=" . $user['userid']))
+				if ($Db_object->query_first("
+					SELECT userid
+					FROM " . $tableprefix . "usertextfield
+					WHERE userid = " . $user['userid']) . "
+				")
 				{
 					// The user is there
 				}
 				else
 				{
-					$Db_object->query("INSERT INTO " . $tableprefix ."usertextfield (userid) VALUES ('$user[userid]')");
+					$Db_object->query("
+						INSERT INTO " . $tableprefix . "usertextfield
+							(userid)
+						VALUES
+							(" . $user['userid'] . ")
+					");
+
 					if ($Db_object->affected_rows())
 					{
 						// It went in
@@ -2453,17 +2760,22 @@ class ImpExDatabaseCore extends ImpExFunction
 				// add to buddy list
 				if ($user['buddylist'] != '')
 				{
-					$sql[] = "buddylist = IF(buddylist IS NULL, LTRIM('$user[buddylist]'),CONCAT(buddylist, ' $user[buddylist]'))";
+					$sql[] = "buddylist = IF(buddylist IS NULL, LTRIM('" . $user['buddylist'] . "'),CONCAT(buddylist, ' " . $user['buddylist'] . "'))";
 				}
+
 				// add to ignore list
 				if ($user['ignorelist'] != '')
 				{
-					$sql[] = "ignorelist = IF(ignorelist IS NULL, LTRIM('$user[ignorelist]'), CONCAT(ignorelist, ' $user[ignorelist]'))";
+					$sql[] = "ignorelist = IF(ignorelist IS NULL, LTRIM('" . $user['ignorelist'] . "'), CONCAT(ignorelist, ' " . $user['ignorelist'] . "'))";
 				}
 
 				if (!empty($sql))
 				{
-					$Db_object->query("UPDATE " . $tableprefix . "usertextfield SET " . implode(', ', $sql) . " WHERE userid = '$user[userid]'");
+					$Db_object->query("
+						UPDATE " . $tableprefix . "usertextfield SET
+							" . implode(', ', $sql) . "
+						WHERE userid = " . $user['userid'] . "
+					");
 
 					return ($Db_object->affected_rows() > 0);
 				}
@@ -2508,6 +2820,7 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$sql = '';
 				$internal_list = '';
@@ -2521,9 +2834,28 @@ class ImpExDatabaseCore extends ImpExFunction
 							$internal_list .= $data . " ";
 						}
 						// For datastore opposed to setting table if it ever gets used
-						// $sql = "UPDATE " . $tableprefix . "settings SET value=CONCAT(value,' " . $list . "') WHERE varname='banemail'";
+						/*$Db_object->query("
+							UPDATE " . $tableprefix . "settings SET
+								value = CONCAT(value, ' " . $list . "')
+							WHERE varname = 'banemail'"
+						);*/
 
-						$sql = "UPDATE " . $tableprefix . "datastore SET data = CONCAT(data, '$internal_list') WHERE title = 'banemail'";
+						$Db_object->query("
+							UPDATE " . $tableprefix . "datastore SET
+								data = CONCAT(data, '" . $internal_list . "')
+							WHERE title = 'banemail'
+						");
+
+						$affected_rows = $Db_object->affected_rows();
+
+						if ($affected_rows)
+						{
+							return $affected_rows;
+						}
+						else
+						{
+							return false;
+						}
 					}
 					break;
 
@@ -2531,12 +2863,32 @@ class ImpExDatabaseCore extends ImpExFunction
 					{
 						$list = implode(' ', $list);
 
-						if($list)
+						if ($list)
 						{
-							$current = $Db_object->query_first("SELECT value FROM {$tableprefix}setting WHERE varname='banip'");
+							$current = $Db_object->query_first("
+								SELECT value
+								FROM " . $tableprefix . "setting
+								WHERE varname = 'banip'
+							");
+
 							$new_list = $current['value'] . " {$list}";
 
-							$sql = "UPDATE {$tableprefix}setting SET value='{$new_list}' WHERE varname = 'banip'";
+							$Db_object->query("
+								UPDATE " . $tableprefix . "setting SET
+									value='" . $new_list . "'
+									WHERE varname = 'banip'
+							");
+
+							$affected_rows = $Db_object->affected_rows();
+
+							if ($affected_rows)
+							{
+								return $affected_rows;
+							}
+							else
+							{
+								return false;
+							}
 						}
 					}
 					break;
@@ -2548,7 +2900,12 @@ class ImpExDatabaseCore extends ImpExFunction
 						{
 							if (is_string($vb_user_name))
 							{
-								$banned_userid = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "user WHERE username = '$vb_user_name'");
+								$banned_userid = $Db_object->query_first("
+									SELECT userid
+									FROM " . $tableprefix . "user
+									WHERE username = '" . $vb_user_name . "'
+								");
+
 								$user_id_list[] = $banned_userid['userid'];
 							}
 						}
@@ -2559,15 +2916,23 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					case 'userid':
 					{
-						$banned_group_id = $Db_object->query_first("SELECT usergroupid FROM " . $tableprefix . "usergroup WHERE title= 'Banned Users'");
+						$banned_group_id = $Db_object->query_first("
+							SELECT usergroupid
+							FROM " . $tableprefix . "usergroup
+							WHERE title = 'Banned Users'
+						");
 
-						if($banned_group_id['usergroupid'] != null)
+						if ($banned_group_id['usergroupid'] != null)
 						{
-							foreach($list as $key => $banned_user_id)
+							foreach($list AS $key => $banned_user_id)
 							{
 								if (is_numeric($banned_user_id))
 								{
-									$Db_object->query("UPDATE {$tableprefix}user SET usergroupid = " . $banned_group_id['usergroupid'] . " WHERE userid={$banned_user_id}");
+									$Db_object->query("
+										UPDATE " . $tableprefix . "user SET
+											usergroupid = " . $banned_group_id['usergroupid'] . "
+										WHERE userid = " . $banned_user_id . "
+									");
 								}
 							}
 						}
@@ -2579,16 +2944,6 @@ class ImpExDatabaseCore extends ImpExFunction
 					{
 						return false;
 					}
-				}
-
-				if ($sql)
-				{
-					$Db_object->query($sql);
-					return ($Db_object->affected_rows());
-				}
-				else
-				{
-					return false;
 				}
 			}
 
@@ -2622,21 +2977,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['post'] === false))
 				{
-					$there = $Db_object->query_first("SELECT postid FROM {$tableprefix}post
-						WHERE importpostid=" . intval(trim($this->get_value('nonmandatory', 'importpostid'))) . "
-						AND importthreadid=" . intval(trim($this->get_value('mandatory', 'importthreadid'))));
+					$there = $Db_object->query_first("
+						SELECT postid
+						FROM " . $tableprefix . "post
+						WHERE importpostid = " . intval(trim($this->get_value('nonmandatory', 'importpostid'))) . "
+							AND importthreadid = " . intval(trim($this->get_value('mandatory', 'importthreadid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-				$sql = "
+				$Db_object->query("
 					INSERT INTO " . $tableprefix . "post
 					(
 						threadid, userid, importthreadid,
@@ -2651,20 +3010,20 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('mandatory', 'userid') . "',
 						'" . $this->get_value('mandatory', 'importthreadid') . "',
 						'" . $this->get_value('nonmandatory', 'parentid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'username')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'username')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
 						'" . $this->get_value('nonmandatory', 'dateline') . "',
-						'".  addslashes($this->get_value('nonmandatory', 'pagetext')) . "',
+						'".  $Db_object->escape_string($this->get_value('nonmandatory', 'pagetext')) . "',
 						'" . $this->get_value('nonmandatory', 'allowsmilie') . "',
 						'" . $this->get_value('nonmandatory', 'showsignature') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'ipaddress')) /* some hack that allows text ...sigh.... */ . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'ipaddress')) . "',
 						'" . $this->get_value('nonmandatory', 'iconid') . "',
 						'" . $this->get_value('nonmandatory', 'visible') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'attach')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'attach')) . "',
 						'" . $this->get_value('nonmandatory', 'importpostid') . "'
 					)
-				";
-				$Db_object->query($sql);
+				");
+
 				$post_id = $Db_object->insert_id();
 
 				return $post_id;
@@ -2700,13 +3059,18 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['user'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importuserid FROM {$tableprefix}user WHERE importuserid=" . intval(trim($this->get_value('mandatory', 'importuserid'))));
+					$there = $Db_object->query_first("
+						SELECT importuserid
+						FROM " . $tableprefix . "user
+						WHERE importuserid = " . intval(trim($this->get_value('mandatory', 'importuserid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -2718,17 +3082,25 @@ class ImpExDatabaseCore extends ImpExFunction
 					// Do a search for the email address to find the user to match this imported one to :
 					if (emailcasesensitive)
 					{
-						$email_match = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "user WHERE email='". addslashes($this->get_value('mandatory', 'email')) . "'");
+						$email_match = $Db_object->query_first("
+							SELECT userid
+							FROM " . $tableprefix . "user
+							WHERE email = '". $Db_object->escape_string($this->get_value('mandatory', 'email')) . "'
+						");
 					}
 					else
 					{
-						$email_match = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "user WHERE UPPER(email)='". strtoupper(addslashes($this->get_value('mandatory', 'email'))) . "'");
+						$email_match = $Db_object->query_first("
+							SELECT userid
+							FROM " . $tableprefix . "user
+							WHERE UPPER(email) = '" . strtoupper($Db_object->escape_string($this->get_value('mandatory', 'email'))) . "'
+						");
 					}
 
 					if ($email_match)
 					{
 
-						if($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $email_match["userid"]))
+						if ($this->associate_user($Db_object, $databasetype, $tableprefix, $this->get_value('mandatory', 'importuserid'), $email_match["userid"]))
 						{
 							// We matched the email address and associated propperly
 							$result['automerge'] = true;
@@ -2759,21 +3131,24 @@ class ImpExDatabaseCore extends ImpExFunction
 				}
 
 				// Link the admins
-				if(strtolower($this->get_value('mandatory', 'username')) == 'admin')
+				if (strtolower($this->get_value('mandatory', 'username')) == 'admin')
 				{
 					$this->set_value('mandatory', 'username', 'imported_admin');
 				}
 
 				// If there is a dupe username pre_pend "imported_" have escape_
-
 				$name = $this->get_value('mandatory', 'username');
 
 				$do_me = array("_" => "\_");
 				$name = str_replace(array_keys($do_me), $do_me, $name);
 
-				$double_name = $Db_object->query("SELECT username FROM " . $tableprefix . "user WHERE username = '". addslashes($name) . "'");
+				$double_name = $Db_object->query("
+					SELECT username
+					FROM " . $tableprefix . "user
+					WHERE username = '". $Db_object->escape_string($name) . "'
+				");
 
-				if($Db_object->num_rows($double_name))
+				if ($Db_object->num_rows($double_name))
 				{
 					$this->set_value('mandatory', 'username', 'imported_' . $this->get_value('mandatory', 'username'));
 				}
@@ -2801,27 +3176,27 @@ class ImpExDatabaseCore extends ImpExFunction
 					)
 					VALUES
 					(
-						'" . addslashes(htmlspecialchars($this->get_value('mandatory', 'username'))) . "',
-						'" . addslashes($this->get_value('mandatory', 'email')) . "',
+						'" . $Db_object->escape_string(htmlspecialchars($this->get_value('mandatory', 'username'))) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'email')) . "',
 						'" . $this->get_value('mandatory', 'usergroupid') . "',
 						'" . $this->get_value('mandatory', 'importuserid') . "',
 						'" . $newpassword . "',
-						'" . addslashes($salt) . "',
+						'" . $Db_object->escape_string($salt) . "',
 						NOW(),
 						'" . $this->get_value('nonmandatory', 'options') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'homepage')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'homepage')) . "',
 						'" . $this->get_value('nonmandatory', 'posts') . "',
 						'" . $this->get_value('nonmandatory', 'joindate') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'icq')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'icq')) . "',
 						'" . $this->get_value('nonmandatory', 'daysprune') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'aim')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'aim')) . "',
 						'" . $this->get_value('nonmandatory', 'membergroupids') . "',
 						'" . $this->get_value('nonmandatory', 'displaygroupid') . "',
 						'" . $this->get_value('nonmandatory', 'styleid') . "',
 						'" . $this->get_value('nonmandatory', 'parentemail') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'yahoo')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'yahoo')) . "',
 						'" . $this->get_value('nonmandatory', 'showvbcode') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'usertitle')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'usertitle')) . "',
 						" . intval($this->get_value('nonmandatory', 'customtitle')) . ",
 						'" . $this->get_value('nonmandatory', 'lastvisit') . "',
 						'" . $this->get_value('nonmandatory', 'lastactivity') . "',
@@ -2839,8 +3214,8 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('nonmandatory', 'ipaddress') . "',
 						'" . $this->get_value('nonmandatory', 'referrerid') . "',
 						'" . $this->get_value('nonmandatory', 'languageid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'msn')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'emailstamp')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'msn')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'emailstamp')) . "',
 						'" . $this->get_value('nonmandatory', 'threadedmode') . "',
 						'" . $this->get_value('nonmandatory', 'pmtotal') . "',
 						'" . $this->get_value('nonmandatory', 'pmunread') . "',
@@ -2854,17 +3229,31 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				if ($userdone)
 				{
-					$exists = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "usertextfield WHERE userid = $userid");
+					$exists = $Db_object->query_first("
+						SELECT userid
+						FROM " . $tableprefix . "usertextfield
+						WHERE userid = " . $userid . "
+					");
 
 					if (!$exists)
 					{
-						if (!$Db_object->query("INSERT INTO " . $tableprefix . "usertextfield (userid) VALUES ($userid)"))
+						if (!$Db_object->query("
+							INSERT INTO " . $tableprefix . "usertextfield
+								(userid)
+							VALUES
+								(" . $userid . ")
+						"))
 						{
 							$this->_failedon = "usertextfield fill";
 							return false;
 						}
 
-						if (!$Db_object->query("INSERT INTO " . $tableprefix . "userfield (userid) VALUES ($userid)"))
+						if (!$Db_object->query("
+							INSERT INTO " . $tableprefix . "userfield
+								(userid)
+							VALUES
+								(" . $userid . ")
+						"))
 						{
 							$this->_failedon = "userfield fill";
 							return false;
@@ -2873,7 +3262,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if ($this->_has_custom_types)
 					{
-						foreach ($this->get_custom_values() as $key => $value)
+						foreach ($this->get_custom_values() AS $key => $value)
 						{
 							if (!$this->import_user_field_value($Db_object, $databasetype, $tableprefix, $key, $value, $userid))
 							{
@@ -2891,7 +3280,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if ($this->_has_default_values)
 					{
-						foreach ($this->get_default_values() as  $key => $value)
+						foreach ($this->get_default_values() AS $key => $value)
 						{
 							if ($key != 'signature')
 							{
@@ -2905,7 +3294,11 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if (array_key_exists('signature',$this->_default_values))
 					{
-						if (!$Db_object->query("UPDATE " . $tableprefix . "usertextfield SET signature='" . addslashes($this->_default_values['signature']) . "' WHERE userid='" . $userid ."'"))
+						if (!$Db_object->query("
+							UPDATE " . $tableprefix . "usertextfield SET
+								signature = '" . $Db_object->escape_string($this->_default_values['signature']) . "'
+							WHERE userid = '" . $userid ."'
+						"))
 						{
 							$this->_failedon = "usertextfield SET signature";
 							return false;
@@ -2914,17 +3307,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					if ($this->get_value('nonmandatory', 'usernote') != NULL)
 					{
-						$sql = "
+						$Db_object->query("
 							INSERT INTO	" . $tableprefix . "usernote
-							(
-								userid, posterid, username, dateline, message, title, allowsmilies, importusernoteid
-							)
+								(userid, posterid, username, dateline, message, title, allowsmilies, importusernoteid)
 							VALUES
-							(
-								{$userid}, 0, '', " . time() . ", '" . addslashes($this->get_value('nonmandatory', 'usernote')) . "', 'Imported Note', 0, 1
-							)
-							";
-						$Db_object->query($sql);
+								(" . $userid . ", 0, '', " . time() . ", '" . $Db_object->escape_string($this->get_value('nonmandatory', 'usernote')) . "', 'Imported Note', 0, 1)
+							");
 					}
 				}
 				else
@@ -2986,7 +3374,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 			$size = getimagesize($file);
 
-			if($size)
+			if ($size)
 			{
 				$width 	= $size[0];
 				$height = $size[1];
@@ -2997,7 +3385,7 @@ class ImpExDatabaseCore extends ImpExFunction
 				$height = '80';
 			}
 
-			if(!$file_sz = @filesize($file))
+			if (!$file_sz = @filesize($file))
 			{
 				$file_sz = 0;
 			}
@@ -3005,26 +3393,44 @@ class ImpExDatabaseCore extends ImpExFunction
 			$urlbits = parse_url($file);
 			$pathbits = pathinfo($urlbits['path']);
 
-			$avatarid = $Db_object->query("
-				INSERT INTO " . $tableprefix . "customavatar
-					(userid, filedata, dateline, filename, filesize, width, height,importcustomavatarid)
-				VALUES
-				(
-					$userid,
-					'" . addslashes($contents) . "',
-					NOW(),
-					'" . addslashes($pathbits['basename'])."',
-					". $file_sz . ",
-					{$width},
-					{$height},
-					'1'
-				)
-			");
-
-
-			if ($Db_object->affected_rows())
+			switch ($databasetype)
 			{
-				return $avatarid;
+				case 'mysql':
+				case 'mysqli':
+				{
+					$avatarid = $Db_object->query("
+						INSERT INTO " . $tableprefix . "customavatar
+							(userid, filedata, dateline, filename, filesize, width, height, importcustomavatarid)
+						VALUES
+						(
+							$userid,
+							'" . $Db_object->escape_string($contents) . "',
+							NOW(),
+							'" . $Db_object->escape_string($pathbits['basename']) . "',
+							". $file_sz . ",
+							" . $width . ",
+							" . $height . ",
+							'1'
+						)
+					");
+
+					if ($Db_object->affected_rows())
+					{
+						return $avatarid;
+					}
+				}
+
+				// Postgres database
+				case 'postgresql':
+				{
+					return false;
+				}
+
+				// other
+				default:
+				{
+					return false;
+				}
 			}
 		}
 		return false;
@@ -3045,20 +3451,24 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['forum'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importcategoryid FROM {$tableprefix}forum WHERE importcategoryid=" . intval(trim($this->get_value('mandatory', 'importcategoryid'))));
+					$there = $Db_object->query_first("
+						SELECT importcategoryid
+						FROM " . $tableprefix . "forum
+						WHERE importcategoryid = " . intval(trim($this->get_value('mandatory', 'importcategoryid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-				// Catch the legacy importers that haven't been
-				// updated
+				// Catch the legacy importers that haven't been updated
 				if ($this->get_value('mandatory', 'options') == '!##NULL##!')
 				{
 					$this->set_value('mandatory', 'options', $this->_default_cat_permissions);
@@ -3075,16 +3485,16 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'styleid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'description')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "',
 						" . $this->get_value('mandatory', 'options') . ",
 						'30',
 						'" . $this->get_value('mandatory', 'displayorder') . "',
 						'" . $this->get_value('mandatory', 'parentid') . "',
 						'" . $this->get_value('mandatory', 'importforumid') . "',
 						'" . $this->get_value('mandatory', 'importcategoryid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'description')) . "'
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "'
 					)
 				");
 
@@ -3092,7 +3502,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				if ($result)
 				{
-					$Db_object->query("UPDATE {$tableprefix}forum SET parentlist = '$categoryid,-1' WHERE forumid = '$categoryid'");
+					$Db_object->query("
+						UPDATE " . $tableprefix . "forum SET
+							parentlist = '" . $categoryid . ",-1'
+						WHERE forumid = " . $categoryid . "
+					");
+
 					if ($Db_object->affected_rows())
 					{
 						return $categoryid;
@@ -3122,7 +3537,6 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 	}
 
-
 	/**
 	* Imports the current objects values as a Forum
 	*
@@ -3138,13 +3552,18 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['forum'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importforumid FROM {$tableprefix}forum WHERE importforumid=" . intval(trim($this->get_value('mandatory', 'importforumid'))));
+					$there = $Db_object->query_first("
+						SELECT importforumid
+						FROM " . $tableprefix . "forum
+						WHERE importforumid = " . intval(trim($this->get_value('mandatory', 'importforumid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -3174,16 +3593,16 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'styleid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
 						" . $this->get_value('mandatory', 'options') . ",
 						'" . $this->get_value('mandatory', 'displayorder') . "',
 						'" . $this->get_value('mandatory', 'parentid') . "',
 						'" . $this->get_value('mandatory', 'importforumid') . "',
 						'" . $this->get_value('mandatory', 'importcategoryid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'description')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "',
 						'" . $this->get_value('nonmandatory', 'replycount') . "',
 						'" . $this->get_value('nonmandatory', 'lastpost') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'lastposter')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'lastposter')) . "',
 						'" . $this->get_value('nonmandatory', 'lastthread') . "',
 						'" . $this->get_value('nonmandatory', 'lastthreadid') . "',
 						'" . $this->get_value('nonmandatory', 'lasticonid') . "',
@@ -3195,19 +3614,25 @@ class ImpExDatabaseCore extends ImpExFunction
 						'" . $this->get_value('nonmandatory', 'password') . "',
 						'" . $this->get_value('nonmandatory', 'link') . "',
 						'" . $this->get_value('nonmandatory', 'childlist') . "',
-						'" . addslashes(htmlspecialchars(strip_tags($this->get_value('mandatory', 'title')), false)) . "',
-						'" . addslashes(htmlspecialchars(strip_tags($this->get_value('nonmandatory', 'description')), false)) . "',
+						'" . $Db_object->escape_string(htmlspecialchars(strip_tags($this->get_value('mandatory', 'title')), false)) . "',
+						'" . $Db_object->escape_string(htmlspecialchars(strip_tags($this->get_value('nonmandatory', 'description')), false)) . "',
 						'" . $this->get_value('nonmandatory', 'showprivate') . "',
 						'" . $this->get_value('nonmandatory', 'lastpostid') . "',
 						'" . $this->get_value('nonmandatory', 'defaultsortfield') . "',
 						'" . $this->get_value('nonmandatory', 'defaultsortorder') . "'
 					)
 				");
+
 				$forumid = $Db_object->insert_id($result);
 
 				if ($result)
 				{
-					$Db_object->query("UPDATE {$tableprefix}forum SET parentlist='$forumid,-1' WHERE forumid='$forumid'");
+					$Db_object->query("
+						UPDATE " . $tableprefix . "forum SET
+							parentlist = '" . $forumid . ",-1'
+							WHERE forumid = " . $forumid . "
+					");
+
 					if ($Db_object->affected_rows())
 					{
 						return $forumid;
@@ -3243,17 +3668,23 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['forum'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importforumid FROM {$tableprefix}forum WHERE importforumid=" . intval(trim($this->get_value('mandatory', 'importforumid'))));
+					$there = $Db_object->query_first("
+						SELECT importforumid
+						FROM " . $tableprefix . "forum
+						WHERE importforumid = " . intval(trim($this->get_value('mandatory', 'importforumid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
+
 				$result = $Db_object->query("
 					INSERT INTO " . $tableprefix . "forum
 					(
@@ -3268,15 +3699,15 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'styleid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
 						" . $this->get_value('mandatory', 'options') . ",
 						'" . $this->get_value('mandatory', 'displayorder') . "',
 						'" . $this->get_value('mandatory', 'parentid') . "',
 						'" . $this->get_value('mandatory', 'importforumid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'description')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "',
 						'" . $this->get_value('nonmandatory', 'replycount') . "',
 						'" . $this->get_value('nonmandatory', 'lastpost') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'lastposter')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'lastposter')) . "',
 						'" . $this->get_value('nonmandatory', 'lastthread') . "',
 						'" . $this->get_value('nonmandatory', 'lastthreadid') . "',
 						'" . $this->get_value('nonmandatory', 'lasticonid') . "',
@@ -3320,25 +3751,28 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function import_thread($Db_object, $databasetype, $tableprefix)
 	{
-		// Check the dupe
-		if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['thread'] === false))
-		{
-			$there = $Db_object->query_first("SELECT importthreadid FROM {$tableprefix}thread
-			WHERE importthreadid=" . intval(trim($this->get_value('mandatory', 'importthreadid'))) . "
-			AND importforumid=" . intval(trim($this->get_value('mandatory', 'importforumid')))
-			);
-
-			if(is_numeric($there[0]))
-			{
-				return false;
-			}
-		}
-
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
+				// Check the dupe
+				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['thread'] === false))
+				{
+					$there = $Db_object->query_first("
+					SELECT importthreadid
+					FROM " . $tableprefix . "thread
+					WHERE importthreadid = " . intval(trim($this->get_value('mandatory', 'importthreadid'))) . "
+						AND importforumid = " . intval(trim($this->get_value('mandatory', 'importforumid'))) . "
+					");
+
+					if (is_numeric($there[0]))
+					{
+						return false;
+					}
+				}
+
 				$Db_object->query("
 					INSERT INTO " . $tableprefix . "thread
 					(
@@ -3354,27 +3788,27 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'forumid') . "',
-						'" . addslashes($this->get_value('mandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('mandatory', 'title')) . "',
 						'" . $this->get_value('mandatory', 'importforumid') . "',
 						'" . $this->get_value('mandatory', 'importthreadid') . "',
 						'" . $this->get_value('nonmandatory', 'firstpostid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'lastpost')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'lastpost')) . "',
 						'" . $this->get_value('nonmandatory', 'pollid') . "',
 						'" . $this->get_value('nonmandatory', 'open')  . "',
 						'" . $this->get_value('nonmandatory', 'replycount') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'postusername')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'postusername')) . "',
 						'" . $this->get_value('nonmandatory', 'postuserid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'lastposter')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'lastposter')) . "',
 						'" . $this->get_value('nonmandatory', 'dateline') . "',
 						'" . $this->get_value('nonmandatory', 'views') . "',
 						'" . $this->get_value('nonmandatory', 'iconid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'notes')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'notes')) . "',
 						'" . $this->get_value('nonmandatory', 'visible') . "',
 						'" . $this->get_value('nonmandatory', 'sticky') . "',
 						'" . $this->get_value('nonmandatory', 'votenum') . "',
 						'" . $this->get_value('nonmandatory', 'votetotal') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'attach')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'similar')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'attach')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'similar')) . "',
 						'" . $this->get_value('nonmandatory', 'hiddencount') . "',
 						'" . $this->get_value('deletedcount', 'hiddencount') . "'
 					)
@@ -3420,32 +3854,32 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['moderator'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importmoderatorid FROM {$tableprefix}moderator WHERE importmoderatorid=" . intval(trim($this->get_value('mandatory', 'importmoderatorid'))));
+					$there = $Db_object->query_first("
+						SELECT importmoderatorid
+						FROM " . $tableprefix . "moderator
+						WHERE importmoderatorid = " . intval(trim($this->get_value('mandatory', 'importmoderatorid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
 				}
 
-
 				$Db_object->query("
 					REPLACE INTO " . $tableprefix . "moderator
-					(
-					userid, forumid, importmoderatorid, permissions, permissions2
-					)
+						(userid, forumid, importmoderatorid, permissions, permissions2)
 					VALUES
-					(
-						'" . intval($this->get_value('mandatory', 'userid')) . "',
+						('" . intval($this->get_value('mandatory', 'userid')) . "',
 						'" . intval($this->get_value('mandatory', 'forumid')) . "',
 						'" . intval($this->get_value('mandatory', 'importmoderatorid')) . "',
 						'" . intval($this->get_value('nonmandatory', 'permissions')) . "',
-						'" . intval($this->get_value('nonmandatory', 'permissions2')) . "'
-					)
+						'" . intval($this->get_value('nonmandatory', 'permissions2')) . "')
 				");
 
 				if ($Db_object->affected_rows())
@@ -3488,13 +3922,18 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Check the dupe
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['customprofilepic'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importcustomprofilepicid FROM {$tableprefix}customprofilepic WHERE importcustomprofilepicid=" . intval(trim($this->get_value('mandatory', 'importcustomprofilepicid'))));
+					$there = $Db_object->query_first("
+						SELECT importcustomprofilepicid
+						FROM " . $tableprefix . "customprofilepic
+						WHERE importcustomprofilepicid = " . intval(trim($this->get_value('mandatory', 'importcustomprofilepicid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -3502,7 +3941,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				$size = @getimagesize($this->get_value('nonmandatory', 'filedata'));
 
-				if($size)
+				if ($size)
 				{
 					$width 	= $size[0];
 					$height = $size[1];
@@ -3513,31 +3952,25 @@ class ImpExDatabaseCore extends ImpExFunction
 					$height = '0';
 				}
 
-				if(!$file_sz = strlen($this->get_value('nonmandatory', 'filedata')))
+				if (!$file_sz = strlen($this->get_value('nonmandatory', 'filedata')))
 				{
 					$file_sz = 0;
 				}
 
-				$sql ="
-					INSERT INTO
-					" . $tableprefix . "customprofilepic
-					(
-						importcustomprofilepicid, userid, filedata,
-						dateline, filename, visible, filesize, height, width
-					)
+				$sql = $Db_object->query("
+					INSERT INTO " . $tableprefix . "customprofilepic
+						(importcustomprofilepicid, userid, filedata, dateline, filename, visible, filesize, height, width)
 					VALUES
-					(
-						'" . $this->get_value('mandatory', 'importcustomprofilepicid') . "',
+						('" . $this->get_value('mandatory', 'importcustomprofilepicid') . "',
 						'" . $this->get_value('nonmandatory', 'userid') . "',
 						'" . $this->get_value('nonmandatory', 'filedata') . "',
 						" . $this->get_value('nonmandatory', 'dateline') . ",
-						'" . addslashes($this->get_value('nonmandatory', 'filename')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'filename')) . "',
 						" . $this->get_value('nonmandatory', 'visible') . ",
 						" . $file_sz . ",
-						{$height},
-						{$width}
-					)
-				";
+						" . $height . ",
+						" . $width  .")
+				");
 
 				if ($Db_object->query($sql))
 				{
@@ -3581,32 +4014,56 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Having to hard code for 3.6.0 because of database phrasing
 				switch(trim(strtolower($title)))
 				{
-					case 'occupation' :
+					case 'occupation':
+					{
 						$fieldid = 4;
 						break;
-					case 'interests' :
+					}
+
+					case 'interests':
+					{
 						$fieldid = 3;
 						break;
-					case 'location' :
+					}
+
+					case 'location':
+					{
 						$fieldid = 2;
 						break;
-					case 'biography' :
+					}
+
+					case 'biography':
+					{
 						$fieldid = 1;
 						break;
-					default :
-						$id = $Db_object->query_first("SELECT varname FROM {$tableprefix}phrase WHERE text LIKE '{$title}'");
+					}
+
+					default:
+					{
+						$id = $Db_object->query_first("
+							SELECT varname
+							FROM " . $tableprefix . "phrase
+							WHERE text LIKE '" . $title . "'
+						");
+
 						$fieldid = substr($id['varname'], 5, strpos($id['varname'], '_')-5);
+					}
 				}
 
-				if(is_numeric($fieldid))
+				if (is_numeric($fieldid))
 				{
 					if ($this->check_user_field($Db_object, $databasetype, $tableprefix, "field{$fieldid}"))
 					{
-						$Db_object->query("UPDATE {$tableprefix}userfield SET field{$fieldid} = '" . addslashes($value) . "' WHERE userid={$userid}");
+						$Db_object->query("
+							UPDATE " . $tableprefix . "userfield SET
+								field" . $fieldid . " = '" . $Db_object->escape_string($value) . "'
+							WHERE userid = " . $userid . "
+						");
 						return true;
 					}
 					else
@@ -3650,12 +4107,17 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli';
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['ranks'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importrankid FROM {$tableprefix}ranks WHERE importrankid=" . intval(trim($this->get_value('mandatory', 'importrankid'))));
+					$there = $Db_object->query_first("
+						SELECT importrankid
+						FROM " . $tableprefix . "ranks
+						WHERE importrankid = " . intval(trim($this->get_value('mandatory', 'importrankid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -3663,18 +4125,16 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				$Db_object->query("
 					INSERT INTO " . $tableprefix ."ranks
-					(importrankid, minposts, ranklevel, rankimg, usergroupid, type, stack, display)
+						(importrankid, minposts, ranklevel, rankimg, usergroupid, type, stack, display)
 					VALUES
-					(
-					" . $this->get_value('mandatory', 'importrankid') . ",
-					" . $this->get_value('nonmandatory', 'minposts') . ",
-					" . intval($this->get_value('nonmandatory', 'ranklevel')) . ",
-					'" . addslashes($this->get_value('nonmandatory', 'rankimg')) . "',
-					0,
-					'" . $this->get_value('nonmandatory', 'type') . "',
-					'" . $this->get_value('nonmandatory', 'stack') . "',
-					'" . $this->get_value('nonmandatory', 'display') . "'
-					)
+						(" . $this->get_value('mandatory', 'importrankid') . ",
+						" . $this->get_value('nonmandatory', 'minposts') . ",
+						" . intval($this->get_value('nonmandatory', 'ranklevel')) . ",
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'rankimg')) . "',
+						0,
+						'" . $this->get_value('nonmandatory', 'type') . "',
+						" . $this->get_value('nonmandatory', 'stack') . ",
+						'" . $this->get_value('nonmandatory', 'display') . "')
 				");
 
 				if ($Db_object->affected_rows())
@@ -3708,20 +4168,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$row_id = $Db_object->query_first("SELECT imagecategoryid FROM ". $tableprefix . "imagecategory WHERE title='Imported Smilies'");
+				$row_id = $Db_object->query_first("
+					SELECT imagecategoryid
+					FROM ". $tableprefix . "imagecategory
+					WHERE title = 'Imported Smilies'
+				");
 
 				if (!$row_id)
 				{
 					$Db_object->query("
 						INSERT INTO " . $tableprefix . "imagecategory
-						(title, imagetype, displayorder)
+							(title, imagetype, displayorder)
 						VALUES
-						(
-							'" . $this->get_value('nonmandatory', 'title') . "',
-							'" . $this->get_value('nonmandatory', 'imagetype') . "',
-							'" . $this->get_value('nonmandatory', 'displayorder') . "'
-						)
+							(
+								'" . $this->get_value('nonmandatory', 'title') . "',
+								'" . $this->get_value('nonmandatory', 'imagetype') . "',
+								'" . $this->get_value('nonmandatory', 'displayorder') . "'
+							)
 					");
 					return $Db_object->insert_id();
 				}
@@ -3761,12 +4226,17 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['usergroup'] === false))
 				{
-					$there = $Db_object->query_first("SELECT importusergroupid FROM {$tableprefix}usergroup WHERE importusergroupid=" . intval(trim($this->get_value('mandatory', 'importusergroupid'))));
+					$there = $Db_object->query_first("
+						SELECT importusergroupid
+						FROM " . $tableprefix . "usergroup
+						WHERE importusergroupid = " . intval(trim($this->get_value('mandatory', 'importusergroupid'))) . "
+					");
 
-					if(is_numeric($there[0]))
+					if (is_numeric($there[0]))
 					{
 						return false;
 					}
@@ -3791,15 +4261,15 @@ class ImpExDatabaseCore extends ImpExFunction
 					VALUES
 					(
 						'" . $this->get_value('mandatory', 'importusergroupid') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'title')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'description')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'usertitle')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'description')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'usertitle')) . "',
 						0,
 						'" . $this->get_value('nonmandatory', 'passwordhistory') . "',
 						'" . $this->get_value('nonmandatory', 'pmquota') . "',
 						'" . $this->get_value('nonmandatory', 'pmsendmax') . "',
-						'" . addslashes($this->get_value('nonmandatory', 'opentag')) . "',
-						'" . addslashes($this->get_value('nonmandatory', 'closetag')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'opentag')) . "',
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'closetag')) . "',
 						'" . $this->get_value('nonmandatory', 'canoverride') . "',
 						'" . $this->get_value('nonmandatory', 'ispublicgroup') . "',
 						'" . $this->get_value('nonmandatory', 'forumpermissions') . "',
@@ -3869,7 +4339,6 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array
 	*/
-	// TODO: migrate to get_souce_data ?
 	function get_details($Db_object, $databasetype, $tableprefix, $start, $per_page, $type, $orderby = false)
 	{
 		$return_array = array();
@@ -3877,42 +4346,58 @@ class ImpExDatabaseCore extends ImpExFunction
 		$is_table = $this->check_table($Db_object, $databasetype, $tableprefix, $type);
 
 		// Check that there isn't a empty value
-		if(empty($per_page) OR !$is_table) { return $return_array; }
-
-		if ($databasetype == 'mysql')
+		if (empty($per_page) OR !$is_table)
 		{
-			if(!$orderby)
-			{
-				$sql = "SELECT * FROM " . $tableprefix . $type;
-			}
-			else
-			{
-				$sql = "SELECT * FROM " . $tableprefix . $type . " ORDER BY " . $orderby;
-			}
+			return $return_array;
+		}
 
-			if($per_page != -1)
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
 			{
-				$sql .= " LIMIT " . $start . "," . $per_page;
-			}
-
-			$details_list = $Db_object->query($sql);
-
-			while ($detail = $Db_object->fetch_array($details_list))
-			{
-				if($orderby)
+				if (!$orderby)
 				{
-					$return_array["$detail[$orderby]"] = $detail;
+					$sql = "SELECT * FROM " . $tableprefix . $type;
 				}
 				else
 				{
-					$return_array[] = $detail;
+					$sql = "SELECT * FROM " . $tableprefix . $type . " ORDER BY " . $orderby;
 				}
+
+				if ($per_page != -1)
+				{
+					$sql .= " LIMIT " . $start . "," . $per_page;
+				}
+
+				$details_list = $Db_object->query($sql);
+
+				while ($detail = $Db_object->fetch_array($details_list))
+				{
+					if ($orderby)
+					{
+						$return_array["$detail[$orderby]"] = $detail;
+					}
+					else
+					{
+						$return_array[] = $detail;
+					}
+				}
+				return $return_array;
+				break;
 			}
-			return $return_array;
-		}
-		else
-		{
-			return false;
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
@@ -3929,13 +4414,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		$sql					= '';
 		$time_start				= 0;
 
-		if(phpversion() >= '5')
+		if (phpversion() >= '5')
 		{
 			$time_start = microtime(true);
 		}
 
 		// Check that there is not a empty value
-		if(empty($per_page))
+		if (empty($per_page))
 		{
 			$return_array['error'] = 'per_page empty';
 			return $return_array;
@@ -3965,17 +4450,22 @@ class ImpExDatabaseCore extends ImpExFunction
 
 		// Table check need to use cache though
 		$tableprefix = '';
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $tablename))
+
+		if (!$this->check_table($Db_object, $databasetype, $tableprefix, $tablename))
 		{
 			// Not there or bad table name
-			$return_array['error']	= 'table check failed';
+			$return_array['error'] = 'table check failed';
 			return $return_array;
 		}
 
 		// Build the SQL
-		$sql = "SELECT {$fields} FROM {$tablename} WHERE {$id_field} > {$start_at} ORDER BY {$id_field} LIMIT {$per_page}";
-
-		$result_set = $Db_object->query($sql);
+		$result_set = $Db_object->query("
+			SELECT " . $fields  ."
+			FROM " . $tablename  ."
+			WHERE " . $id_field  ." > " . $start_at  ."
+			ORDER BY " . $id_field  ."
+			LIMIT " . $per_page  ."
+		");
 
 		// Do it and build the array
 		while ($row = $Db_object->fetch_array($result_set))
@@ -3984,7 +4474,7 @@ class ImpExDatabaseCore extends ImpExFunction
 			$return_array['data'][$id] = $row;
 		}
 
-		if(phpversion() >= '5')
+		if (phpversion() >= '5')
 		{
 			$return_array['time'] = microtime(true) - $time_start;
 		}
@@ -4000,20 +4490,33 @@ class ImpExDatabaseCore extends ImpExFunction
 		return $return_array;
 	}
 
-	// TODO: Could be made redundant with a recursive idcache call
 	function get_post_parent_id($Db_object, $databasetype, $tableprefix, $import_post_id)
 	{
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$sql = "SELECT postid FROM " . $tableprefix . "post WHERE importpostid =" . $import_post_id;
+			case 'mysql':
+			case 'mysqli':
+			{
+				$post_id = $Db_object->query_first("
+					SELECT postid
+					FROM " . $tableprefix . "post
+					WHERE importpostid = " . $import_post_id . "
+				");
 
-			$post_id = $Db_object->query_first($sql);
+				return $post_id[0];
+			}
 
-			return $post_id[0];
-		}
-		else
-		{
-			return false;
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
@@ -4028,9 +4531,14 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				// Get all the user ids ......
-				$current_pm_folders = $Db_object->query_first("SELECT pmfolders FROM {$tableprefix}usertextfield WHERE userid={$userid}");
+				// Get all the user ids
+				$current_pm_folders = $Db_object->query_first("
+					SELECT pmfolders
+					FROM " . $tableprefix . "usertextfield
+					WHERE userid = " . $userid . "
+				");
 
 				$current_pm_folders =  unserialize($current_pm_folders['pmfolders']);
 
@@ -4061,35 +4569,73 @@ class ImpExDatabaseCore extends ImpExFunction
 
 	function get_options_setting($Db_object, $databasetype, $tableprefix, $name)
 	{
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$options_return = $Db_object->query_first("SELECT data FROM " . $tableprefix ."datastore WHERE title='options'");
+			case 'mysql':
+			case 'mysqli':
+			{
+				$options_return = $Db_object->query_first("
+					SELECT data
+					FROM " . $tableprefix ."datastore
+					WHERE title = 'options'
+				");
 
-			$options_array = unserialize($options_return['data']);
+				$options_array = unserialize($options_return['data']);
 
-			return $options_array[$name];
-		}
-		else
-		{
-			return false;
+				return $options_array[$name];
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
 	function get_vb_post_user_id($Db_object, $databasetype, $tableprefix, $post_id)
 	{
 		// Check that there is not a empty value
-		if(empty($post_id)) { return 0; }
-
-		if ($databasetype == 'mysql')
+		if (empty($post_id))
 		{
-			$details_list = $Db_object->query_first("SELECT userid FROM {$tableprefix}post WHERE postid={$post_id}");
-			return $details_list['userid'];
+			return 0;
+		}
+
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$details_list = $Db_object->query_first("
+					SELECT userid
+					FROM " . $tableprefix . "post
+					WHERE postid = " . $post_id . "
+				");
+				return $details_list['userid'];
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 
 		return 0;
 	}
 
-	// TODO: discus_file
 	function select_profilefield_list($Db_object, $databasetype, $tableprefix, $title)
 	{
 		$return_array = array();
@@ -4102,28 +4648,45 @@ class ImpExDatabaseCore extends ImpExFunction
 				switch($title)
 				{
 					case 'occupation' :
+					{
 						$fieldid = 4;
 						break;
-					case 'interests' :
+					}
+
+					case 'interests':
+					{
 						$fieldid = 3;
 						break;
-					case 'location' :
+					}
+
+					case 'location':
+					{
 						$fieldid = 2;
 						break;
-					case 'biography' :
+					}
+
+					case 'biography':
+					{
 						$fieldid = 1;
 						break;
-					default :
+					}
+
+					default:
+					{
 						return false;
+					}
 				}
 
-				if($fieldid)
+				if ($fieldid)
 				{
-					$list = $Db_object->query("SELECT userid, field{$fieldid} as $title FROM " . $tableprefix . "userfield");
+					$list = $Db_object->query("
+						SELECT userid, field" . $fieldid . " AS " . $title . "
+						FROM " . $tableprefix . "userfield
+					");
 
 					while ($fielddata = $Db_object->fetch_array($list))
 					{
-						if($fielddata[$title])
+						if ($fielddata[$title])
 						{
 							$return_array[$fielddata['userid']] = strtolower($fielddata[$title]);
 						}
@@ -4157,15 +4720,20 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	int
 	*/
-	// TODO: Depricate into idcache
 	function get_vb_userid($Db_object, $databasetype, $tableprefix, $importuserid)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$result = $Db_object->query_first("SELECT userid FROM " . $tableprefix . "user WHERE importuserid = " . $importuserid);
+				$result = $Db_object->query_first("
+					SELECT userid
+					FROM " . $tableprefix . "user
+					WHERE importuserid = " . $importuserid . "
+				");
+
 				if ($result)
 				{
 					return $result['userid'];
@@ -4200,21 +4768,27 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			The vb id of the thread
 	*/
-	// TODO: Ditch this
 	function get_style_ids($Db_object, $databasetype, $tableprefix, $pad=0)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$styles = $Db_object->query("SELECT styleid,importstyleid FROM " . $tableprefix . "style");
+				$styles = $Db_object->query("
+					SELECT styleid, importstyleid
+					FROM " . $tableprefix . "style
+				");
+
 				while ($style = $Db_object->fetch_array($styles))
 				{
-					$impstyleid = $this->iif($pad, $style['importstyleid'], intval($style['importstyleid']));
+					$impstyleid = ($pad ? $style['importstyleid'] : intval($style['importstyleid']));
 					$styleid["$impstyleid"] = $style['styleid'];
 				}
+
 				$Db_object->free_result($styles);
+
 				return $styleid;
 			}
 
@@ -4247,13 +4821,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$user_groups = $Db_object->query("SELECT usergroupid, title FROM " . $tableprefix . "usergroup  WHERE importusergroupid <> 0");
+				$user_groups = $Db_object->query("
+					SELECT usergroupid, title
+					FROM " . $tableprefix . "usergroup
+					WHERE importusergroupid <> 0
+				");
 
 				while ($group = $Db_object->fetch_array($user_groups))
 				{
 					$return_data["$group[title]"] = $group['usergroupid'];
 				}
+
 				$Db_object->free_result($user_groups);
 
 				return $return_data;
@@ -4284,25 +4864,33 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	int
 	*/
-	// TODO: Depricate into idcache
 	function get_one_username($Db_object, $databasetype, $tableprefix, $theuserid, $id='importuserid')
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				switch ($id)
 				{
 					case 'importuserid':
 					{
-						$sql = "SELECT username FROM " . $tableprefix . "user WHERE importuserid = " . $theuserid;
+						$result = $Db_object->query_first("
+							SELECT username
+							FROM " . $tableprefix . "user
+							WHERE importuserid = " . $theuserid . "
+						");
 					}
 					break;
 
 					case 'userid':
 					{
-						$sql = "SELECT username FROM " . $tableprefix . "user WHERE userid = " . $theuserid;
+						$result = $Db_object->query_first("
+							SELECT username
+							FROM " . $tableprefix . "user
+							WHERE userid = " . $theuserid . "
+						");
 					}
 					break;
 
@@ -4311,8 +4899,6 @@ class ImpExDatabaseCore extends ImpExFunction
 						return false;
 					}
 				}
-
-				$result = $Db_object->query_first($sql);
 
 				if ($result)
 				{
@@ -4351,23 +4937,30 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	int
 	*/
-	// TODO: Depricate into idcache
 	function get_user_array($Db_object, $databasetype, $tableprefix, $startat = null, $perpage = null)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$_usersarray = array();
 
 				if ($startat == null OR $perpage == null)
 				{
-					$sql = "SELECT userid,username,importuserid FROM " . $tableprefix . "user";
+					$result = $Db_object->query("
+						SELECT userid,username,importuserid
+						FROM " . $tableprefix . "user
+					");
 				}
 				else
 				{
-					$sql = "SELECT userid, username, importuserid FROM " . $tableprefix . "user LIMIT $startat, $perpage";
+					$result = $Db_object->query("
+						SELECT userid, username, importuserid
+						FROM " . $tableprefix . "user
+						LIMIT " . $startat . ", " . $perpage . "
+					");
 				}
 
 				$result = $Db_object->query($sql);
@@ -4430,10 +5023,15 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$banned_grouip_id = $Db_object->query_first("SELECT usergroupid FROM " . $tableprefix . "usergroup  WHERE title='Banned Users'");
+				$banned_grouip_id = $Db_object->query_first("
+					SELECT usergroupid
+					FROM " . $tableprefix . "usergroup
+					WHERE title = 'Banned Users'
+				");
 
-				if($banned_grouip_id)
+				if ($banned_grouip_id)
 				{
 					return $banned_grouip_id['usergroupid'];
 				}
@@ -4459,6 +5057,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 	function zuul($dana)
 	{
+		// See https://www.youtube.com/watch?v=lg7MAacSPNM
 		$zuul = "There is no importers only zuul";
 
 		return $zuul;
@@ -4479,13 +5078,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$user_groups = $Db_object->query("SELECT usergroupid, importusergroupid FROM " . $tableprefix . "usergroup  WHERE importusergroupid <> 0");
+				$user_groups = $Db_object->query("
+					SELECT usergroupid, importusergroupid
+					FROM " . $tableprefix . "usergroup
+					WHERE importusergroupid <> 0
+				");
 
 				while ($group = $Db_object->fetch_array($user_groups))
 				{
 					$return_data["$group[importusergroupid]"] = $group['usergroupid'];
 				}
+
 				$Db_object->free_result($user_groups);
 
 				return $return_data;
@@ -4516,19 +5121,20 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	int		mixed			The vb id of the thread
 	*/
-	// TODO: Depricate into idcache
 	function get_thread_id($Db_object, $databasetype, $tableprefix, $importthreadid, $forumid)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$result = $Db_object->query_first("
 					SELECT threadid FROM " . $tableprefix . "thread
 					WHERE importthreadid= " . intval($importthreadid) . "
-					AND importforumid = '" . $forumid . "'
+						AND importforumid = '" . $forumid . "'
 				");
+
 				return $result['threadid'];
 			}
 
@@ -4546,20 +5152,24 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 	}
 
-	// TODO: Depricate into idcache or move to freethreads & phorum3
 	function get_forum_and_thread_ids($Db_object, $databasetype, $tableprefix)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$result = $Db_object->query("SELECT threadid, importthreadid, importforumid FROM " . $tableprefix . "thread");
+				$result = $Db_object->query("
+					SELECT threadid, importthreadid, importforumid
+					FROM " . $tableprefix . "thread
+				");
 
 				while ($ids = $Db_object->fetch_array($result))
 				{
 					$return_data["$ids[importforumid]"]["$ids[importthreadid]"] = $ids['threadid'];
 				}
+
 				$Db_object->free_result($result);
 
 				return $return_data;
@@ -4588,20 +5198,25 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			The array of vb ids of the threads
 	*/
-	// TODO: Depricate into idcache, used all over the place still !!
 	function get_threads_ids($Db_object, $databasetype, $tableprefix)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$threads = $Db_object->query("SELECT threadid, importthreadid FROM " . $tableprefix . "thread WHERE importthreadid <> 0");
+				$threads = $Db_object->query("
+					SELECT threadid, importthreadid
+					FROM " . $tableprefix . "thread
+					WHERE importthreadid <> 0
+				");
 
 				while ($thread = $Db_object->fetch_array($threads))
 				{
 					$threadid["$thread[importthreadid]"] = $thread['threadid'];
 				}
+
 				$Db_object->free_result($threads);
 
 				return $threadid;
@@ -4630,7 +5245,6 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			The array of vb ids of the threads
 	*/
-	// TODO: Depricate into idcache, tis evil .....
 	function get_posts_ids($Db_object, $databasetype, $tableprefix)
 	{
 		$return_array = array();
@@ -4639,13 +5253,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$posts = $Db_object->query("SELECT postid, importpostid FROM " . $tableprefix . "post WHERE importpostid <> 0");
+				$posts = $Db_object->query("
+					SELECT postid, importpostid
+					FROM " . $tableprefix . "post
+					WHERE importpostid <> 0
+				");
 
 				while ($post = $Db_object->fetch_array($posts))
 				{
 					$return_array["$post[importpostid]"] = $post['postid'];
 				}
+
 				$Db_object->free_result($posts);
 
 				return $return_array;
@@ -4680,13 +5300,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$forums = $Db_object->query("SELECT forumid, importcategoryid FROM " . $tableprefix . "forum WHERE importcategoryid <> 0");
+				$forums = $Db_object->query("
+					SELECT forumid, importcategoryid
+					FROM " . $tableprefix . "forum
+					WHERE importcategoryid <> 0
+				");
 
 				while ($forum = $Db_object->fetch_array($forums))
 				{
 					$categoryid["$forum[importcategoryid]"] = $forum['forumid'];
 				}
+
 				$Db_object->free_result($forums);
 
 				return $categoryid;
@@ -4713,13 +5339,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$forums = $Db_object->query("SELECT forumid, title FROM " . $tableprefix . "forum WHERE importcategoryid <> 0");
+				$forums = $Db_object->query("
+					SELECT forumid, title
+					FROM " . $tableprefix . "forum
+					WHERE importcategoryid <> 0
+				");
 
 				while ($forum = $Db_object->fetch_array($forums))
 				{
 					$categoryid["$forum[title]"] = $forum['forumid'];
 				}
+
 				$Db_object->free_result($forums);
 
 				return $categoryid;
@@ -4746,14 +5378,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$forums = $Db_object->query("SELECT forumid,  importforumid, title FROM " . $tableprefix . "forum WHERE importforumid <> 0");
+				$forums = $Db_object->query("
+					SELECT forumid, importforumid, title
+					FROM " . $tableprefix . "forum
+					WHERE importforumid <> 0
+				");
 
 				while ($forum = $Db_object->fetch_array($forums))
 				{
-					$categoryid["$forum[title]"]['forumid'] 		= $forum['forumid'];
-					$categoryid["$forum[title]"]['importforumid'] 	= $forum['importforumid'];
+					$categoryid["$forum[title]"]['forumid'] = $forum['forumid'];
+					$categoryid["$forum[title]"]['importforumid'] = $forum['importforumid'];
 				}
+
 				$Db_object->free_result($forums);
 
 				return $categoryid;
@@ -4791,13 +5429,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$user_ids = $Db_object->query("SELECT userid, importuserid FROM " . $tableprefix . "user WHERE importuserid <> 0");
+				$user_ids = $Db_object->query("
+					SELECT userid, importuserid
+					FROM " . $tableprefix . "user
+					WHERE importuserid <> 0
+				");
 
 				while ($user_id = $Db_object->fetch_array($user_ids))
 				{
 					$return_array["$user_id[importuserid]"] = $user_id['userid'];
 				}
+
 				$Db_object->free_result($user_ids);
 
 				return $return_array;
@@ -4826,13 +5470,13 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			Data array[importuserid] = userid
 	*/
-	// TODO: Depricate into idcache, tis evil .....	user ALL over the place ... ugh
 	function get_user_ids($Db_object, $databasetype, $tableprefix, $do_int_val = false)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$users = $Db_object->query("
 					SELECT userid, username, importuserid
@@ -4852,6 +5496,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					$userid["$importuserid"] = $user['userid'];
 				}
+
 				$Db_object->free_result($users);
 
 				return $userid;
@@ -4871,7 +5516,6 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 	}
 
-	// TODO: Move to vb_36 ?
 	function get_subscription_ids($Db_object, $databasetype, $tableprefix)
 	{
 		$return_array = array();
@@ -4880,13 +5524,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$subscriptions = $Db_object->query("SELECT subscriptionid , importsubscriptionid FROM {$tableprefix}subscription WHERE importsubscriptionid <> 0");
+				$subscriptions = $Db_object->query("
+					SELECT subscriptionid, importsubscriptionid
+					FROM " . $tableprefix . "subscription
+					WHERE importsubscriptionid <> 0
+				");
 
 				while ($subscription = $Db_object->fetch_array($subscriptions))
 				{
 					$return_array["$subscription[importsubscriptionid]"] = $subscription['subscriptionid'];
 				}
+
 				$Db_object->free_result($subscriptions);
 
 				return $return_array;
@@ -4915,20 +5565,25 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			Data array[importuserid] = username
 	*/
-	// TODO: Depricate into idcache
 	function get_username($Db_object, $databasetype, $tableprefix)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$users = $Db_object->query("SELECT username, userid, importuserid AS importuserid FROM " . $tableprefix ."user WHERE importuserid <> 0");
+				$users = $Db_object->query("
+					SELECT username, userid, importuserid AS importuserid
+					FROM " . $tableprefix ."user
+					WHERE importuserid <> 0
+				");
 				while ($user = $Db_object->fetch_array($users))
 				{
 					// The normal
-					$username["$user[importuserid]"]		= $user['username'];
+					$username["$user[importuserid]"] = $user['username'];
 				}
+
 				$Db_object->free_result($users);
 
 				return $username;
@@ -4954,12 +5609,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$users = $Db_object->query("SELECT username, userid FROM " . $tableprefix ."user WHERE importuserid <> 0");
+				$users = $Db_object->query("
+					SELECT username, userid
+					FROM " . $tableprefix ."user
+					WHERE importuserid <> 0
+				");
+
 				while ($user = $Db_object->fetch_array($users))
 				{
 					$username["$user[username]"] = $user['userid'];
 				}
+
 				$Db_object->free_result($users);
 
 				return $username;
@@ -4986,15 +5648,22 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$users = $Db_object->query("SELECT email, userid, username FROM " . $tableprefix ."user WHERE importuserid <> 0");
+				$users = $Db_object->query("
+					SELECT email, userid, username
+					FROM " . $tableprefix ."user
+					WHERE importuserid <> 0
+				");
+
 				while ($user = $Db_object->fetch_array($users))
 				{
 					$email_addy = strtolower($user['email']);
 
-					$email[$email_addy]['userid'] 	= $user['userid'];
+					$email[$email_addy]['userid'] = $user['userid'];
 					$email[$email_addy]['username'] = $user['username'];
 				}
+
 				$Db_object->free_result($users);
 
 				return $email;
@@ -5023,10 +5692,9 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array	mixed			Data array[importuserid] = username
 	*/
-	// TODO: idcache user a lot.
 	function get_vb_post_id($Db_object, $databasetype, $tableprefix, $import_post_id)
 	{
-		if(!$import_post_id)
+		if (!$import_post_id)
 		{
 			return false;
 		}
@@ -5035,8 +5703,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$post_id = $Db_object->query_first("SELECT postid, importpostid FROM {$tableprefix}post WHERE importpostid={$import_post_id}");
+				$post_id = $Db_object->query_first("
+					SELECT postid, importpostid
+					FROM " . $tableprefix . "post
+					WHERE importpostid = " . $import_post_id . "
+				");
 
 				return $post_id['postid'];
 			}
@@ -5072,8 +5745,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$forums = $Db_object->query("SELECT forumid, importforumid FROM " . $tableprefix . "forum WHERE importforumid > 0");
+				$forums = $Db_object->query("
+					SELECT forumid, importforumid
+					FROM " . $tableprefix . "forum
+					WHERE importforumid > 0
+				");
 
 				while ($forum = $Db_object->fetch_array($forums))
 				{
@@ -5087,6 +5765,7 @@ class ImpExDatabaseCore extends ImpExFunction
 						$forumid["$forum[importforumid]"] = $forum['forumid'];
 					}
 				}
+
 				$Db_object->free_result($forums);
 
 				return $forumid;
@@ -5127,10 +5806,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("UPDATE " . $tableprefix . "datastore SET data = '' WHERE title = 'banemail'");
-				$Db_object->query("UPDATE " . $tableprefix . "setting SET value = '' WHERE varname = 'banip'");
-				// TODO: Error and return handeling
+				$Db_object->query("
+					UPDATE " . $tableprefix . "datastore SET
+						data = ''
+					WHERE title = 'banemail'
+				");
+
+				$Db_object->query("
+					UPDATE " . $tableprefix . "setting SET
+						value = ''
+					WHERE varname = 'banip'
+				");
+
 				return true;
 			}
 
@@ -5156,17 +5845,22 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$Db_object->query("
 					DELETE FROM " . $tableprefix  . "attachment
-					WHERE
-						importattachmentid <> 0
-							AND
-						contenttypeid = $contenttypeid
+					WHERE importattachmentid <> 0
+						AND contenttypeid = $contenttypeid
 				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "attachment AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "attachment auto_increment = 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "attachment AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "attachment auto_increment = 0
+				");
+
 				return true;
 			}
 
@@ -5191,16 +5885,33 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "subscription WHERE importsubscriptionid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "subscription
+					WHERE importsubscriptionid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "subscription AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "subscription auto_increment = 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "subscription AUTO_INCREMENT = 0
+				");
 
-				$Db_object->query("DELETE FROM " . $tableprefix  . "subscriptionlog WHERE importsubscriptionlogid <> 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "subscription auto_increment = 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "subscriptionlog AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "subscriptionlog auto_increment = 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "subscriptionlog
+					WHERE importsubscriptionlogid <> 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "subscriptionlog AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "subscriptionlog auto_increment = 0
+				");
 				return true;
 			}
 
@@ -5233,15 +5944,33 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "avatar WHERE importavatarid <> 0");
-				$Db_object->query("DELETE FROM " . $tableprefix  . "customavatar WHERE importcustomavatarid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "avatar
+					WHERE importavatarid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "avatar AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "avatar auto_increment = 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "customavatar
+					WHERE importcustomavatarid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "customavatar AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "customavatar auto_increment = 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "avatar AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "avatar auto_increment = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "customavatar AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "customavatar auto_increment = 0
+				");
 				return true;
 			}
 
@@ -5275,17 +6004,23 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// delete imported categories and forums
 				$Db_object->query("
 					DELETE FROM " . $tableprefix  . "forum
 					WHERE importforumid <> 0
-					OR importcategoryid <> 0
+						OR importcategoryid <> 0
 				");
 
 				// reset the auto increment
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "forum AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "forum auto_increment = 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "forum AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "forum auto_increment = 0
+				");
 
 				return true;
 			}
@@ -5320,11 +6055,19 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "thread WHERE importthreadid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "thread WHERE importthreadid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "thread AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "thread auto_increment = 0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "thread AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "thread auto_increment = 0
+				");
 
 				return true;
 			}
@@ -5359,11 +6102,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$user_id = $Db_object->query_first("SELECT usergroupid FROM " . $tableprefix . "usergroup WHERE title = 'Banned Users'");
+				$user_id = $Db_object->query_first("
+					SELECT usergroupid
+					FROM " . $tableprefix . "usergroup
+					WHERE title = 'Banned Users'
+				");
+
 				if ($user_id)
 				{
-					$Db_object->query("DELETE FROM " . $tableprefix  . "user WHERE usergroupid <> $user_id[usergroupid]");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "user
+						WHERE usergroupid <> " . $user_id['usergroupid'] . "
+					");
 				}
 				return true;
 			}
@@ -5398,49 +6150,110 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$users = $Db_object->query("SELECT userid FROM " . $tableprefix  . "user WHERE importuserid <> 0");
+				$users = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix  . "user
+					WHERE importuserid <> 0
+				");
 
 				if ($Db_object->num_rows($users))
 				{
 					$removeid = array('0');
+
 					while ($user = $Db_object->fetch_array($users))
 					{
 						$removeid[] = $user['userid'];
 					}
+
 					$Db_object->free_result($users);
 
 					$ids = implode(',', $removeid);
 
 					// user
-					$Db_object->query("DELETE FROM " . $tableprefix  . "user WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "user AUTO_INCREMENT=0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "user auto_increment=0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "user
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "user AUTO_INCREMENT=0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "user auto_increment=0
+					");
 
 					// customavatar
-					$Db_object->query("DELETE FROM " . $tableprefix  . "customavatar WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "customavatar AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "customavatar auto_increment = 0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "customavatar
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "customavatar AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "customavatar auto_increment = 0
+					");
 
 					// customprofilepic
-					$Db_object->query("DELETE FROM " . $tableprefix  . "customprofilepic WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "customprofilepic AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "customprofilepic auto_increment = 0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "customprofilepic
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "customprofilepic AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "customprofilepic auto_increment = 0
+					");
 
 					// userfield
-					$Db_object->query("DELETE FROM " . $tableprefix  . "userfield WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "userfield AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "userfield auto_increment = 0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "userfield
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "userfield AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "userfield auto_increment = 0
+					");
 
 					// usertextfield
-					$Db_object->query("DELETE FROM " . $tableprefix  . "usertextfield WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "usertextfield AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "usertextfield auto_increment = 0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "usertextfield
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "usertextfield AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "usertextfield auto_increment = 0
+					");
 
 					// usernote
-					$Db_object->query("DELETE FROM " . $tableprefix  . "usernote WHERE userid IN(" . $ids . ")");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "usernote AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "usernote auto_increment = 0");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "usernote
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "usernote AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "usernote auto_increment = 0
+					");
 				}
 
 				 return true;
@@ -5475,11 +6288,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "post WHERE importthreadid <> 0");
-				$Db_object->query("DELETE FROM " . $tableprefix  . "post WHERE importpostid <> 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "post AUTO_INCREMENT = 0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "post auto_increment = 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "post
+					WHERE importthreadid <> 0
+				");
+
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "post
+					WHERE importpostid <> 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "post AUTO_INCREMENT = 0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "post auto_increment = 0
+				");
 				return true;
 			}
 
@@ -5512,9 +6339,14 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// poll ids
-				$polls = $Db_object->query("SELECT pollid FROM " . $tableprefix  . "poll WHERE importpollid <> '0'");
+				$polls = $Db_object->query("
+					SELECT pollid
+					FROM " . $tableprefix  . "poll
+					WHERE importpollid <> '0'
+				");
 
 				if ($Db_object->num_rows($polls))
 				{
@@ -5527,16 +6359,37 @@ class ImpExDatabaseCore extends ImpExFunction
 					$poll_ids = implode(',', $removeid);
 
 					// Remove them
-					$Db_object->query("UPDATE " . $tableprefix  . "thread SET pollid=0 WHERE importthreadid <> 0 ");
+					$Db_object->query("
+						UPDATE " . $tableprefix  . "thread SET
+							pollid = 0
+						WHERE importthreadid <> 0
+					");
 
-					$Db_object->query("DELETE from " . $tableprefix  . "poll WHERE pollid IN($poll_ids)");
-					$Db_object->query("DELETE from " . $tableprefix  . "pollvote WHERE pollid IN($poll_ids)");
+					$Db_object->query("
+						DELETE from " . $tableprefix  . "poll
+						WHERE pollid IN(" . $poll_ids . ")
+					");
 
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "poll AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "poll auto_increment = 0");
+					$Db_object->query("
+						DELETE from " . $tableprefix  . "pollvote
+						WHERE pollid IN(" . $poll_ids . ")
+					");
 
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "pollvote AUTO_INCREMENT = 0");
-					$Db_object->query("ALTER TABLE " . $tableprefix  . "pollvote auto_increment = 0");
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "poll AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "poll auto_increment = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "pollvote AUTO_INCREMENT = 0
+					");
+
+					$Db_object->query("
+						ALTER TABLE " . $tableprefix  . "pollvote auto_increment = 0
+					");
 				}
 				return true;
 			}
@@ -5571,17 +6424,28 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$imported_users = $Db_object->query("SELECT userid FROM " . $tableprefix  . "user WHERE importuserid <> 0");
+				$imported_users = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix  . "user
+					WHERE importuserid <> 0
+				");
 
 				if ($Db_object->num_rows($imported_users))
 				{
 					$userids = array('0');
+
 					while ($userid = $Db_object->fetch_array($imported_users))
 					{
 						$userids[] = $userid['userid'];
 					}
-					$Db_object->query("UPDATE " . $tableprefix . "usertextfield SET buddylist = '' WHERE userid IN (" . implode(',', $userids) . ")");
+
+					$Db_object->query("
+						UPDATE " . $tableprefix . "usertextfield SET
+							buddylist = ''
+						WHERE userid IN (" . implode(',', $userids) . ")
+					");
 				}
 				return true;
 			}
@@ -5615,17 +6479,28 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$imported_users = $Db_object->query("SELECT userid FROM " . $tableprefix  . "user WHERE importuserid <> 0");
+				$imported_users = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix  . "user
+					WHERE importuserid <> 0
+				");
 
 				if ($Db_object->num_rows($imported_users))
 				{
 					$userids = array('0');
+
 					while ($userid = $Db_object->fetch_array($imported_users))
 					{
 						$userids[] = $userid['userid'];
 					}
-					$Db_object->query("UPDATE " . $tableprefix . "usertextfield SET ignorelist = '' WHERE userid IN (" . implode(',', $userids) . ")");
+
+					$Db_object->query("
+						UPDATE " . $tableprefix . "usertextfield SET
+							ignorelist = ''
+						WHERE userid IN (" . implode(',', $userids) . ")
+					");
 				}
 				return true;
 			}
@@ -5659,9 +6534,14 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// user ids
-				$users = $Db_object->query("SELECT userid FROM " . $tableprefix  . "user WHERE importuserid <> 0");
+				$users = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix  . "user
+					WHERE importuserid <> 0
+				");
 
 				if ($Db_object->num_rows($users))
 				{
@@ -5671,21 +6551,35 @@ class ImpExDatabaseCore extends ImpExFunction
 					{
 						$removeid[] = $user['userid'];
 					}
+
 					$user_ids = implode(',', $removeid);
 
 					// pm_texts
-					$pm_text_ids = $Db_object->query("SELECT pmtextid from " . $tableprefix  . "pm WHERE userid IN(" . $user_ids . ")");
+					$pm_text_ids = $Db_object->query("
+						SELECT pmtextid
+						FROM " . $tableprefix  . "pm
+						WHERE userid IN(" . $user_ids . ")
+					");
+
 					$removeid = array('0');
 
 					while ($pm_text = $Db_object->fetch_array($pm_text_ids))
 					{
 						$removeid[] = $pm_text['pmtextid'];
 					}
+
 					$_pm_text_ids = implode(',', $removeid);
 
 					// Remove them
-					$Db_object->query("DELETE from " . $tableprefix  . "pmtext WHERE fromuserid IN(" . $_pm_text_ids . ")");
-					$Db_object->query("DELETE from " . $tableprefix  . "pm WHERE userid IN(" . $user_ids . ")");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "pmtext
+						WHERE fromuserid IN(" . $_pm_text_ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "pm
+						WHERE userid IN(" . $user_ids . ")
+					");
 
 					// Just to make sure.
 					$check_sql = "DESCRIBE `" .$tableprefix . "pm`";
@@ -5693,9 +6587,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					while ($key = $Db_object->fetch_array($keys))
 					{
-						if($key['Field'] == "importpmid")
+						if ($key['Field'] == "importpmid")
 						{
-							$Db_object->query("DELETE from " . $tableprefix  . "pm WHERE importpmid <> 0");
+							$Db_object->query("
+								DELETE FROM " . $tableprefix  . "pm
+								WHERE importpmid <> 0
+							");
 						}
 					}
 
@@ -5704,9 +6601,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					while ($key = $Db_object->fetch_array($keys))
 					{
-						if($key['Field'] == "importpmid")
+						if ($key['Field'] == "importpmid")
 						{
-							$Db_object->query("DELETE from " . $tableprefix  . "pmtext WHERE importpmid <> 0");
+							$Db_object->query("
+								DELETE FROM " . $tableprefix  . "pmtext
+								WHERE importpmid <> 0
+							");
 						}
 					}
 				}
@@ -5742,17 +6642,27 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$imported_users = $Db_object->query("SELECT userid FROM " . $tableprefix  . "user WHERE importuserid <> 0");
+				$imported_users = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix  . "user
+					WHERE importuserid <> 0
+				");
 
 				if ($Db_object->num_rows($imported_users))
 				{
 					$removeid = array('0');
+
 					while ($userid = $Db_object->fetch_array($imported_users))
 					{
 						$removeid[] = $userid['userid'];
 					}
-					$Db_object->query("DELETE FROM " . $tableprefix  . "moderator WHERE userid IN (" . implode(',', $removeid) . ")");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "moderator
+						WHERE userid IN (" . implode(',', $removeid) . ")
+					");
 				}
 				return true;
 			}
@@ -5786,8 +6696,13 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "smilie WHERE importsmilieid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "smilie
+					WHERE importsmilieid <> 0
+				");
+
 				return true;
 			}
 
@@ -5820,11 +6735,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "usergroup WHERE importusergroupid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "usergroup
+					WHERE importusergroupid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "usergroup AUTO_INCREMENT=0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "usergroup auto_increment=0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "usergroup AUTO_INCREMENT=0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "usergroup auto_increment=0
+				");
 				return true;
 			}
 
@@ -5859,10 +6783,18 @@ class ImpExDatabaseCore extends ImpExFunction
 			// MySQL database
 			case 'mysql':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "customprofilepic WHERE importcustomprofilepicid <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "customprofilepic
+					WHERE importcustomprofilepicid <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "customprofilepic AUTO_INCREMENT=0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "customprofilepic auto_increment=0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "customprofilepic AUTO_INCREMENT=0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "customprofilepic auto_increment=0
+				");
 
 				return true;
 			}
@@ -5897,11 +6829,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "ranks WHERE importrankid  <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "ranks
+					WHERE importrankid  <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "ranks AUTO_INCREMENT=0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "ranks auto_increment=0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "ranks AUTO_INCREMENT=0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "ranks auto_increment=0
+				");
 
 				return true;
 			}
@@ -5936,11 +6877,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "usergroup WHERE importusergroupid  <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "usergroup
+					WHERE importusergroupid  <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "usergroup AUTO_INCREMENT=0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "usergroup auto_increment=0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "usergroup AUTO_INCREMENT=0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "usergroup auto_increment=0
+				");
 
 				return true;
 			}
@@ -5965,11 +6915,20 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$Db_object->query("DELETE FROM " . $tableprefix  . "phrase WHERE importphraseid  <> 0");
+				$Db_object->query("
+					DELETE FROM " . $tableprefix  . "phrase
+					WHERE importphraseid  <> 0
+				");
 
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "phrase AUTO_INCREMENT=0");
-				$Db_object->query("ALTER TABLE " . $tableprefix  . "phrase auto_increment=0");
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "phrase AUTO_INCREMENT=0
+				");
+
+				$Db_object->query("
+					ALTER TABLE " . $tableprefix  . "phrase auto_increment=0
+				");
 
 				return true;
 			}
@@ -5994,11 +6953,12 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$users = $Db_object->query("
 					SELECT userid, username
 					FROM " . $tableprefix . "user AS user
-					LEFT JOIN " . $tableprefix . "usergroup AS usergroup USING (usergroupid)
+						LEFT JOIN " . $tableprefix . "usergroup AS usergroup USING (usergroupid)
 					WHERE !(usergroup.adminpermissions & 3) # this is the 'cancontrolpanel' option
 				");
 
@@ -6008,16 +6968,17 @@ class ImpExDatabaseCore extends ImpExFunction
 					while ($user = $Db_object->fetch_array($users))
 					{
 						$Db_object->query("
-							UPDATE " . $tableprefix . "post
-							SET username = '" . addslashes($user['username']) . "',
-							userid = 0
-							WHERE userid = $user[userid]
+							UPDATE " . $tableprefix . "post SET
+								username = '" . $Db_object->escape_string($user['username']) . "',
+								userid = 0
+							WHERE userid = " . $user['userid'] . "
 						");
+
 						$Db_object->query("
-							UPDATE " . $tableprefix . "usernote
-							SET username = '" . addslashes($user['username']) . "',
-							posterid = 0
-							WHERE posterid = $user[userid]
+							UPDATE " . $tableprefix . "usernote SET
+								username = '" . $Db_object->escape_string($user['username']) . "',
+								posterid = 0
+							WHERE posterid = " . $user['userid'] . "
 						");
 
 						$removeid[] = $user['userid'];
@@ -6026,28 +6987,106 @@ class ImpExDatabaseCore extends ImpExFunction
 					$ids = implode(',', $removeid);
 
 					// user-related
-					$Db_object->query("DELETE FROM " . $tableprefix . "usernote WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "user WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "userfield WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "usertextfield WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "access WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "event WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "customavatar WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "customprofilepic WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "moderator WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "subscribeforum WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "subscribethread WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "subscriptionlog WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "session WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "userban WHERE userid IN ($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix . "administrator WHERE userid IN ($ids)");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "usernote
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "user
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "userfield
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "usertextfield
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "access
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "event
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "customavatar
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "customprofilepic
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "moderator
+						WHERE userid IN ($" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "subscribeforum
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "subscribethread
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "subscriptionlog
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "session
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "userban
+						WHERE userid IN (" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix . "administrator
+						WHERE userid IN (" . $ids . ")
+					");
 
 					// user
-					$Db_object->query("DELETE FROM " . $tableprefix  . "user WHERE userid IN($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix  . "customavatar WHERE userid IN($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix  . "customprofilepic WHERE userid IN($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix  . "userfield WHERE userid IN($ids)");
-					$Db_object->query("DELETE FROM " . $tableprefix  . "usertextfield WHERE userid IN($ids)");
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "user
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "customavatar
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "customprofilepic
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "userfield
+						WHERE userid IN(" . $ids . ")
+					");
+
+					$Db_object->query("
+						DELETE FROM " . $tableprefix  . "usertextfield
+						WHERE userid IN(" . $ids . ")
+					");
 				}
 
 				 return true;
@@ -6084,9 +7123,14 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				// Get all the user ids ......
-				$user_ids = $Db_object->query("SELECT userid FROM {$tableprefix}user WHERE importuserid <> 0");
+				$user_ids = $Db_object->query("
+					SELECT userid
+					FROM " . $tableprefix . "user
+					WHERE importuserid <> 0
+				");
 
 				// Uggg one at a time....
 				while ($userid = $Db_object->fetch_array($user_ids))
@@ -6094,7 +7138,11 @@ class ImpExDatabaseCore extends ImpExFunction
 					$current_folders = array();
 
 					// Get the current users folders
-					$db_folders = $Db_object->query_first("SELECT pmfolders FROM {$tableprefix}usertextfield WHERE userid=" . $userid['userid']);
+					$db_folders = $Db_object->query_first("
+						SELECT pmfolders
+						FROM " . $tableprefix . "usertextfield
+						WHERE userid=" . $userid['userid'] . "
+					");
 
 					// Append the new one
 					if ($db_folders['pmfolders'])
@@ -6108,7 +7156,11 @@ class ImpExDatabaseCore extends ImpExFunction
 					}
 
 					// Write it back to the usertextfield
-					$Db_object->query("UPDATE {$tableprefix}usertextfield SET pmfolders='" . serialize($current_folders) . "' WHERE userid=" . $userid['userid']);
+					$Db_object->query("
+						UPDATE " . $tableprefix . "usertextfield SET
+							pmfolders = '" . serialize($current_folders) . "'
+						WHERE userid = " . $userid['userid'] . "
+					");
 
 					unset($current_folders);
 				}
@@ -6142,60 +7194,94 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function clean_nested_forums($Db_object, $databasetype, $tableprefix, $importid)
 	{
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$sql = "
-			SELECT forumid, importcategoryid FROM " .
-			$tableprefix."forum
-			WHERE
-			parentid = 0
-			AND
-			importforumid <> 0";
-
-
-			$do_list = $Db_object->query($sql);
-
-			while ($do = $Db_object->fetch_array($do_list))
+			case 'mysql':
+			case 'mysqli':
 			{
-				$catid = $do['importcategoryid'];
-				$fid = $do['forumid'];
-				if ($importid[$catid] AND $fid)
-				{
-					$sql = "UPDATE " . $tableprefix."forum SET parentid=" . $importid[$catid] . " WHERE forumid =" . $fid;
-				}
+				$do_list = $Db_object->query("
+					SELECT forumid, importcategoryid
+					FROM " . $tableprefix."forum
+					WHERE parentid = 0
+						AND importforumid <> 0
+				");
 
-				$Db_object->query($sql);
+				while ($do = $Db_object->fetch_array($do_list))
+				{
+					$catid = $do['importcategoryid'];
+					$fid = $do['forumid'];
+
+					if ($importid[$catid] AND $fid)
+					{
+						$Db_object->query("
+							UPDATE " . $tableprefix . "forum SET
+								parentid = " . $importid[$catid] . "
+							WHERE forumid = " . $fid . ")
+						");
+					}
+				}
 			}
-		}
-		else
-		{
-			return false;
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
 
 	function update_user_pm_count($Db_object, $databasetype, $tableprefix)
 	{
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$users = $Db_object->query("SELECT userid, username FROM " . $tableprefix ."user");
-
-			while ($user = $Db_object->fetch_array($users))
+			case 'mysql':
+			case 'mysqli':
 			{
-				$pmcount = $Db_object->query("SELECT count(*) FROM " . $tableprefix ."pm WHERE userid = " . $user['userid']);
+				$users = $Db_object->query("
+					SELECT userid, username
+					FROM " . $tableprefix ."user
+				");
 
-				$pms = $Db_object->fetch_array($pmcount);
-
-				if(intval($pms[key($pms)]) != 0)
+				while ($user = $Db_object->fetch_array($users))
 				{
-					$Db_object->query("UPDATE " . $tableprefix ."user SET pmtotal=" . $pms[key($pms)] . " WHERE userid=" . $user['userid']);
+					$pmcount = $Db_object->query("
+						SELECT COUNT(*)
+						FROM " . $tableprefix . "pm
+						WHERE userid = " . $user['userid'] . "
+					");
+
+					$pms = $Db_object->fetch_array($pmcount);
+
+					if (intval($pms[key($pms)]) != 0)
+					{
+						$Db_object->query("
+							UPDATE " . $tableprefix ."user SET
+								pmtotal=" . $pms[key($pms)] . "
+							WHERE userid = " . $user['userid'] . "
+						");
+					}
 				}
+				return true;
 			}
-			return true;
-		}
-		else
-		{
-			return false;
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
@@ -6210,28 +7296,54 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function update_poll_ids($Db_object, $databasetype, $tableprefix)
 	{
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$result = $Db_object->query("SELECT pollid, threadid, importthreadid FROM " . $tableprefix . "thread WHERE open=10 AND pollid <> 0 AND importthreadid <> 0");
-
-			while ($thread = $Db_object->fetch_array($result))
+			case 'mysql':
+			case 'mysqli':
 			{
-				$new_thread_id = $Db_object->query_first("SELECT threadid FROM " . $tableprefix . "thread where importthreadid = ".$thread['pollid']);
+				$result = $Db_object->query("
+					SELECT pollid, threadid, importthreadid
+					FROM " . $tableprefix . "thread
+					WHERE open=10
+						AND pollid <> 0
+						AND importthreadid <> 0
+				");
 
-				if($new_thread_id['threadid'])
+				while ($thread = $Db_object->fetch_array($result))
 				{
-					// Got it
-					$Db_object->query("UPDATE " . $tableprefix . "thread SET pollid =" . $new_thread_id['threadid'] . " WHERE threadid=".$thread['threadid']);
-				}
-				else
-				{
-					// Why does it miss some ????
+					$new_thread_id = $Db_object->query_first("
+						SELECT threadid
+						FROM " . $tableprefix . "thread
+						WHERE importthreadid = " . $thread['pollid'] . "
+					");
+
+					if ($new_thread_id['threadid'])
+					{
+						// Got it
+						$Db_object->query("
+							UPDATE " . $tableprefix . "thread SET
+								pollid = " . $new_thread_id['threadid'] . "
+							WHERE threadid=".$thread['threadid'] . "
+						");
+					}
+					else
+					{
+						// Why does it miss some ????
+					}
 				}
 			}
-		}
-		else
-		{
-			return false;
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
@@ -6247,22 +7359,52 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function build_user_statistics($Db_object, $databasetype, $tableprefix)
 	{
-		// get total members
-		$members = $Db_object->query_first("SELECT COUNT(*) AS users, MAX(userid) AS max FROM " . $tableprefix . "user");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				// get total members
+				$members = $Db_object->query_first("
+					SELECT COUNT(*) AS users, MAX(userid) AS max
+					FROM " . $tableprefix . "user
+				");
 
-		// get newest member
-		$newuser = $Db_object->query_first("SELECT userid, username FROM " . $tableprefix . "user WHERE userid = $members[max]");
+				// get newest member
+				$newuser = $Db_object->query_first("
+					SELECT userid, username
+					FROM " . $tableprefix . "user
+					WHERE userid = " . $members['max'] . "
+				");
 
-		// make a little array with the data
-		$values = array(
-			'numbermembers' => $members['users'],
-			'newusername' => $newuser['username'],
-			'newuserid' => $newuser['userid']
-		);
+				// make a little array with the data
+				$values = array(
+					'numbermembers' => $members['users'],
+					'newusername' => $newuser['username'],
+					'newuserid' => $newuser['userid']
+				);
 
-		// update the special template
-		$Db_object->query("REPLACE INTO " . $tableprefix . "datastore (title, data)
-						VALUES ('userstats', '" . addslashes(serialize($values)) . "')");
+				// update the special template
+				$Db_object->query("
+					REPLACE INTO " . $tableprefix . "datastore
+						(title, data)
+					VALUES
+						('userstats', '" . $Db_object->escape_string(serialize($values)) . "')
+				");
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	/**
@@ -6277,22 +7419,41 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function construct_child_list($Db_object, $databasetype, $tableprefix, $forumid)
 	{
-		if ($forumid == -1)
+		switch ($databasetype)
 		{
-			return '-1';
+			case 'mysql':
+			case 'mysqli':
+			{
+				if ($forumid == -1)
+				{
+					return '-1';
+				}
+
+				$childlist = $forumid;
+
+				$children = $Db_object->query("SELECT forumid FROM " . $tableprefix . "forum WHERE parentid = {$forumid}");
+				while ($child = $Db_object->fetch_array($children))
+				{
+					$childlist .= ',' . $child['forumid'];
+				}
+
+				$childlist .= ',-1';
+
+				return $childlist;
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
-
-		$childlist = $forumid;
-
-		$children = $Db_object->query("SELECT forumid FROM " . $tableprefix . "forum WHERE parentid = {$forumid}");
-		while ($child = $Db_object->fetch_array($children))
-		{
-			$childlist .= ',' . $child['forumid'];
-		}
-
-		$childlist .= ',-1';
-
-		return $childlist;
 	}
 
 
@@ -6308,17 +7469,40 @@ class ImpExDatabaseCore extends ImpExFunction
 	*/
 	function build_forum_child_lists($Db_object, $databasetype, $tableprefix, $forumid = -1)
 	{
-		$forums = $Db_object->query("SELECT forumid FROM " . $tableprefix . "forum WHERE childlist = ''");
-
-
-		while ($forum = $Db_object->fetch_array($forums))
+		switch ($databasetype)
 		{
-			$childlist = $this->construct_child_list($Db_object, $databasetype, $tableprefix, $forum['forumid']);
-			$Db_object->query("
-				UPDATE " . $tableprefix . "forum
-				SET childlist = '$childlist'
-				WHERE forumid = " . $forum['forumid']
-			);
+			case 'mysql':
+			case 'mysqli':
+			{
+				$forums = $Db_object->query("
+					SELECT forumid
+					FROM " . $tableprefix . "forum
+					WHERE childlist = ''
+				");
+
+				while ($forum = $Db_object->fetch_array($forums))
+				{
+					$childlist = $this->construct_child_list($Db_object, $databasetype, $tableprefix, $forum['forumid']);
+
+					$Db_object->query("
+						UPDATE " . $tableprefix . "forum SET
+							childlist = '$childlist'
+						WHERE forumid = " . $forum['forumid'] . "
+					");
+				}
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
@@ -6342,25 +7526,31 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				// TODO: Was used as a work around, this should all be done in one SQL statment
-				$thread_ids = $Db_object->query("SELECT DISTINCT threadid FROM " . $tableprefix . "post where importthreadid <> 0");
+				$thread_ids = $Db_object->query("
+					SELECT DISTINCT threadid
+					FROM " . $tableprefix . "post
+					WHERE importthreadid <> 0
+				");
 
 				if ($Db_object->num_rows($thread_ids))
 				{
-					while($thread_id = $Db_object->fetch_array($thread_ids))
+					while ($thread_id = $Db_object->fetch_array($thread_ids))
 					{
 						$parentpost = $Db_object->query_first("
-							SELECT postid FROM " . $tableprefix . "post
-							WHERE threadid = $thread_id[threadid]
-							ORDER BY dateline LIMIT 1
+							SELECT postid
+							FROM " . $tableprefix . "post
+							WHERE threadid = " . $thread_id['threadid'] . "
+							ORDER BY dateline
+							LIMIT 1
 						");
 
 						$Db_object->query("
-							UPDATE " . $tableprefix . "post
-							SET parentid = $parentpost[postid]
-							WHERE threadid = $thread_id[threadid]
-								AND postid <> $parentpost[postid]
+							UPDATE " . $tableprefix . "post SET
+								parentid = " . $parentpost['postid'] . "
+							WHERE threadid = " . $thread_id['threadid'] . "
+								AND postid <> " . $parentpost['postid'] . "
 								AND parentid = 0
 						");
 					}
@@ -6398,6 +7588,7 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$usergroupids = $Db_object->query("
 					SELECT usergroupid
@@ -6411,11 +7602,12 @@ class ImpExDatabaseCore extends ImpExFunction
 
 					while ($usergroupid = $Db_object->fetch_array($usergroupids))
 					{
-						$sql = ("SELECT forumpermissionid FROM " . $tableprefix . "forumpermission
-						WHERE
-						forumid={$forum_id}
-						AND
-						usergroupid =". $usergroupid['usergroupid']);
+						$exsists = $Db_object->query_first("
+							SELECT forumpermissionid
+							FROM " . $tableprefix . "forumpermission
+							WHERE forumid = " . $forum_id . "
+								AND usergroupid = ". $usergroupid['usergroupid'] . "
+						");
 
 						$exsists = $Db_object->query_first($sql);
 
@@ -6425,7 +7617,7 @@ class ImpExDatabaseCore extends ImpExFunction
 						}
 						else
 						{
-							$extended_insert[] = "($forum_id, $usergroupid[usergroupid], 0)";
+							$extended_insert[] = "(" . $forum_id . ", " . $usergroupid['usergroupid'] . ", 0)";
 						}
 					}
 
@@ -6440,9 +7632,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					}
 				}
 
-				// TODO: Need to actually check this opposed to just returning it !
 				return true;
-
 			}
 
 			// Postgres database
@@ -6477,10 +7667,17 @@ class ImpExDatabaseCore extends ImpExFunction
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 				$Db_object->reporterror = false;
-				$result = $Db_object->query_first("SELECT {$field} FROM {$tableprefix}userfield");
+
+				$result = $Db_object->query_first("
+					SELECT " . $field . "
+					FROM " . $tableprefix . "userfield
+				");
+
 				$Db_object->reporterror = true;
+
 				if (!$Db_object->errno)
 				{
 					return true;
@@ -6514,27 +7711,27 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	boolean
 	*/
-	function check_database($Db_object, $databasetype, $tableprefix, $sourceexists)
+	function check_database($Db_object, $databasetype, $tableprefix, $sourceexists, &$displayobject)
 	{
 		// Need to use $this->source_table_cache
 		$found_tables = array();
 
-		if(!$sourceexists)
+		if (!$sourceexists)
 		{
-			// TODO: return code of phrase
-			return array( 	'code'	=>	false,
-							'text'	=>	"<h4>Please set 'sourceexists = true' in ImpExConfig.php</h4>");
+			return array(
+				'code'	=>	false,
+				'text'	=>	$displayobject->phrases['sourceexists_true']
+			);
 		}
 
 		$return_string = '';
 
 		if (count($this->_valid_tables) == 0)
 		{
-			// TODO: return code of phrase
-			die('<h4>ImpExDatabase :: check_database $this->_valid_tables must be over ridden in the 000 module of the system</h4>');
+			die($displayobject->phrases['validtable_overridden']);
 		}
 
-		foreach ($this->_valid_tables as $key => $value)
+		foreach ($this->_valid_tables AS $key => $value)
 		{
 			if (lowercase_table_names)
 			{
@@ -6552,23 +7749,26 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
 				$code = false;
 				$prefix_poss = array();
-				$tables = $Db_object->query("SHOW TABLES");
-				$return_string .= "<hr><h3>Testing source against : <b>" . $this->system ."</b> ::" . $this->_version . "</h3>";
-				$return_string .= "<br /><b>Valid found tables :</b><br /> ";
 
-				while ($table = $Db_object->fetch_array($tables))
+				$tables = $Db_object->query("
+					SHOW TABLES
+				");
+
+				$return_string .= $displayobject->update_html($displayobject->table_header());
+				$return_string .= $displayobject->update_html($displayobject->make_table_header($displayobject->phrases['testing_source_against'] . $this->system .' ::' . $this->_version . ''));
+
+				$return_string .= $displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['valid_tables_found'] . '</b>'));
+
+				while ($table = $Db_object->fetch_row($tables))
 				{
-					/// The above call to fetch_array() needs to be passed DBARRAY_NUM if db_mysql.php is updated!
-					// NOTE: Building display data here ! AARRRGGGHHH Must change !
-					// TODO: -
-
 					if (in_array($table[0], $valid_tables))
 					{
 						// TODO: return code of phrase
-						$return_string .= "\n\t<br /><span class=\"isucc\">" . $table[0] . " found.</span>";
+						$return_string .= $displayobject->update_html($displayobject->make_description('<span class="isucc">' . $table[0] . ' ' . $displayobject->phrases['found'] . '.</span>'));
 
 						// List the found ones
 						$found_tables[] = $table[0];
@@ -6577,9 +7777,9 @@ class ImpExDatabaseCore extends ImpExFunction
 					}
 					else
 					{
-						foreach($this->_valid_tables AS $valid_table)
+						foreach ($this->_valid_tables AS $valid_table)
 						{
-							if($pos = strpos($table[0], $valid_table))
+							if ($pos = strpos($table[0], $valid_table))
 							{
 								$poss_key = substr($table[0], 0, $pos);
 								$prefix_poss[$poss_key]++;
@@ -6590,39 +7790,47 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				$not_found = array_diff($valid_tables, $found_tables);
 
-				if(count($not_found))
+				if (count($not_found))
 				{
-					$return_string .= "\n\t<br /><br /><b>Possibly custom tables or incorrect prefix :</b><br /> ";
-					// Found some
-					foreach($not_found as $table_name)
+					$return_string .= $displayobject->update_html($displayobject->make_description($displayobject->phrases['customtable_prefix']));
+
+					foreach ($not_found AS $table_name)
 					{
 						// TODO: Phrase
-						$return_string .= "\n\t<br /><span class=\"ifail\">{$table_name} <b>NOT</b> found.</span>";
+						$return_string .= $displayobject->update_html($displayobject->make_description('<span class="ifail">' . $table_name . ' ' . $displayobject->phrases['not_found'] . '.</span>'));
 					}
 				}
 
 				if ($prefix_poss)
 				{
 					krsort($prefix_poss, SORT_NUMERIC);
+
 					if (end($prefix_poss) > count($found_tables))
 					{
-						$return_string .= "\n\t<br />\n\t<br />\n\t<span><b>If you have all red tables, i.e. none correct this could possible be your table prefix :</b></span>\n\t<br />\n\t<br />\n\t<list>";
+						$return_string .= $displayobject->update_html($displayobject->make_description('<span><b>If you have all red tables, i.e. none correct this could possible be your table prefix :</b></span><br /><br />'));
 						// Possiable table prefix
 						// Sort to get the most common found one
-						$return_string .="\n\t\t<li>" . key($prefix_poss) . "</li>";
-						$return_string .= "\n\t</list>";
+						$return_string .= $displayobject->update_html($displayobject->make_description(key($prefix_poss)));
 					}
 				}
 
-				return array(	'code'	=>	$code,
-								'text'	=>	$return_string);
+				$return_string .= $displayobject->update_html($displayobject->table_footer());
+
+				return array(
+					'code'	=>	$code,
+					'text'	=>	$return_string
+				);
 
 			}
 
 			// MS-SQL database
 			case 'mssql':
 			{
-				$tables = $Db_object->query("SELECT	TABLE_NAME FROM	INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+				$tables = $Db_object->query("
+					SELECT TABLE_NAME
+					FROM INFORMATION_SCHEMA.TABLES
+					WHERE TABLE_TYPE = 'BASE TABLE'
+				");
 
 				while ($table = $Db_object->fetch_array($tables))
 				{
@@ -6638,14 +7846,16 @@ class ImpExDatabaseCore extends ImpExFunction
 
 				$not_found = array_diff($valid_tables, $found_tables);
 
-				foreach($not_found as $table_name)
+				foreach($not_found AS $table_name)
 				{
 					// TODO: Phrase
 					$return_string .= "<br /><span class=\"ifail\">{$table_name} <b>NOT</b> found.</span>";
 				}
 
-				return array(	'code'	=>	true,
-								'text'	=>	$return_string);
+				return array(
+					'code'	=>	true,
+					'text'	=>	$return_string
+				);
 			}
 
 			// other
@@ -6662,59 +7872,58 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				$tables = $Db_object->query("SHOW TABLES");
+				$tables = $Db_object->query("
+					SHOW TABLES
+				");
+
 				while ($table = $Db_object->fetch_array($tables))
 				{
-
-
 					if ($table[key($table)] == $tableprefix . $table_name)
 					{
 						// Check if there are required fields
 						if ($req_fields AND is_array($req_fields))
 						{
-							if ($databasetype == 'mysql')
+							$src_fields = $Db_object->query("
+								DESCRIBE " . $tableprefix . $table_name . "
+							");
+
+							$key_array = array();
+
+							while ($src_field = $Db_object->fetch_array($src_fields))
 							{
-								$src_fields = $Db_object->query("DESCRIBE {$tableprefix}{$table_name}");
-
-								$key_array = array();
-
-								while ($src_field = $Db_object->fetch_array($src_fields))
+								if ($req_fields[$src_field['Field']])
 								{
-									if ($req_fields[$src_field['Field']])
-									{
-										unset($req_fields[$src_field['Field']]);
-									}
+									unset($req_fields[$src_field['Field']]);
+								}
+							}
+
+							// if any that were required wern't unset, they aren't there
+							if (count($req_fields) > 0)
+							{
+								$string = '';
+								$string .= '<br />ImpEx cannot continue and has halted due to missing needed fields in the source database :';
+								$string .= '<br />';
+								$string .= '<br />';
+								$string .= '<list>';
+
+								foreach ($req_fields as $missing => $o)
+								{
+									$string .= "<li>" . $tableprefix . $table_name . ".<b>" . $missing . "</b></li>";
 								}
 
-								// if any that were required wern't unset, they aren't there
-								if (count($req_fields) > 0)
-								{
-									$string = '';
-										$string .= '<br />ImpEx cannot continue and has halted due to missing needed fields in the source database :';
-										$string .= '<br />';
-										$string .= '<br />';
-										$string .= '<list>';
-										foreach ($req_fields as $missing => $o)
-										{
-											$string .= "<li>{$tableprefix}{$table_name}.<b>{$missing}</b></li>";
-										}
-										$string .= "</list>";
-										$string .= '<br />Repair the source database and restart the import.';
-										$string .= "</body>";
-										$string .= "</html>";
+								$string .= "</list>";
+								$string .= '<br />Repair the source database and restart the import.';
+								$string .= "</body>";
+								$string .= "</html>";
 
-										echo $string;
-										exit();
-								}
-								else
-								{
-									// all found
-									return true;
-								}
+								echo $string;
+								exit();
 							}
 							else
 							{
+								// all found
 								return true;
 							}
 						}
@@ -6749,23 +7958,28 @@ class ImpExDatabaseCore extends ImpExFunction
 	}
 
 	/**
-	* Checks for a smilie text
-	*
-	* @param	object	databaseobject	The database that the function is going to interact with.
-	* @param	string	mixed			The type of database 'mysql', 'postgresql', etc
-	* @param	string	mixed			The prefix to the table name i.e. 'vb3_'
-	* @param	string	mixed			array( title => '', smilietext => '', smiliepath => '')
-	*
-	* @return	boolean
-	*/
+	 * Checks for a smilie text
+	 *
+	 * @param	object	databaseobject	The database that the function is going to interact with.
+	 * @param	string	mixed			The type of database 'mysql', 'postgresql', etc
+	 * @param	string	mixed			The prefix to the table name i.e. 'vb3_'
+	 * @param	string	mixed			array( title => '', smilietext => '', smiliepath => '')
+	 *
+	 * @return	boolean
+	 */
 	function does_smilie_exists($Db_object, $databasetype, $tableprefix, $smilie)
 	{
 		switch ($databasetype)
 		{
 			// MySQL database
 			case 'mysql':
+			case 'mysqli':
 			{
-				return $Db_object->query_first("SELECT smilieid FROM " . $tableprefix . "smilie WHERE smilietext='". addslashes($smilie['smilietext']) ."'");
+				return $Db_object->query_first("
+					SELECT smilieid
+					FROM " . $tableprefix . "smilie
+					WHERE smilietext = '". $Db_object->escape_string($smilie['smilietext']) ."'
+				");
 			}
 
 			// Postgres database
@@ -6782,25 +7996,25 @@ class ImpExDatabaseCore extends ImpExFunction
 		}
 	}
 
-/**
-	* Returns the attachment_id => attachment array
-	*
-	* @param	object	databaseobject	The database object to run the query against
-	* @param	string	mixed			Table database type
-	* @param	string	mixed			The prefix to the table name i.e. 'vb3_'
-	* @param	int		mixed			Start point
-	* @param	int		mixed			End point
-	* @param	string	mixed			Productid of product that owns the attachment
-	* @param	string	mixed			Class of the content that owns the attachment
-	*
-	* @return	array
-	*/
+	/**
+	 * Returns the attachment_id => attachment array
+	 *
+	 * @param	object	databaseobject	The database object to run the query against
+	 * @param	string	mixed			Table database type
+	 * @param	string	mixed			The prefix to the table name i.e. 'vb3_'
+	 * @param	int		mixed			Start point
+	 * @param	int		mixed			End point
+	 * @param	string	mixed			Productid of product that owns the attachment
+	 * @param	string	mixed			Class of the content that owns the attachment
+	 *
+	 * @return	array
+	 */
 	function get_vb4_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $productid, $class)
 	{
 		$return_array = array();
 
 		// Check that there is not an empty value
-		if(empty($per_page))
+		if (empty($per_page))
 		{
 			return $return_array;
 		}
@@ -6808,84 +8022,130 @@ class ImpExDatabaseCore extends ImpExFunction
 		// Get contenttypeid
 		$contenttypeid = $this->get_contenttypeid($Db_object, $databasetype, $tableprefix, $productid, $class);
 
-		if ($databasetype == 'mysql')
+		switch ($databasetype)
 		{
-			$sql = "
-				SELECT
-					a.*,
-					fd.filesize, fd.filedata, fd.width, fd.height, fd.filehash, fd.userid
-				FROM {$tableprefix}attachment AS a
-				INNER JOIN {$tableprefix}filedata AS fd ON (a.filedataid = fd.filedataid)
-				WHERE
-					a.contenttypeid = {$contenttypeid}
-				ORDER BY a.attachmentid
-				LIMIT {$start_at}, {$per_page}
-			";
-
-			$details_list = $Db_object->query($sql);
-
-			while ($detail = $Db_object->fetch_array($details_list))
+			case 'mysqli':
+			case 'mysqli':
 			{
-				$return_array["$detail[attachmentid]"] = $detail;
+				$sql = "
+					SELECT
+						a.*,
+						fd.filesize, fd.filedata, fd.width, fd.height, fd.filehash, fd.userid
+					FROM " . $tableprefix . "attachment AS a
+					INNER JOIN " . $tableprefix . "filedata AS fd ON (a.filedataid = fd.filedataid)
+					WHERE
+						a.contenttypeid = {$contenttypeid}
+					ORDER BY a.attachmentid
+					LIMIT {$start_at}, {$per_page}
+				";
+
+				$details_list = $Db_object->query($sql);
+
+				while ($detail = $Db_object->fetch_array($details_list))
+				{
+					$return_array["$detail[attachmentid]"] = $detail;
+				}
+
+				return $return_array;
 			}
 
-			return $return_array;
-		}
-		else
-		{
-			return false;
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
 		}
 	}
 
-/**
-	* Returns the attachment_id => attachment array
-	*
-	* @param	object	databaseobject	The database object to run the query against
-	* @param	string	mixed			Table database type
-	* @param	string	mixed			The prefix to the table name i.e. 'vb3_'
- 	* @param	string	mixed			Productid of product that owns the attachment
-	* @param	string	mixed			Class of the content that owns the attachment
-	*
-	* @return	int		Contenttypeid
- */
+	/**
+	 * Returns the attachment_id => attachment array
+	 *
+	 * @param	object	databaseobject	The database object to run the query against
+	 * @param	string	mixed			Table database type
+	 * @param	string	mixed			The prefix to the table name i.e. 'vb3_'
+ 	 * @param	string	mixed			Productid of product that owns the attachment
+	 * @param	string	mixed			Class of the content that owns the attachment
+	 *
+	 * @return	int		Contenttypeid
+	 */
 	function get_contenttypeid(&$Db_object, &$databasetype, &$tableprefix, $productid, $class)
 	{
-		$contenttype = $Db_object->query_first("
-			SELECT c.contenttypeid
-			FROM {$tableprefix}contenttype AS c
-			INNER JOIN {$tableprefix}package AS p ON (c.packageid = p.packageid)
-			WHERE
-				c.class = '" . addslashes($class) . "'
-					AND
-				p.productid = '" . addslashes($productid) . "'
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$contenttype = $Db_object->query_first("
+					SELECT c.contenttypeid
+					FROM " . $tableprefix . "contenttype AS c
+						INNER JOIN " . $tableprefix . "package AS p ON (c.packageid = p.packageid)
+					WHERE c.class = '" . $Db_object->escape_string($class) . "'
+						AND p.productid = '" . $Db_object->escape_string($productid) . "'
+				");
 
-		return intval($contenttype['contenttypeid']);
+				return intval($contenttype['contenttypeid']);
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
-/**
-	* Returns the packageid
-	*
-	* @param	object	databaseobject	The database object to run the query against
-	* @param	string	mixed			Table database type
-	* @param	string	mixed			The prefix to the table name i.e. 'vb3_'
- 	* @param	string	mixed			Productid of product 
-	* @param	string	mixed			Class of the content
-	*
-	* @return	int		Packageid
- */
+	/**
+	 * Returns the packageid
+	 *
+	 * @param	object	databaseobject	The database object to run the query against
+	 * @param	string	mixed			Table database type
+	 * @param	string	mixed			The prefix to the table name i.e. 'vb3_'
+ 	 * @param	string	mixed			Productid of product 
+	 * @param	string	mixed			Class of the content
+	 *
+	 * @return	int		Packageid
+	 */
 	function get_packageid(&$Db_object, &$databasetype, &$tableprefix, $productid, $class)
 	{
-		$package = $Db_object->query_first("
-			SELECT packageid
-			FROM {$tableprefix}package
-			WHERE
-				productid = '" . addslashes($productid) . "'
-					AND
-				class = '" . addslashes($class) . "'
-		");
+		switch ($databasetype)
+		{
+			case 'mysql':
+			case 'mysqli':
+			{
+				$package = $Db_object->query_first("
+					SELECT packageid
+					FROM " . $tableprefix . "package
+					WHERE productid = '" . $Db_object->escape_string($productid) . "'
+						AND class = '" . $Db_object->escape_string($class) . "'
+				");
 
-		return $package['packageid'];
+				return $package['packageid'];
+			}
+
+			// Postgres database
+			case 'postgresql':
+			{
+				return false;
+			}
+
+			// other
+			default:
+			{
+				return false;
+			}
+		}
 	}
 }
 
@@ -6924,26 +8184,30 @@ class ImpExCache
 
 		$type = strtolower($type);
 
-		switch($type)
+		switch ($type)
 		{
 			case 'user':
 			{
 				// Already guest
 				if ($importid == 0)
 				{
-					return "0";
+					return 0;
 				}
 
 				if (!$this->userid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT userid, username FROM ". $this->prefix ."user WHERE importuserid={$importid}");
-					$this->userid_array[$importid]	= $data['userid'];
-					$this->username_array[$importid]= $data['username'];
+					$data = $this->Db->query_first("
+						SELECT userid
+						FROM ". $this->prefix ."user
+						WHERE importuserid = " . $importid . "
+					");
+
+					$this->userid_array[$importid] = $data['userid'];
 
 					// Guest
 					if (!$this->userid_array[$importid])
 					{
-						return "0";
+						return 0;
 					}
 				}
 
@@ -6962,8 +8226,13 @@ class ImpExCache
 
 				if (!$this->username_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT username FROM ". $this->prefix ."user WHERE importuserid={$importid}");
-					$this->username_array[$importid]= $data['username'];
+					$data = $this->Db->query_first("
+						SELECT username
+						FROM ". $this->prefix ."user
+						WHERE importuserid = " . $importid . "
+					");
+
+					$this->username_array[$importid] = $data['username'];
 				}
 
 				return $this->username_array[$importid];
@@ -6981,11 +8250,16 @@ class ImpExCache
 
 				if (!$this->usernametoid_array["$importid"])
 				{
-					$data = $this->Db->query_first("SELECT userid FROM ". $this->prefix ."user WHERE username='" . addslashes($importid) . "'");
-					$this->usernametoid_array["$importid"]= $data['userid'];
+					$data = $this->Db->query_first("
+						SELECT userid
+						FROM ". $this->prefix . "user
+						WHERE username = '" . $Db_object->escape_string($importid) . "'
+					");
+
+					$this->usernametoid_array[$importid] = $data['userid'];
 				}
 
-				return $this->usernametoid_array["$importid"];
+				return $this->usernametoid_array[$importid];
 
 				break;
 			}
@@ -6994,8 +8268,12 @@ class ImpExCache
 			{
 				if (!$this->threadid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT threadid FROM ". $this->prefix ."thread WHERE importthreadid={$importid}");
-					$this->threadid_array[$importid]= $data['threadid'];
+					$data = $this->Db->query_first("
+						SELECT threadid
+						FROM ". $this->prefix ."thread
+						WHERE importthreadid = " . $importid . "
+					");
+					$this->threadid_array[$importid] = $data['threadid'];
 				}
 
 				return $this->threadid_array[$importid];
@@ -7007,7 +8285,13 @@ class ImpExCache
 			{
 				if (!$this->threadandforumid_array[$forum][$importid])
 				{
-					$data = $this->Db->query_first("SELECT threadid FROM ". $this->prefix ."thread WHERE importthreadid={$importid} AND importforumid={$forum}");
+					$data = $this->Db->query_first("
+						SELECT threadid
+						FROM ". $this->prefix ."thread
+						WHERE importthreadid = " . $importid . "
+							AND importforumid = " . $forum . "
+					");
+
 					$this->threadandforumid_array[$forum][$importid] = $data['threadid'];
 				}
 
@@ -7020,8 +8304,13 @@ class ImpExCache
 			{
 				if (!$this->postid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT postid FROM ". $this->prefix ."post WHERE importpostid={$importid}");
-					$this->postid_array[$importid]= $data['postid'];
+					$data = $this->Db->query_first("
+						SELECT postid
+						FROM ". $this->prefix ."post
+						WHERE importpostid = " . $importid . "
+					");
+
+					$this->postid_array[$importid] = $data['postid'];
 				}
 
 				return $this->postid_array[$importid];
@@ -7034,7 +8323,13 @@ class ImpExCache
 				if (!$this->blogid_array[$importid])
 				{
 					$this->Db->reporterror = 0;
-					$data = $this->Db->query_first("SELECT blogid FROM " . $this->prefix . "blog WHERE importblogid={$importid}");
+
+					$data = $this->Db->query_first("
+						SELECT blogid
+						FROM " . $this->prefix . "blog
+						WHERE importblogid = " . $importid . "
+					");
+
 					$this->Db->reporterror = 1;
 					$this->blogid_array[$importid]= $data['blogid'];
 				}
@@ -7048,7 +8343,12 @@ class ImpExCache
 			{
 				if (!$this->blogcatid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT blogcategoryid FROM ". $this->prefix ."blog_category WHERE importblogcategoryid={$importid}");
+					$data = $this->Db->query_first("
+						SELECT blogcategoryid
+						FROM ". $this->prefix ."blog_category
+						WHERE importblogcategoryid = " . $importid . "
+					");
+
 					$this->blogcatid_array[$importid]= $data['blogcategoryid'];
 				}
 
@@ -7061,7 +8361,12 @@ class ImpExCache
 			{
 				if (!$this->cmscatid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT categoryid FROM ". $this->prefix ."cms_category WHERE importcmscategoryid={$importid}");
+					$data = $this->Db->query_first("
+						SELECT categoryid
+						FROM ". $this->prefix ."cms_category
+						WHERE importcmscategoryid = " . $importid . "
+					");
+
 					$this->cmscatid_array[$importid] = $data['categoryid'];
 				}
 
@@ -7074,7 +8379,12 @@ class ImpExCache
 			{
 				if (!$this->cmsgrid_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT gridid FROM {$this->prefix}cms_grid WHERE importcmsgridid = {$importid}");
+					$data = $this->Db->query_first("
+						SELECT gridid
+						FROM " . $this->prefix . "cms_grid
+						WHERE importcmsgridid = " . $importid . "
+					");
+
 					$this->cmsgrid_array[$importid] = $data['gridid'];
 				}
 				return $this->cmsgrid_array[$importid];
@@ -7086,7 +8396,12 @@ class ImpExCache
 			{
 				if (!$this->cmslayout_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT layoutid FROM {$this->prefix}cms_layout WHERE importcmslayoutid = {$importid}");
+					$data = $this->Db->query_first("
+						SELECT layoutid
+						FROM " . $this->prefix . "cms_layout
+						WHERE importcmslayoutid = " . $importid  ."
+					");
+
 					$this->cmslayout_array[$importid] = $data['layoutid'];
 				}
 				return $this->cmslayout_array[$importid];
@@ -7098,7 +8413,12 @@ class ImpExCache
 			{
 				if (!$this->cmsnode_array[$importid])
 				{
-					$data = $this->Db->query_first("SELECT nodeid FROM {$this->prefix}cms_node WHERE importcmsnodeid = {$importid}");
+					$data = $this->Db->query_first("
+						SELECT nodeid
+						FROM " . $this->prefix . "cms_node
+						WHERE importcmsnodeid = " . $importid . "
+					");
+
 					$this->cmsnode_array[$importid] = $data['nodeid'];
 				}
 				return $this->cmsnode_array[$importid];
@@ -7133,13 +8453,16 @@ class ImpExCache
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 
 				$avatar_qry = $Db_object->query("
-					SELECT avatarid FROM " . TABLE_PREFIX . "avatar WHERE
-					importavatarid = " . $this->get_value('nonmandatory','iiconid')) ;
+					SELECT avatarid
+					FROM " . TABLE_PREFIX . "avatar
+					WHERE importavatarid = " . $this->get_value('nonmandatory', 'iiconid') . "
+				");
 
-				if ($avatar_info = $Db_object->fetch_array($avatar_qry) )
+				if ($avatar_info = $Db_object->fetch_array($avatar_qry))
 				{
 					if ($avatar_info['avatarid'])
 					{
@@ -7150,6 +8473,7 @@ class ImpExCache
 
 				break;
 			}
+
 			default :
 			{
 				return false;
@@ -7160,47 +8484,50 @@ class ImpExCache
 		//first we need to save the file.
 		if (file_exists($targetfile))
 		{
-			return "File $targetfile already exists. Please select a target folder with no files with the names of those to be imported.<br />\n";
+			return 'File ' . $targetfile . ' already exists. Please select a target folder with no files with the names of those to be imported.<br />\n';
 		}
 		$file_contents = $this->vb_file_get_contents($sourcefile);
 
 		if (!$file_contents)
 		{
-			return "File $sourcefile is either missing, empty, or hidden<br />\n";
+			return 'File ' . $sourcefile . ' is either missing, empty, or hidden<br />\n';
 		}
 
 		if (!vb_file_save_contents($filename, $contents))
 		{
-			return "The file create/save command failed. Please check the target folder location and permissions.<br />\n";
+			return 'The file create/save command failed. Please check the target folder location and permissions.<br />\n';
 		}
 
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 
 				$Db_object->query_write("
 					INSERT INTO " . TABLE_PREFIX . "avatar
-				(
-					title,
-					minimumposts,
-					avatarpath,
-					imagecategoryid,
-					displayorder,
-					importavatarid
-				)
-				VALUES
-				(
-					'" . addslashes($this->get_value('nonmandatory','title')) . "',
-					0, '" .
-				addslashes($this->get_value('nonmandatory','avatarpath')) . "',
-					" . $this->get_value('mandatory','imagecategoryid')  . ", 1, " .
-				$this->get_value('mandatory','importavatarid')  . ") "
+					(
+						title,
+						minimumposts,
+						avatarpath,
+						imagecategoryid,
+						displayorder,
+						importavatarid
+					)
+					VALUES
+					(
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+						0,
+						'" . $Db_object->escape_string($this->get_value('nonmandatory', 'avatarpath')) . "',
+						" . $this->get_value('mandatory', 'imagecategoryid')  . ",
+						1,
+						" . $this->get_value('mandatory', 'importavatarid')  . ") "
 				);
 
 				$avatarid = $Db_object->insert_id();
 				return $avatarid;
 			}
+
 			default :
 			{
 				return false;
@@ -7211,7 +8538,6 @@ class ImpExCache
 
 	function assignAvatar(&$Db_object, &$databasetype, &$tableprefix, $userid, $avatarid)
 	{
-
 		if (!intval($userid) OR !intval($avatarid) )
 		{
 			return false;
@@ -7221,10 +8547,14 @@ class ImpExCache
 		switch ($databasetype)
 		{
 			case 'mysql':
+			case 'mysqli':
 			{
 				$Db_object->query("
-					update " . $tableprefix . "user
-					set avatarid = $avatarid where userid = $userid	");
+					UPDATE " . $tableprefix . "user SET
+						avatarid = " . $avatarid . "
+					WHERE userid = " . $userid . "
+				");
+
 				return $Db_object->insert_id();
 			}
 

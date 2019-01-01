@@ -31,7 +31,7 @@ class vb2_000 extends ImpExModule
 	*
 	* @var    array
 	*/
-	var $_modulestring 	= 'vBulletin 2';
+	var $_modulestring 	= 'vBulletin';
 	var $_homepage 	= 'http://www.vbulletin.com';
 
 	/**

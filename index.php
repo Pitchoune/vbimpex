@@ -69,25 +69,26 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 {
 	// If the admincp was renamed, lets try and find it depending on vBulletin version
 	$admincpdir = '';
+
 	require('../includes/config.php');
 
 	if (!empty($admincpdir)) // 3.0.x will overwrite this
 	{
 		// Version 3.0.x
-		chdir("../{$admincpdir}/");
+		chdir("../" . $admincpdir . "/");
 	}
 	else if (!empty($config['Misc']['admincpdir']))
 	{
-		if(is_dir("../{$config['Misc']['admincpdir']}/"))
+		if (is_dir("../" . $config['Misc']['admincpdir'] . "/"))
 		{
 			// Version 3.6.x
 			chdir("../");
-			include ('./includes/adminfunctions.php'); // Only for 3.6.x
+			require_once('./includes/adminfunctions.php'); // Only for 3.6.x
 		}
 		else
 		{
 			// The config.php path is invalid
-			die('config.php admincp path does not exsist');
+			die('config.php admincp path does not exist');
 		}
 	}
 	else
@@ -95,8 +96,13 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 		// Should never be here.
 	}
 
+	if (!defined('DIR'))
+	{
+		define('DIR', (($getcwd = getcwd()) ? $getcwd : '.'));
+	}
+
 	// Get the admincp global
-	require_once('./global.php'); // Works for 3.6.x and 3.0.x as global didn't change/move.
+	require_once(DIR . '/global.php'); // Works for 3.6.x and 3.0.x as global didn't change/move.
 
 	$usewrapper = true;
 }
@@ -107,7 +113,6 @@ else
 	$usewrapper = false;
 }
 
-
 // #############################################################################
 // Try to locate vBulletin config, or use ImpExConfig
 // #############################################################################
@@ -115,8 +120,7 @@ else
 // $usewrapper is a flag for standalone, so if its true were installed
 if ($usewrapper)
 {
-	include ('./includes/config.php');
-
+	require_once (DIR . '/includes/config.php');
 
 	$using_local_config = '<p>' . $impex_phrases['using_local_config'] . '</p>';
 
@@ -124,7 +128,7 @@ if ($usewrapper)
 	if ($config['Database']['dbtype'] AND $config['MasterServer']['servername'] AND $config['MasterServer']['username']	AND $config['MasterServer']['password'] AND $config['Database']['dbname'])
 	{
 		// Over write ImpExConfig.php
-		$impexconfig['target']['databasetype']	= 'mysql';
+		$impexconfig['target']['databasetype']	= 'mysqli';
 		$impexconfig['target']['server']		= trim($config['MasterServer']['servername']) . ":" . trim($config['MasterServer']['port']);
 		$impexconfig['target']['user']			= trim($config['MasterServer']['username']);
 		$impexconfig['target']['password']		= trim($config['MasterServer']['password']);
@@ -140,27 +144,47 @@ else
 
 
 // #############################################################################
-// Database connect
-// #############################################################################
-
-$Db_target = new DB_Sql_vb_impex();
-$Db_source = new DB_Sql_vb_impex();
-
-$Db_target->appname 		= 'vBulletin:ImpEx Target';
-$Db_target->appshortname 	= 'vBulletin:ImpEx Target';
-$Db_target->database 		= $impexconfig['target']['database'];
-$Db_target->type 			= $impexconfig['target']['databasetype'];
-
-$Db_target->connect($impexconfig['target']['server'], $impexconfig['target']['user'], $impexconfig['target']['password'], $impexconfig['target']['persistent'], $impexconfig['target']['charset']);
-
-$Db_target->select_db($impexconfig['target']['database']);
-
-
-// #############################################################################
-// Session start
+// Database connect & session start
 // #############################################################################
 
 $ImpEx = new ImpExController();
+
+$dbtype = strtolower($impexconfig['target']['databasetype']);
+
+if ($dbtype == 'mysqli')
+{
+	$Db_target = new ImpEx_Database_Mysqli($ImpEx);
+	$Db_source = new ImpEx_Database_Mysqli($ImpEx);
+}
+else
+{
+	$Db_target = new ImpEx_Database($ImpEx);
+	$Db_source = new ImpEx_Database($ImpEx);
+}
+
+$Db_target->appname 		= 'ImpEx Target';
+$Db_target->appshortname 	= 'ImpEx Target';
+
+$Db_target->connect(
+	$impexconfig['target']['database'],
+	$impexconfig['target']['server'],
+	3306,
+	$impexconfig['target']['user'],
+	$impexconfig['target']['password'],
+	$impexconfig['target']['persistent'],
+	'',
+	$impexconfig['target']['charset']
+);
+
+// Allow setting of SQL mode, not generally required
+if (isset($impexconfig['system']['set_sql_mode']))
+{
+	$Db_target->force_sql_mode($impexconfig['system']['set_sql_mode']);
+}
+else
+{
+	$Db_target->force_sql_mode(''); // Force blank mode if none set, avoids Strict Mode issues.
+}
 
 $session_state = $ImpEx->return_session($Db_target, $impexconfig['target']['tableprefix']);
 
@@ -178,7 +202,7 @@ else
 // Requires ImpExDatabase version (has to be done here as it needs the session)
 // #############################################################################
 
-require_once (IDIR . '/ImpExDatabaseCore.php');
+require_once(IDIR . '/ImpExDatabaseCore.php');
 
 #ImpExDatabase_<product>_version.php
 
@@ -219,12 +243,14 @@ require_once (IDIR . '/ImpExData.php');
 // Instantiate ImpExDisplay
 // #############################################################################
 
-if($usewrapper)
+if ($usewrapper)
 {
+	// Use internal vBulletin rendering functions from AdminCP
 	$ImpExDisplay = new ImpExDisplayWrapper();
 }
 else
 {
+	// Use standalone rendreing functions
 	$ImpExDisplay = new ImpExDisplay();
 }
 
@@ -235,10 +261,11 @@ $ImpExDisplay->phrases =& $impex_phrases;
 // create vbfields
 // #############################################################################
 
-if($ImpExSession->get_session_var('vbfields') != 'done')
+if ($ImpExSession->get_session_var('vbfields') != 'done')
 {
 	require_once(IDIR. '/vbfields.php');
 	$queries = &retrieve_vbfields_queries($impexconfig['target']['tableprefix']);
+
 	foreach ($queries AS $query)
 	{
 		$Db_target->query($query);
@@ -252,23 +279,39 @@ if($ImpExSession->get_session_var('vbfields') != 'done')
 // initalise error store
 // #############################################################################
 
-if($ImpExSession->get_session_var('errortable') != 'done')
+if ($ImpExSession->get_session_var('errortable') != 'done')
 {
 	// Just incase the session was removed and the error table is still there.
-	$Db_target->query("DROP TABLE IF EXISTS {$impexconfig['target']['tableprefix']}impexerror");
+	$Db_target->query("
+		DROP TABLE IF EXISTS " . $impexconfig['target']['tableprefix'] . "impexerror
+	");
+
+	// Define MySQL type/engine following MySQL version (ImpEx can be run on 4.0.0 or 4.2.5)
+	$mysqlversion = $Db_target->query_first("
+		SELECT VERSION() AS version
+	");
+
+	if (version_compare($mysqlversion['version'], '5.2', '>'))
+	{
+		$engine = 'ENGINE';
+	}
+	else
+	{
+		$engine = 'TYPE';
+	}
 
 	// Create a new one.
-	$error_table = "CREATE TABLE {$impexconfig['target']['tableprefix']}impexerror (
-						errorid bigint(20) unsigned NOT NULL auto_increment,
-						errortype varchar(10) NOT NULL default '',
-						classnumber varchar(3) NOT NULL default '',
-						importid bigint(20) NOT NULL default 0,
-						error varchar(250) default 'NULL',
-						remedy varchar(250) default 'NULL',
-						PRIMARY KEY (errorid)
-					) ENGINE=MyISAM";
-
-	$Db_target->query($error_table);
+	$Db_target->query("
+		CREATE TABLE " . $impexconfig['target']['tableprefix'] . "impexerror (
+			errorid BIGINT(20) UNSIGNED NOT NULL auto_increment,
+			errortype VARCHAR(10) NOT NULL DEFAULT '',
+			classnumber VARCHAR(3) NOT NULL DEFAULT '',
+			importid BIGINT(20) NOT NULL DEFAULT 0,
+			error VARCHAR(250) DEFAULT 'NULL',
+			remedy VARCHAR(250) DEFAULT 'NULL',
+			PRIMARY KEY (errorid)
+		) " . $engine . "=MyISAM
+	");
 
 	$ImpExSession->add_session_var('errortable', 'done');
 }
@@ -292,14 +335,14 @@ $ImpExSession->add_session_var('sourcedatabasetype', strtolower($impexconfig['so
 $ImpExSession->add_session_var('errorlogging', $impexconfig['system']['errorlogging']);
 $ImpExSession->add_session_var('pagespeed', $impexconfig['system']['pagespeed']);
 
-if($impexconfig['sourceexists'])
+if ($impexconfig['sourceexists'])
 {
 	if ($impexconfig['source']['databasetype'] == 'mssql')
-	{// Check if mssql support is in php or should a connection be made via pure style .......
-		if(!function_exists('mssql_connect'))
+	{
+		// Check if mssql support is in php or should a connection be made via pure style .......
+		if (!function_exists('mssql_connect'))
 		{
-
-			if(function_exists('sqlsrv_connect'))
+			if (function_exists('sqlsrv_connect'))
 			{
 				$impexconfig['source']['databasetype'] = 'sqlsrv';
 			}
@@ -312,30 +355,30 @@ if($impexconfig['sourceexists'])
 		}
 	}
 
-	$Db_source->appname 		= 'vBulletin:ImpEx Source';
-	$Db_source->appshortname 	= 'vBulletin:ImpEx Source';
-	$Db_source->database 		= $impexconfig['source']['database'];
-	if (strtolower(trim($impexconfig['source']['databasetype'])) == 'mysql' OR strtolower(trim($impexconfig['source']['databasetype'])) == 'mysqli')
-	{
-		$Db_source->type 		= 'mysql';
-	}
-	else
-	{
-		$Db_source->type 		= $impexconfig['source']['databasetype'];
-	}
+	$Db_source->appname 		= 'ImpEx Source';
+	$Db_source->appshortname 	= 'ImpEx Source';
 
-	$Db_source->connect($impexconfig['source']['server'], $impexconfig['source']['user'], $impexconfig['source']['password'], $impexconfig['source']['persistent'], $impexconfig['source']['charset']);
+	$Db_source->connect(
+		$impexconfig['source']['database'],
+		$impexconfig['source']['server'],
+		3306,
+		$impexconfig['source']['user'],
+		$impexconfig['source']['password'],
+		$impexconfig['source']['persistent'],
+		'',
+		$impexconfig['source']['charset']
+	);
 
-	if ($Db_source->link_id)
+	if ($Db_source->connection)
 	{ // got connected
-		switch ($Db_source->geterrno())
+		switch ($Db_source->errno())
 		{
 			case 1046:
 				$ImpExDisplay->display_error($ImpExDisplay->phrases['no_source_set']);
 				exit;
 			break;
 			case 1049:
-				$ImpExDisplay->display_error($ImpExDisplay->phrases['source_not_exsist']);
+				$ImpExDisplay->display_error($ImpExDisplay->phrases['source_not_exist']);
 				exit;
 			break;
 		}
@@ -348,21 +391,21 @@ if($impexconfig['sourceexists'])
 
 	// php versions before 4.2.0 do nasty things with multiple connections to the same server
 	// See http://uk.php.net/manual/en/function.mysql-connect.php
-	if (($Db_target->link_id === $Db_source->link_id) AND phpversion() < '4.2.0')
+	if (($Db_target->connection === $Db_source->connection) AND phpversion() < '4.2.0')
 	{
 		$Db_target->require_db_reselect = true;
 		$Db_source->require_db_reselect = true;
 	}
 }
 
-$ImpEx->get_post_values($ImpExSession,$_POST);
+$ImpEx->get_post_values($ImpExSession, $_POST);
 
 
 // #############################################################################
 // Autosubmit
 // #############################################################################
 
-$ImpExDisplay->update_basic('autosubmit',$ImpExSession->get_session_var('autosubmit'));
+$ImpExDisplay->update_basic('autosubmit', $ImpExSession->get_session_var('autosubmit'));
 
 
 // #############################################################################
@@ -387,7 +430,7 @@ if ($module == '000' OR $module == NULL)
 	if ($system != '' AND $system != 'NONE')
 	{
 		// When there is a system chosen, but not running, build the module list.
-		require_once (IDIR . "/systems/{$system}/000.php");
+		require_once (IDIR . "/systems/" . $system . "/000.php");
 		$ImpExSession->build_module_list($ImpExDisplay);
 	}
 	else
@@ -407,11 +450,14 @@ if ($module == '000' OR $module == NULL)
 }
 
 echo $ImpExDisplay->page_header() .
-		'<br> <div align="center"><a href="help.php">' . $ImpExDisplay->phrases['db_cleanup'] .
+		'<br /> <div align="center"><a href="help.php">' . $ImpExDisplay->phrases['db_cleanup'] .
 		'</a> ||| <a href="http://www.vbulletin.com/docs/html/impex" target="blank_"> ' .
 		$ImpExDisplay->phrases['online_manual'] . '</a></div>';
 
-if ($using_local_config) { echo '<div align="center"> ' . $using_local_config . '</div><br>'; }
+if ($using_local_config)
+{
+	echo '<div align="center"> ' . $using_local_config . '</div><br />';
+}
 
 
 // #############################################################################
@@ -421,13 +467,13 @@ if ($using_local_config) { echo '<div align="center"> ' . $using_local_config . 
 if ($currentmoduleworking != NULL)
 {
 	// Ensure we have the $system_000.php module to extend from
-	require_once (IDIR . "/systems/{$system}/000.php");
+	require_once (IDIR . '/systems/' . $system . '/000.php');
 
 	// Get the one we are working with.
-	require_once (IDIR . "/systems/{$system}/{$currentmoduleworking}.php");
+	require_once (IDIR . '/systems/' . $system . '/' . $currentmoduleworking . '.php');
 
 	// Create that class
-	$classname = "{$system}_{$currentmoduleworking}";
+	$classname = $system . '_' . $currentmoduleworking;
 	$ModuleCall = new $classname($ImpExSession);
 
 	$ModuleCall->system = $system;
@@ -441,7 +487,6 @@ if ($currentmoduleworking != NULL)
 	$ModuleCall->resume($ImpExSession, $ImpExDisplay, $Db_target, $Db_source);
 }
 
-
 // #############################################################################
 // Init
 // #############################################################################
@@ -451,9 +496,9 @@ if ($module != '000' AND $module != NULL AND $currentmoduleworking == FALSE)
 	$ImpExDisplay->update_basic('displaymodules', 'FALSE');
 
 	// Ensure we have the $system_000.php module to extend from
-	if (is_file(IDIR . "/systems/{$system}/000.php"))
+	if (is_file(IDIR . '/systems/' . $system . '/000.php'))
 	{
-		require_once(IDIR . "/systems/{$system}/000.php");
+		require_once(IDIR . '/systems/' . $system . '/000.php');
 	}
 	else
 	{
@@ -463,13 +508,13 @@ if ($module != '000' AND $module != NULL AND $currentmoduleworking == FALSE)
 	// Check if its a core module
 	if ($module < 900)
 	{
-		require_once (IDIR . "/systems/{$system}/{$module}.php");
+		require_once (IDIR . '/systems/' . $system . '/' . $module . '.php');
 		// Create the name of the class to instantiate
 		$classname = "{$system}_{$module}";
 	}
 	else
 	{
-		require_once (IDIR . "/cleanup.php");
+		require_once (IDIR . '/cleanup.php');
 		// Create the name of the class to instantiate
 		$classname = "core_{$module}";
 	}
@@ -497,6 +542,7 @@ if ($module != '000' AND $module != NULL AND $currentmoduleworking == FALSE)
 
 $ImpEx->updateDisplay($ImpExSession, $ImpExDisplay);
 echo $ImpExDisplay->display($ImpExSession);
+
 if ($displayerrors)
 {
 	echo $ImpExSession->display_errors('all');
@@ -513,6 +559,4 @@ echo "\n<!-- PWD " . getcwd() . "-->\n";
 
 echo $ImpExDisplay->page_footer();
 
-// New comment
-/*======================================================================*/
 ?>

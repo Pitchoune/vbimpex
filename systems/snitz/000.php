@@ -31,7 +31,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @var    array
 	*/
-	var $_modulestring 	= 'Snitz Mysql & MSSQL';
+	var $_modulestring 	= 'Snitz Mysql &amp; MSSQL';
 	var $_homepage 	= 'http://forum.snitz.com/';
 
 

@@ -61,13 +61,15 @@ class vb4_000 extends ImpExModule
 	}
 
 
-	function get_post_parent_id(&$Db_object, &$databasetype, &$tableprefix, $import_post_id)
+	function get_post_parent_id($Db_object, $databasetype, $tableprefix, $import_post_id)
 	{
-		if ($databasetype == 'mysql')
+		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
 		{
-			$sql = "SELECT postid FROM " . $tableprefix . "post WHERE importpostid =" . $import_post_id;
-
-			$post_id = $Db_object->query_first($sql);
+			$post_id = $Db_object->query_first("
+				SELECT postid
+				FROM " . $tableprefix . "post
+				WHERE importpostid = " . $import_post_id . "
+			");
 
 			return $post_id[0];
 		}
@@ -79,11 +81,13 @@ class vb4_000 extends ImpExModule
 
 	function get_thread_id_from_poll_id(&$Db_object, &$databasetype, &$tableprefix, $poll_id)
 	{
-		if ($databasetype == 'mysql')
+		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
 		{
-			$sql = "SELECT importthreadid FROM " . $tableprefix . "thread WHERE pollid =" . $poll_id;
-
-			$thread_id = $Db_object->query_first($sql);
+			$thread_id = $Db_object->query_first("
+				SELECT importthreadid
+				FROM " . $tableprefix . "thread
+				WHERE pollid = " . $poll_id . "
+			");
 
 			return $thread_id[0];
 		}
@@ -93,20 +97,34 @@ class vb4_000 extends ImpExModule
 		}
 	}
 
-	function update_poll_ids(&$Db_object, &$databasetype, &$tableprefix)
+	function update_poll_ids($Db_object, $databasetype, $tableprefix)
 	{
-		if ($databasetype == 'mysql')
+		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
 		{
-			$result = $Db_object->query("SELECT pollid, threadid, importthreadid FROM " . $tableprefix . "thread WHERE open=10 AND pollid <> 0 AND importthreadid <> 0");
+			$result = $Db_object->query("
+				SELECT pollid, threadid, importthreadid
+				FROM " . $tableprefix . "thread
+				WHERE open=10
+					AND pollid <> 0
+					AND importthreadid <> 0
+			");
 
 			while ($thread = $Db_object->fetch_array($result))
 			{
-				$new_thread_id = $Db_object->query_first("SELECT threadid FROM " . $tableprefix . "thread where importthreadid = ".$thread['pollid']);
+				$new_thread_id = $Db_object->query_first("
+					SELECT threadid
+					FROM " . $tableprefix . "thread
+					WHERE importthreadid = " . $thread['pollid'] . "
+				");
 
-				if($new_thread_id['threadid'])
+				if ($new_thread_id['threadid'])
 				{
 					// Got it
-					$Db_object->query("UPDATE " . $tableprefix . "thread SET pollid =" . $new_thread_id['threadid'] . " WHERE threadid=".$thread['threadid']);
+					$Db_object->query("
+						UPDATE " . $tableprefix . "thread SET
+							pollid = " . $new_thread_id['threadid'] . "
+						WHERE threadid=" . $thread['threadid'] . "
+					");
 				}
 				else
 				{
@@ -124,9 +142,13 @@ class vb4_000 extends ImpExModule
 	{
 		$return_array = array();
 
-		if ($databasetype == 'mysql')
+		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
 		{
-			$result = $Db_object->query("SELECT * FROM " . $tableprefix . "pm WHERE pmtextid=". $pm_text_id);
+			$result = $Db_object->query("
+				SELECT *
+				FROM " . $tableprefix . "pm
+				WHERE pmtextid = ". $pm_text_id . "
+			");
 
 			while ($pm = $Db_object->fetch_array($result))
 			{
@@ -141,5 +163,5 @@ class vb4_000 extends ImpExModule
 		return $return_array;
 	}
 }
-/*======================================================================*/
+
 ?>

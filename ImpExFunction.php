@@ -30,7 +30,7 @@ class ImpExFunction
 
 	function check_table_cache($tablename)
 	{
-		if(in_array($tablename, $this->source_table_cache))
+		if (in_array($tablename, $this->source_table_cache))
 		{
 			return true;
 		}
@@ -56,6 +56,7 @@ class ImpExFunction
 	function option2bin($optionstring)
 	{
 		$optionstring = strtolower(trim($optionstring));
+
 		switch ($optionstring)
 		{
 			case 'yes':
@@ -82,17 +83,20 @@ class ImpExFunction
 
 	function is_coppa($birthday)
 	{
-		$return_array = array( 'status' 	=> false,
-							   'is_coppa'	=> true);
+		$return_array = array(
+			'status' 	=> false,
+			'is_coppa'	=> true
+		);
+
 		$date_bits = array();
 		$unix_ts = 0;
 
-		if(stristr($birthday,"-"))
+		if (stristr($birthday,"-"))
 		{
 			//Its YYYY-MM-DD
-			$date_bits = explode('-',$birthday);
+			$date_bits = explode('-', $birthday);
 
-			if(!checkdate(intval($date_bits[1]), intval($date_bits[2]), intval($date_bits[0])))
+			if (!checkdate(intval($date_bits[1]), intval($date_bits[2]), intval($date_bits[0])))
 			{
 				return $return_array;
 			}
@@ -101,7 +105,7 @@ class ImpExFunction
 		}
 
 		// 410240038 13 years of seconds
-		if( $birthday > (time() - 410240038))
+		if ($birthday > (time() - 410240038))
 		{
 			$return_array['status'] = true;
 			$return_array['is_coppa'] = true;
@@ -340,11 +344,10 @@ class ImpExFunction
 			$sessionobject->add_error('fatal',
 									 $this->_modulestring,
 									 "$path is incorrect",
-									 'Check the file structe of the  board');
+									 'Check the file structure of the  board');
 			return false;
 		}
 	}
-
 
 	/**
 	* Simple file checker
@@ -368,22 +371,23 @@ class ImpExFunction
 			$sessionobject->add_error('fatal',
 									 $this->_modulestring,
 									 "$path is incorrect",
-									 'Check the file structe of the board');
+									 'Check the file structure of the board');
 			return false;
 		}
 	}
 
 	function scandir($dirstr)
 	{
-		if(!is_dir($dirstr))
+		if (!is_dir($dirstr))
 		{
 			return false;
 		}
 
-		if(!function_exists("scandir"))
+		if (!function_exists("scandir"))
 		{
 			$files = array();
-			if(is_dir($dirstr))
+
+			if (is_dir($dirstr))
 			{
 				$fh = opendir($dirstr);
 
@@ -447,6 +451,7 @@ class ImpExFunction
 		{
 			$oldmask = @umask(0);
 			$partialpath = dirname($path);
+
 			if (!$this->vbmkdir($partialpath, $mode))
 			{
 				return false;
@@ -460,7 +465,7 @@ class ImpExFunction
 
 	function check_avatar_size(&$url, &$size_allowed)
 	{
-		if($url AND @fopen($url,'r'))
+		if ($url AND @fopen($url, 'r'))
 		{
 			$size = strlen($this->vb_file_get_contents($url));
 
@@ -498,12 +503,9 @@ class ImpExFunction
 				}
 			}
 		}
-
 		return false;
-	}
-	
+	}	
 }
-
 
 /*======================================================================*/
 ?>

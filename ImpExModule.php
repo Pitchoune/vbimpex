@@ -91,7 +91,7 @@ class ImpExModule extends ImpExDatabase
 	);
 
 	var $_import_ids_400 = array(
-		array('filedata'	=>	'importfiledataid')
+		array('filedata' =>	'importfiledataid')
 	);
 	
 	var $_avatar_size = array(
@@ -185,7 +185,7 @@ class ImpExModule extends ImpExDatabase
 				'fatal',
 				'ImpExModule',
 				"ImpExModule::init failed trying to find file $name",
-				'Check the path and that the file is accessable by the web server'
+				'Check the path and that the file is accessible by the web server'
 			);
 		}
 
@@ -222,12 +222,12 @@ class ImpExModule extends ImpExDatabase
 
 		if ($this->$function($Db_target, $targetdatabasetype, $targettableprefix, $arguments))
 		{
-			if(!$sessionobject->add_session_var(substr(get_class($this) , -3) . '_objects_done', '0'))
+			if (!$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0'))
 			{
 				return false;
 			}
 
-			if(!$sessionobject->add_session_var(substr(get_class($this) , -3) . '_objects_failed', '0'))
+			if (!$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0'))
 			{
 				return false;
 			}
@@ -316,6 +316,7 @@ class ImpExModule extends ImpExDatabase
 		$moduleclassarray = array();
 		$count = 0;
 		$line = array();
+
 		if (is_dir($dir))
 		{
 			if ($dh = opendir($dir))
@@ -326,8 +327,9 @@ class ImpExModule extends ImpExDatabase
 					{
 						//open the file
 						$filetext = file($dir .'/'. $filename);
+
 						//find the line with class
-						foreach ($filetext as $value)
+						foreach ($filetext AS $value)
 						{
 							if (strpos($value, 'extends'))
 							{

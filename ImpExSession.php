@@ -173,11 +173,11 @@ class ImpExSession
 				)
 				VALUES
 				(
-					'{$type}',
-					'{$classnumber}',
+					'" . $type . "',
+					'" . $classnumber . "',
 					" . intval($importid) . ",
-					'{$error}',
-					'{$remedy}'
+					'" . $error . "',
+					'" . $remedy . "'
 				)"
 			);
 		}
@@ -264,7 +264,7 @@ class ImpExSession
 	}
 
 	/**
-	* Accessor : Adds a session variable, if the variable exsists it sets it
+	* Accessor : Adds a session variable, if the variable exists it sets it
 	*
 	* @see		set_session_var
 	*
@@ -331,6 +331,7 @@ class ImpExSession
 		for ($i = 0; $i <= $this->get_number_of_modules(); ++$i)
 		{
 			$position = str_pad($i, 3, '0', STR_PAD_LEFT);
+
 			if ($this->_session_vars[$position] == 'WORKING')
 			{
 				return $position;
@@ -423,7 +424,7 @@ class ImpExSession
 	*/
 	function end_timing($modulestring)
 	{
-		if($this->get_session_var($modulestring . '_time_taken') == '0')
+		if ($this->get_session_var($modulestring . '_time_taken') == '0')
 		{
 			$this->set_session_var($modulestring . '_time_taken', '1');
 		}
@@ -433,13 +434,15 @@ class ImpExSession
 	function get_users_to_associate()
 	{
 		$return_array = array();
-		foreach($this->_session_vars as $key => $value)
+
+		foreach ($this->_session_vars AS $key => $value)
 		{
-			if (substr($key, 0, 12) == 'user_to_ass_' && $value != '')
+			if (substr($key, 0, 12) == 'user_to_ass_' AND $value != '')
 			{
 				array_push($return_array, array($key => $value));
 			}
 		}
+
 		return $return_array;
 	}
 

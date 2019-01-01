@@ -24,7 +24,7 @@ class vb3_000 extends ImpExModule
 	*
 	* @var    string
 	*/
-	var $_version = '3.0.* - 3.5.*';
+	var $_version = '3.0.x - 3.5.x';
 	var $_tier = '2';
 	
 	/**
