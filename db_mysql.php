@@ -3,7 +3,7 @@
 || ####################################################################
 || # vBulletin Impex
 || # ---------------------------------------------------------------- # ||
-|| # Copyright 20002014 vBulletin Solutions Inc. All Rights Reserved. ||
+|| # All PHP code in this file is Copyright 2000-2014 vBulletin Solutions Inc.
 || # This code is made available under the Modified BSD License -- see license.txt # ||
 || # http://www.vbulletin.com 
 || ####################################################################
