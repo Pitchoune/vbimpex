@@ -14,10 +14,6 @@ error_reporting(E_ALL & ~E_NOTICE);
 // this class is used in all scripts
 // do NOT fiddle unless you know what you are doing
 
-define('DBARRAY_NUM', MYSQL_NUM);
-define('DBARRAY_ASSOC', MYSQL_ASSOC);
-define('DBARRAY_BOTH', MYSQL_BOTH);
-
 if (!defined('IDIR')) { die; }
 
 if (!defined('DB_EXPLAIN'))
@@ -32,6 +28,10 @@ if (!defined('DB_QUERIES'))
 
 class ImpEx_Database_Mysql
 {
+	const DBARRAY_BOTH  = 0;
+	const DBARRAY_ASSOC = 1;
+	const DBARRAY_NUM   = 2;
+
 	var $functions = array(
 		'connect'            => 'mysql_connect',
 		'pconnect'           => 'mysql_pconnect',
@@ -63,9 +63,9 @@ class ImpEx_Database_Mysql
 	var $registry = null;
 
 	var $fetch_types = array(
-		DBARRAY_NUM   => MYSQL_NUM,
-		DBARRAY_ASSOC => MYSQL_ASSOC,
-		DBARRAY_BOTH  => MYSQL_BOTH
+		self::DBARRAY_NUM   => 'MYSQL_NUM',
+		self::DBARRAY_ASSOC => 'MYSQL_ASSOC',
+		self::DBARRAY_BOTH  => 'MYSQL_BOTH'
 	);
 
 	var $appname = 'ImpEx';
@@ -414,7 +414,7 @@ class ImpEx_Database_Mysql
 
 	function fetch_array($queryresult, $type = DBARRAY_ASSOC)
 	{
-		return @$this->functions['fetch_array']($queryresult, $this->fetchtypes["$type"]);
+		return @$this->functions['fetch_array']($queryresult, $this->fetch_types["$type"]);
 	}
 
 	function fetch_row($queryresult)
@@ -588,6 +588,8 @@ class ImpEx_Database_Mysql
 					@file_put_contents($tempfile, $data);
 				}
 			}
+
+			date_default_timezone_set('UTC');
 
 			$vboptions      =& $vbulletin->options;
 			$technicalemail =& $vbulletin->config['Database']['technicalemail'];
@@ -773,10 +775,10 @@ class ImpEx_Database_Mysqli extends ImpEx_Database_Mysql
 		'get_server_info'	 => 'mysqli_get_server_info',
 	);
 
-	var $fetchtypes = array(
-		DBARRAY_NUM   => MYSQLI_NUM,
-		DBARRAY_ASSOC => MYSQLI_ASSOC,
-		DBARRAY_BOTH  => MYSQLI_BOTH
+	var $fetch_types = array(
+		self::DBARRAY_NUM   => MYSQLI_NUM,
+		self::DBARRAY_ASSOC => MYSQLI_ASSOC,
+		self::DBARRAY_BOTH  => MYSQLI_BOTH
 	);
 
 	function db_connect($servername, $port, $username, $password, $usepconnect, $configfile = '', $charset = '')

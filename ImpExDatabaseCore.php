@@ -291,7 +291,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					FROM " . $tableprefix . $tablename . "
 				");
 
-				while ($key = $Db_object->fetch_array($keys))
+				while ($key = $Db_object->fetch_assoc($keys))
 				{
 					if ($key['Key_name'] == "import" . $tablename . "_index")
 					{
@@ -7808,7 +7808,7 @@ class ImpExDatabaseCore extends ImpExFunction
 					if (end($prefix_poss) > count($found_tables))
 					{
 						$return_string .= $displayobject->update_html($displayobject->make_description('<span><b>If you have all red tables, i.e. none correct this could possible be your table prefix :</b></span><br /><br />'));
-						// Possiable table prefix
+						// Possible table prefix
 						// Sort to get the most common found one
 						$return_string .= $displayobject->update_html($displayobject->make_description(key($prefix_poss)));
 					}

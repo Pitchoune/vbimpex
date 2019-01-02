@@ -50,15 +50,15 @@ class vb4_001 extends vb4_000
 		$source_db_type			= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix 	= $sessionobject->get_session_var('sourcetableprefix');
 
-		$class_num        = substr(get_class($this) , -3);
+		$class_num        = substr(get_class($this), -3);
 		$databasedone     = true;
 
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
-			$sessionobject->timing($class_num, 'start' ,$sessionobject->get_session_var('autosubmit'));
+			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		$displayobject->update_basic('title',$displayobject->phrases['altering_tables']);
+		$displayobject->update_basic('title', $displayobject->phrases['altering_tables']);
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['altering_tables']));
 		$displayobject->update_html($displayobject->make_description($displayobject->phrases['alter_desc_1'] . $displayobject->phrases['alter_desc_2'] . $displayobject->phrases['alter_desc_3'] . $displayobject->phrases['alter_desc_4']));
@@ -85,21 +85,14 @@ class vb4_001 extends vb4_000
 		$this->add_index($Db_target, $target_db_type, $target_table_prefix, 'post');
 		$this->add_index($Db_target, $target_db_type, $target_table_prefix, 'user');
 
-
 		// Check the database connection
 		$result = $this->check_database($Db_source, $source_db_type, $source_table_prefix, $sessionobject->get_session_var('sourceexists'), $displayobject);
-		$displayobject->display_now($result['text']);
 
 		if ($result['code'])
 		{
-			$sessionobject->timing($class_num,'stop', $sessionobject->get_session_var('autosubmit'));
+			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
-
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
-				$sessionobject->return_stats($class_num,'_time_taken'),
-				$sessionobject->return_stats($class_num,'_objects_done'),
-				$sessionobject->return_stats($class_num,'_objects_failed')
-			));
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['check_update_db'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
 			$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');

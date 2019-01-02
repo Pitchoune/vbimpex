@@ -109,7 +109,14 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 else
 {
 	// Running standalone
+	if (!defined('DIR'))
+	{
+		define('DIR', (($getcwd = getcwd()) ? $getcwd : '.'));
+	}
+
 	chdir('../'); // make sure our includes use the same paths
+
+
 	$usewrapper = false;
 }
 
@@ -158,8 +165,8 @@ if ($dbtype == 'mysqli')
 }
 else
 {
-	$Db_target = new ImpEx_Database($ImpEx);
-	$Db_source = new ImpEx_Database($ImpEx);
+	$Db_target = new ImpEx_Database_Mysql($ImpEx);
+	$Db_source = new ImpEx_Database_Mysql($ImpEx);
 }
 
 $Db_target->appname 		= 'ImpEx Target';
@@ -291,13 +298,13 @@ if ($ImpExSession->get_session_var('errortable') != 'done')
 		SELECT VERSION() AS version
 	");
 
-	if (version_compare($mysqlversion['version'], '5.2', '>'))
+	if (version_compare($mysqlversion['version'], '5.2', '=<'))
 	{
-		$engine = 'ENGINE';
+		$engine = 'TYPE';
 	}
 	else
 	{
-		$engine = 'TYPE';
+		$engine = 'ENGINE';
 	}
 
 	// Create a new one.

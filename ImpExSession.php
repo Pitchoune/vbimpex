@@ -363,7 +363,7 @@ class ImpExSession
 	*
 	* @return	mixed	string|NULL
 	*/
-	function timing($modulestring,$action,$isauto)
+	function timing($modulestring, $action, $isauto)
 	{
 		if ($action == 'start')
 		{
@@ -374,8 +374,7 @@ class ImpExSession
 			$this->add_session_var($modulestring . '_' . $action, time());
 			$this->add_session_var($modulestring . '_auto', $isauto);
 
-			$taken = intval($this->get_session_var($modulestring . '_stop')) -
-					 intval($this->get_session_var($modulestring . '_start'));
+			$taken = intval($this->get_session_var($modulestring . '_stop')) - intval($this->get_session_var($modulestring . '_start'));
 
 			if ($taken == 0)
 			{
@@ -400,7 +399,7 @@ class ImpExSession
 	*/
 	function return_stats($modulestring, $just_one = false)
 	{
-		if($just_one)
+		if ($just_one)
 		{
 			return intval($this->get_session_var($modulestring . $just_one));
 		}
@@ -411,7 +410,7 @@ class ImpExSession
 			'_time_taken'		=>	intval($this->get_session_var($modulestring . '_time_taken')),
 			'_objects_done'		=>	intval($this->get_session_var($modulestring . '_objects_done')),
 			'_objects_failed'	=>	intval($this->get_session_var($modulestring . '_objects_failed'))
-			);
+		);
 
 	}
 

@@ -26,7 +26,7 @@ class ImpExDisplay extends ImpExFunction
 	/**
 	* Class version
 	*
-	* This will allow the checking for interoprability of class version in diffrent
+	* This will allow the checking for interoprability of class version in different
 	* versions of ImpEx
 	*
 	* @var    string
@@ -262,7 +262,7 @@ class ImpExDisplay extends ImpExFunction
 		$return_string = '';
 		$return_string .= "\n<form action=\"$phpscript.php\" " . ($uploadform ? "ENCTYPE=\"multipart/form-data\" " : "") . " name=\"$name\" method=\"post\">";
 
-		$return_string .= ($addtable == 1 ? '\n<table cellpadding=\"1\" cellspacing=\"0\" border=\"0\" align=\"center\" width=\"90%\" class=\"tblborder\">' : '');
+		$return_string .= ($addtable == 1 ? '<br /><table cellpadding="1" cellspacing="0" border="0" align="center" width="90%" class="tblborder">' : '');
 
 		return $return_string;
 	}
@@ -514,31 +514,31 @@ class ImpExDisplay extends ImpExFunction
 		{
 			$line = trim($line);
 
-			if(strpos($line, '$_product'))
+			if (strpos($line, '$_product'))
 			{
-				$details[product] = substr($line, strpos($line,"'")+1, -2);
+				$details['product'] = substr($line, strpos($line, "'") + 1, -2);
 				#$prod = true;
 			}
 
-			if(strpos($line, '$_modulestring'))
+			if (strpos($line, '$_modulestring'))
 			{
-				$details[title] = substr($line, strpos($line,"'")+1, -2);
+				$details['title'] = substr($line, strpos($line, "'") + 1, -2);
 				$tit = true;
 			}
 
-			if(strpos($line, '$_version'))
+			if (strpos($line, '$_version'))
 			{
-				$details[version] = substr($line, strpos($line,"'")+1, -2);
+				$details['version'] = substr($line, strpos($line, "'") + 1, -2);
 				$ver = true;
 			}
 
-			if(strpos($line, '$_homepage'))
+			if (strpos($line, '$_homepage'))
 			{
-				$details[homepage] = substr($line, strpos($line,"'")+1, -2);
+				$details['homepage'] = substr($line, strpos($line, "'") + 1, -2);
 				$hom = true;
 			}
 
-			if($tit AND $ver AND $hom)
+			if ($tit AND $ver AND $hom)
 			{
 				continue;
 			}
@@ -574,7 +574,6 @@ class ImpExDisplay extends ImpExFunction
 		{
 			while (false !== ($file = readdir($handle)))
 			{
-				#if ($file=='vBlogetin') { continue; }
 				if ($file[0] != '.' AND $file != '.svn' AND $file != 'index.html' AND substr($file, -4) != '.zip' )
 				{
 					if ($details = $this->module_ver($file, '000'))
@@ -623,7 +622,7 @@ class ImpExDisplay extends ImpExFunction
 
 		foreach ($systems_list AS $product => $product_array)
 		{
-			$form .= '<optgroup label="'.$product.'">';
+			$form .= '<optgroup label="' . $product . '">';
 
 			foreach ($product_array AS $file => $title)
 			{
@@ -658,11 +657,11 @@ class ImpExDisplay extends ImpExFunction
 
 		foreach ($this->_target_versions AS $product => $prod_list)
 		{
-			$to .= '<optgroup label="'.$product.'">';
+			$to .= '<optgroup label="' . $product . '">';
 
 			foreach($prod_list AS $ver => $text)
 			{
-				$to .= "<option value=\"{$ver}\">{$text}</option>";
+				$to .= "<option value=\"" . $ver . "\">" . $text . "</option>";
 			}
 
 			$to .= '</optgroup>';
@@ -809,8 +808,6 @@ class ImpExDisplay extends ImpExFunction
 
 		if ($this->_screenbasic['choosesystem'] == 'TRUE')
 		{
-			// TODO: here
-			#$string .= $this->choose_target_system($sessionobject);
 			$string .= $this->choose_system($sessionobject);
 		}
 
@@ -824,6 +821,8 @@ class ImpExDisplay extends ImpExFunction
 	*
 	* @param	string		mixed		The name of the module
 	* @param	int			mixed		The seconds taken to complete
+	* @param	int			mixed		Number of successful
+	* @param	int			mixed		Number of failed
 	*
 	* @return	mixed	string|NULL
 	*/
@@ -836,7 +835,7 @@ class ImpExDisplay extends ImpExFunction
 		}
 		else
 		{
-			return "<p align=\"center\">{$this->phrases['module']} : <b>$modulestring</b>. <i>{$this->phrases['successful']}</i>, : $seconds {$this->phrases['second']}.</p>
+			return "<p align=\"center\">{$this->phrases['module']} : <b>$modulestring</b>. <i>{$this->phrases['successful']}</i>, : $seconds {$this->phrases['seconds']}.</p>
 					<p align=\"center\"> {$this->phrases['successful']}: <b>$successful</b>. {$this->phrases['failed']}: <b>$failed</b>.</p>";
 		}
 	}

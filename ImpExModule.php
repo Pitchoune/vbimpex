@@ -10,10 +10,10 @@
 \*======================================================================*/
 
 /**
-* Core module that needs to be exeteded by the diffrent import systems.
+* Core module that needs to be extended by the different import systems.
 *
 * Is the base module class that all the import systems must extend to be
-* controlled by ImpEx core, it maintains the dependacy controll amongst the
+* controlled by ImpEx core, it maintains the dependency control amongst the
 * modules and defines the functions that the core will call and that which
 * be overridden.
 *

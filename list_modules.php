@@ -1,4 +1,4 @@
-<?
+<?php
 define('IDIR', (($getcwd = getcwd()) ? $getcwd : '.'));
 
 if(!is_file(IDIR . '/ImpExConfig.php'))
