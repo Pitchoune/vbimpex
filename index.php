@@ -1,5 +1,4 @@
 <?php
-#apd_set_pprof_trace();
 /*======================================================================*\
 || ######################################################################## ||
 || # vBulletin Impex
@@ -42,7 +41,7 @@ if(!is_file(IDIR . '/ImpExConfig.php'))
 else
 {
 	require_once (IDIR . '/ImpExConfig.php');
-	require_once (IDIR . $impexconfig['system']['language']);
+	require_once (IDIR . '/impex_language_' . $impexconfig['system']['language'] . '.php');
 }
 
 
@@ -245,7 +244,6 @@ switch ($ImpExSession->get_session_var('targetsystem'))
 require_once (IDIR . '/ImpExModule.php');
 require_once (IDIR . '/ImpExData.php');
 
-
 // #############################################################################
 // Instantiate ImpExDisplay
 // #############################################################################
@@ -263,7 +261,6 @@ else
 
 $ImpExDisplay->phrases =& $impex_phrases;
 
-
 // #############################################################################
 // create vbfields
 // #############################################################################
@@ -280,7 +277,6 @@ if ($ImpExSession->get_session_var('vbfields') != 'done')
 
 	$ImpExSession->add_session_var('vbfields', 'done');
 }
-
 
 // #############################################################################
 // initalise error store
@@ -324,7 +320,6 @@ if ($ImpExSession->get_session_var('errortable') != 'done')
 }
 
 $ImpExSession->_target_db =& $Db_target;
-
 
 // #############################################################################
 // Add vars to session
@@ -552,7 +547,7 @@ echo $ImpExDisplay->display($ImpExSession);
 
 if ($displayerrors)
 {
-	echo $ImpExSession->display_errors('all');
+	echo $ImpExSession->display_errors('all', $ImpExDisplay);
 }
 
 // #############################################################################

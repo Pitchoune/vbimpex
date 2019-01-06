@@ -18,7 +18,6 @@
 * be overridden.
 *
 * @package 		ImpEx
-*
 */
 
 if (!class_exists('ImpExDatabase')) { die('Direct class access violation'); }
@@ -62,7 +61,6 @@ class ImpExModule extends ImpExDatabase
 		'icon_eek.gif'		=>	':eek:',
 		'icon_frown.gif'	=>	':('
 	);
-
 
 	var $_import_ids = array (
 		'0' 	=> array('moderator'		=>  'importmoderatorid'),
@@ -151,9 +149,8 @@ class ImpExModule extends ImpExDatabase
 	* Constructor
 	*
 	* Empty
-	*
 	*/
-	function ImpExModule()
+	public function __constructor()
 	{
 	}
 
@@ -168,24 +165,24 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @return	none
 	*/
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = FALSE)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = FALSE)
 	{
 		$modulenumber = substr(get_class($this), 7);
 		$currentmoduleworking = $sessionobject->get_session_var('system');
 
 		$name = 'systems/' . $currentmoduleworking . '/' . $modulenumber .'.php';
 
-		if (file_exists($name))
+		if (file_exists(IDIR . '/' . $name))
 		{
-			include $name;
+			require_once(IDIR . '/' . $name);
 		}
 		else
 		{
 			$sessionobject->add_error(
 				'fatal',
 				'ImpExModule',
-				"ImpExModule::init failed trying to find file $name",
-				'Check the path and that the file is accessible by the web server'
+				construct_phrase($displayobject->phrases['module_cant_load_class'], $name),//"ImpExModule::init failed trying to find file $name",
+				$displayobject->phrases['module_check_readable_files']
 			);
 		}
 
@@ -215,7 +212,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @return	none
 	*/
-	function restart(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $function, $arguments = null)
+	public function restart(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $function, $arguments = null)
 	{
 		$targetdatabasetype = $sessionobject->get_session_var('targetdatabasetype');
 		$targettableprefix = $sessionobject->get_session_var('targettableprefix');
@@ -232,11 +229,11 @@ class ImpExModule extends ImpExDatabase
 				return false;
 			}
 
-			return true;
+			return TRUE;
 		}
 		else
 		{
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -247,16 +244,16 @@ class ImpExModule extends ImpExDatabase
 	* @param	string	$dependent		the three digit module number i.e. '004'
 	* @return	boolean
 	*/
-	function check_order(&$sessionobject, $dependent)
+	public function check_order(&$sessionobject, $dependent)
 	{
 		if ($sessionobject->get_session_var($dependent) != 'FINISHED')
 		{
 			$sessionobject->set_session_var(substr(get_class($this), -3), 'FALSE');
-			return FALSE;
+			return false;
 		}
 		else
 		{
-			return TRUE;
+			return true;
 		}
 	}
 
@@ -265,7 +262,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @param	object	sessionobject	The current sessionobject.
 	*/
-	function using(&$sessionobject)
+	public function using(&$sessionobject)
 	{
 		$sessionobject->set_session_var(substr(get_class($this), (intval(strlen(get_class($this))) - 3)), 'WORKING');
 	}
@@ -280,7 +277,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @return	none
 	*/
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		$this->init($sessionobject, $displayobject, $Db_target, $Db_source, TRUE);
 	}
@@ -289,7 +286,7 @@ class ImpExModule extends ImpExDatabase
 	* Accessor: Sets the private memeber variable _restart to true
 	*
 	*/
-	function restarted()
+	public function restarted()
 	{
 		$this->_restart = true;
 	}
@@ -299,7 +296,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @param	string	mixed	An error string for the internal error stack
 	*/
-	function add_module_error($text)
+	public function add_module_error($text)
 	{
 		$this->_error = $this->_error + array(count($this->_error), $text);
 	}
@@ -311,7 +308,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* @return	array	string	An array of all the modules names of a system
 	*/
-	function get_class_list($dir)
+	public function get_class_list($dir)
 	{
 		$moduleclassarray = array();
 		$count = 0;
@@ -333,7 +330,7 @@ class ImpExModule extends ImpExDatabase
 						{
 							if (strpos($value, 'extends'))
 							{
-								$line=explode(' ', $value);
+								$line = explode(' ', $value);
 								break;
 							}
 						}
@@ -347,5 +344,5 @@ class ImpExModule extends ImpExDatabase
 		return $moduleclassarray;
 	}
 }
-/*======================================================================*/
+
 ?>

@@ -14,7 +14,6 @@
 * This handles interaction with the different types of database.
 *
 * @package 		ImpEx
-*
 */
 
 if (!class_exists('ImpExDatabaseCore')) { die('Direct class access violation'); }
@@ -37,15 +36,15 @@ class ImpExDatabase extends ImpExDatabaseCore
 	* Constructor
 	*
 	* Empty
-	*
 	*/
-	function ImpExDatabase()
+	public function __construct()
 	{
 	}
 
-
-
-	function zuul($dana){ return "There is no importers only impex"; }
+	public function zuul($dana)
+	{
+		return "There is no importers only impex";
+	}
 }
-/*======================================================================*/
+
 ?>

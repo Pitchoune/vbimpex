@@ -14,7 +14,6 @@
 * This handles interaction with the different types of database.
 *
 * @package 		ImpEx
-*
 */
 
 if (!class_exists('ImpExDatabaseCore')) { die('Direct class access violation'); }
@@ -37,16 +36,18 @@ class ImpExDatabase extends ImpExDatabaseCore
 	* Constructor
 	*
 	* Empty
-	*
 	*/
-	function ImpExDatabase()
+	public function __constructor()
 	{
 	}
-		
-	function import_attachment($Db_object, $databasetype, $tableprefix, $import_post_id = TRUE)
+
+	/**
+	* aaa
+	*/
+	public function import_attachment($Db_object, $databasetype, $tableprefix, $import_post_id = true)
 	{
-		return $this->import_vb4_attachment($Db_object, $databasetype, $tableprefix, $import_post_id = true);
+		return $this->import_vb4_attachment($Db_object, $databasetype, $tableprefix, $import_post_id);
 	}
 }
-/*======================================================================*/
+
 ?>

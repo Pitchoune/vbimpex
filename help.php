@@ -27,7 +27,7 @@ if (!is_file(IDIR . '/ImpExConfig.php'))
 else
 {
 	require_once (IDIR . '/ImpExConfig.php');
-	require_once (IDIR . $impexconfig['system']['language']);
+	require_once (IDIR . '/impex_language_' . $impexconfig['system']['language'] . '.php');
 }
 
 // #############################################################################
@@ -374,7 +374,7 @@ if ($_GET['action'] == 'delids')
 
 	$Db_target->query("
 		DELETE FROM " . $targettableprefix . "datastore
-		WHERE title='ImpExSession'
+		WHERE title = 'ImpExSession'
 	");
 
 	echo $impex_phrases['session_deleted'];

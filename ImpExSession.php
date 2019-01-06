@@ -13,7 +13,7 @@
 *
 * Holds lots of groovy session data, yum yum yum.
 *
-* @package 		ImpEx
+* @package		ImpEx
 *
 */
 
@@ -27,7 +27,7 @@ class ImpExSession
 	* This will allow the checking for interoprability of class version in diffrent
 	* versions of ImpEx
 	*
-	* @var    string
+	* @var	  string
 	*/
 	var $_version = "0.0.1";
 
@@ -37,7 +37,7 @@ class ImpExSession
 	* All the session variables are stored in here
 	*
 	*
-	* @var    array
+	* @var	  array
 	*/
 	var $_session_vars = array
 	(
@@ -55,7 +55,7 @@ class ImpExSession
 	* The title text for the modules of the currently running importer
 	*
 	*
-	* @var    array
+	* @var	  array
 	*/
 	var $_moduletitles = array();
 
@@ -65,10 +65,10 @@ class ImpExSession
 	/**
 	* The Session errors
 	*
-	* The errors are held in a 2D array, each entry  holds : 'timestamp','type','module','errorstring','remedy'
+	* The errors are held in a 2D array, each entry	 holds : 'timestamp','type','module','errorstring','remedy'
 	*
 	*
-	* @var    array
+	* @var	  array
 	*/
 	var $_session_errors = array();
 
@@ -78,7 +78,7 @@ class ImpExSession
 	* Empty
 	*
 	*/
-	function ImpExSession()
+	public function __constructor()
 	{
 	}
 
@@ -88,7 +88,7 @@ class ImpExSession
 	*
 	* @return	none
 	*/
-	function build_module_list(&$displayobject)
+	public function build_module_list(&$displayobject)
 	{
 		if ($this->get_session_var('modulelist') == 'FALSE')
 		{
@@ -104,11 +104,16 @@ class ImpExSession
 						{
 							$sourcefile = '';
 							$sourcefile = $dir .'/'. $filename;
+
 							require_once($sourcefile);
+
 							$classname = $this->get_session_var('system') . '_'. substr($filename, 0 , 3);
+
 							$module = new $classname($displayobject);
+
 							$this->add_session_var(substr($filename, 0 , 3), 'FALSE');
 							$this->add_module_title(substr($filename, 0 , 3), $module->_modulestring);
+
 							unset($sourcefile);
 						}
 					}
@@ -123,7 +128,6 @@ class ImpExSession
 			$this->add_session_var('feedback_module_title', 'FALSE');
 			$this->add_module_title("910", $displayobject->phrases['feedback_module_title']);
 
-
 			$this->set_session_var('modulelist', 'TRUE');
 		}
 	}
@@ -131,7 +135,7 @@ class ImpExSession
 	/**
 	* Adds an error to the error stack
 	*
-	* @param	object 	mixed	database connection object to use
+	* @param	object	mixed	database connection object to use
 	* @param	string	mixed	The type of error : 'invalid' | 'fatal' | 'warning'
 	* @param	int		mixed	The class/module number where the error came from
 	* @param	string	mixed	The error
@@ -139,13 +143,9 @@ class ImpExSession
 	*
 	* @return	none
 	*/
-
-	# old function
-	#function add_error($post['post_id'], $displayobject->phrases['post_not_imported'], $displayobject->phrases['post_not_imported_rem']);
-
-	function add_error($Db_target, $type, $classnumber, $importid = 0, $error = 'old', $remedy = 'false')
+	public function add_error($Db_target, $type, $classnumber, $importid = 0, $error = 'old', $remedy = 'false')
 	{
-		if(!is_object($Db_target))
+		if (!is_object($Db_target))
 		{
 			// It's the legacy function call
 			return true;
@@ -160,28 +160,15 @@ class ImpExSession
 
 			$type	= addslashes($type);
 			$error	= addslashes($error);
-			$remedy	= addslashes($remedy);
+			$remedy = addslashes($remedy);
 
 			$Db_target->query("
 				INSERT INTO ". $this->_session_vars['targettableprefix'] ."impexerror
-				(
-					errortype,
-					classnumber,
-					importid,
-					error,
-					remedy
-				)
+					(errortype, classnumber, importid, error, remedy)
 				VALUES
-				(
-					'" . $type . "',
-					'" . $classnumber . "',
-					" . intval($importid) . ",
-					'" . $error . "',
-					'" . $remedy . "'
-				)"
+					('" . $type . "', '" . $classnumber . "', " . intval($importid) . ", '" . $error . "', '" . $remedy . "')"
 			);
 		}
-
 	}
 
 	/**
@@ -191,7 +178,7 @@ class ImpExSession
 	*
 	* @return	none
 	*/
-	function get_module_string($position)
+	public function get_module_string($position)
 	{
 		return $this->_moduletitles[$position];
 	}
@@ -201,7 +188,7 @@ class ImpExSession
 	*
 	* @return	int
 	*/
-	function get_number_of_modules()
+	public function get_number_of_modules()
 	{
 		return count($this->_moduletitles);
 	}
@@ -213,7 +200,7 @@ class ImpExSession
 	*
 	* @return	mixed|boolean
 	*/
-	function get_session_var($name)
+	public function get_session_var($name)
 	{
 		return stripslashes($this->_session_vars[$name]);
 	}
@@ -225,20 +212,21 @@ class ImpExSession
 	*
 	* @return	string
 	*/
-	function display_errors($type)
+	public function display_errors($type, &$displayobject)
 	{
 		$i = 0;
 		$return_string = '';
-		foreach ($this->_session_errors as $value)
+
+		foreach ($this->_session_errors AS $value)
 		{
 			if ($type == 'all' OR strtolower($type) == $value['type'])
 			{
-				$return_string .= '<br /><b>Timestamp</b> : ' . date("H:i:s",$value['timestamp']) . '. <b>Type</b> : ' . $value['type'] . '. <b>Module</b> : ' . $value['module'] . ' .<br /><u>Errorstring</u><br />' . $value['errorstring'] . '. <br /><u>Remedy</u><br />' . $value['remedy'] . '<br />';
+				$return_string .= '<br /><b>' . $displayobject->phrases['timestamp'] . '</b> : ' . date("H:i:s", $value['timestamp']) . '. <b>' . $displayobject->phrases['type'] . '</b> : ' . $value['type'] . '. <b>' . $displayobject->phrases['module'] . '</b> : ' . $value['module'] . ' .<br /><u>' . $displayobject->phrases['errorstring'] . '</u><br />' . $value['errorstring'] . '. <br /><u>' . $displayobject->phrases['remedy'] . '</u><br />' . $value['remedy'] . '<br />';
 				$i++;
 			}
 		}
 
-		return "<h4>Error count of : $type = $i</h4>" . $return_string;
+		return '<h4>' . $displayobject->phrases['errorcount'] . ' ' . $type . ' = ' . $i . '</h4>' . $return_string;
 	}
 
 	/**
@@ -249,7 +237,7 @@ class ImpExSession
 	*
 	* @return	boolean
 	*/
-	function set_session_var($name, $value)
+	public function set_session_var($name, $value)
 	{
 		if ($this->_session_vars[$name] == NULL)
 		{
@@ -273,7 +261,7 @@ class ImpExSession
 	*
 	* @return	boolean
 	*/
-	function add_session_var($key, $value)
+	public function add_session_var($key, $value)
 	{
 		if (empty($this->_session_vars[$key]))
 		{
@@ -291,13 +279,12 @@ class ImpExSession
 	/**
 	* Accessor : Adds a module title, if the variable exsists it sets it if it dosen't exsist it creates it
 	*
-	*
 	* @param	string	mixed	The 3 digit number of the module
 	* @param	mixed	mixed	The value to set the module title to
 	*
 	* @return	boolean
 	*/
-	function add_module_title($key, $value)
+	public function add_module_title($key, $value)
 	{
 		$this->_moduletitles[$key] = $value;
 	}
@@ -305,12 +292,11 @@ class ImpExSession
 	/**
 	* Accessor : Returns a modules title
 	*
-	*
 	* @param	string	mixed	The 3 digit number of the module
 	*
 	* @return	boolean
 	*/
-	function get_module_title($name)
+	public function get_module_title($name)
 	{
 		return $this->_moduletitles[$name];
 	}
@@ -320,7 +306,7 @@ class ImpExSession
 	*
 	* @return	boolean|mixed
 	*/
-	function any_working()
+	public function any_working()
 	{
 		if ($this->_session_vars[001] == 'FAILED')
 		{
@@ -340,7 +326,6 @@ class ImpExSession
 		return false;
 	}
 
-
 	/**
 	* Remvoes a session varaible from the array
 	*
@@ -348,7 +333,7 @@ class ImpExSession
 	*
 	* @return	boolean
 	*/
-	function remove_session_var($name)
+	public function remove_session_var($name)
 	{
 		unset($this->_session_vars[$name]);
 		return $this->get_session_var($name);
@@ -363,7 +348,7 @@ class ImpExSession
 	*
 	* @return	mixed	string|NULL
 	*/
-	function timing($modulestring, $action, $isauto)
+	public function timing($modulestring, $action, $isauto)
 	{
 		if ($action == 'start')
 		{
@@ -397,7 +382,7 @@ class ImpExSession
 	*
 	* @return	array	start time stamp, end time stamp, seconds taken
 	*/
-	function return_stats($modulestring, $just_one = false)
+	public function return_stats($modulestring, $just_one = false)
 	{
 		if ($just_one)
 		{
@@ -421,7 +406,7 @@ class ImpExSession
 	*
 	* @return	mixed	string|NULL
 	*/
-	function end_timing($modulestring)
+	public function end_timing($modulestring)
 	{
 		if ($this->get_session_var($modulestring . '_time_taken') == '0')
 		{
@@ -429,8 +414,10 @@ class ImpExSession
 		}
 	}
 
-
-	function get_users_to_associate()
+	/**
+	* aaa
+	*/
+	public function get_users_to_associate()
 	{
 		$return_array = array();
 
@@ -445,7 +432,10 @@ class ImpExSession
 		return $return_array;
 	}
 
-	function delete_users_to_associate()
+	/**
+	* aaa
+	*/
+	public function delete_users_to_associate()
 	{
 		foreach($this->_session_vars as $key => $value)
 		{
@@ -455,7 +445,6 @@ class ImpExSession
 			}
 		}
 	}
-
 }
-/*======================================================================*/
+
 ?>

@@ -35,23 +35,23 @@ if (!defined('IDIR')) { die; }
 # index.php phrases
 #####################################
 
-$impex_phrases['enter_customer_number'] 					= 'Please enter pass code';
+$impex_phrases['enter_customer_number'] 					= 'Veuillez insérer le code d\'accès';
 
-$impex_phrases['using_local_config']						= 'Using includes/config.php for target config.';
-$impex_phrases['using_impex_config']						= 'Using ImpExConfig.php for target config.';
+$impex_phrases['using_local_config']						= 'Utilisation du fichier includes/config.php comme configuration cible.';
+$impex_phrases['using_impex_config']						= 'Utilisation du fichier ImpExConfig.php comme configuration cible.';
 $impex_phrases['no_mssql_support']							= 'You do not have MSSQL support in this version/compile of php, the importer will not be able to connect to the source database.';
 $impex_phrases['no_mssql_support_link']						= '</br>Read this : <a target="_blank" href="http://www.php.net/manual/en/ref.mssql.php">PHP MSSQL</a>';
 $impex_phrases['no_source_set']								= 'A source database was not entered in ImpExConfig.php';
 $impex_phrases['source_not_exist']							= 'The source database entered in ImpExConfig.php does not exist.';
 $impex_phrases['sourceexists_is_false'] 					= 'You have set sourceexists to FALSE in ImpExConfig.php, this means you do not want to import from a database system, this system is a source database system.';
 $impex_phrases['failed_connection']							= 'Connection to source server failed. Check username and password.';
-$impex_phrases['db_cleanup']								= 'Database cleanup &amp; restart';
-$impex_phrases['online_manual']								= 'Online manual';
-$impex_phrases['cleanup_module_title']						= 'Clean up module';
-$impex_phrases['feedback_module_title']						= 'Feedback';
-$impex_phrases['build_version']								= 'ImpEx build version : ';
-$impex_phrases['remove']									= 'Remove ImpEx once import is complete and final';
-$impex_phrases['finished_import']							= 'Once you have finished these modules follow these instructions to complete the import';
+$impex_phrases['db_cleanup']								= 'Nettoyage de la base de données &amp; redémarrage';
+$impex_phrases['online_manual']								= 'Manuel en ligne (anglais)';
+$impex_phrases['cleanup_module_title']						= 'Nettoyer le module';
+$impex_phrases['feedback_module_title']						= 'Avis';
+$impex_phrases['build_version']								= 'ImpEx version : ';
+$impex_phrases['remove']									= 'Supprimez ImpEx une fois votre importation complète et finale !';
+$impex_phrases['finished_import']							= 'Une fois que vous avez fini d\'utiliser ces modules, suivez les instructions suivantes pour terminer l\'importation (anglais)';
 
 #####################################
 # help.php phrases
@@ -99,43 +99,43 @@ $impex_phrases['cant_find_config']      					= 'Can\'t find ImpExConfig.php';
 # ImpExDisplay.php phrases
 #####################################
 
-$impex_phrases['system']									= 'System';
+$impex_phrases['system']									= 'Système';
 $impex_phrases['version']									= 'Version';
 
-$impex_phrases['title']										= 'Import / Export';
-$impex_phrases['redo']										= 'Redo Module';
-$impex_phrases['start_module']								= 'Start Module';
+$impex_phrases['title']										= 'Importer / Exporter';
+$impex_phrases['redo']										= 'Recommencer le module';
+$impex_phrases['start_module']								= 'Démarrer le module';
 $impex_phrases['minute_title']								= ' min(s)'; # Note space
 $impex_phrases['seconds_title']								= ' sec(s)'; # Note space
-$impex_phrases['totals']									= 'Totals:';
+$impex_phrases['totals']									= 'Totaux :';
 
-$impex_phrases['select_system']								= 'Select System :: ';
-$impex_phrases['select_target_system']						= 'Select version <b>and</b> product to export to :: ';
+$impex_phrases['select_system']								= 'Sélectionnez le système :: ';
+$impex_phrases['select_target_system']						= 'Sélectionnez la version <b>et</b> le produit à exporter vers :: ';
 
-$impex_phrases['installed_systems']							= 'The installed importers';
-$impex_phrases['start_import']								= 'Begin Import';
+$impex_phrases['installed_systems']							= 'Importeurs installés';
+$impex_phrases['start_import']								= 'Commencer l\'importation';
 
 $impex_phrases['module']									= 'Module';
 $impex_phrases['action']									= 'Action';
-$impex_phrases['completed']									= 'Completed';
+$impex_phrases['completed']									= 'Terminé';
 
-$impex_phrases['second']									= 'Second';
-$impex_phrases['seconds']									= 'Seconds';
+$impex_phrases['second']									= 'seconde';  # lowercase
+$impex_phrases['seconds']									= 'secondes'; # lowercase
 
-$impex_phrases['successful']								= 'Successful';
-$impex_phrases['failed']									= 'Failed';
-$impex_phrases['redirecting']								= 'Redirecting...';
-$impex_phrases['timetaken']									= 'Time taken';
+$impex_phrases['successful']								= 'Succès';
+$impex_phrases['failed']									= 'Échec';
+$impex_phrases['redirecting']								= 'Redirection en cours...';
+$impex_phrases['timetaken']									= 'Temps d\'utilisation';
 
-$impex_phrases['associate']									= 'Associate';
-$impex_phrases['quit']										= 'Quit';
+$impex_phrases['associate']									= 'Associer';
+$impex_phrases['quit']										= 'Quitter';
 
-$impex_phrases['submit']									= 'Submit';
-$impex_phrases['reset']										= 'Reset';
+$impex_phrases['submit']									= 'Envoyer';
+$impex_phrases['reset']										= 'Réinitialiser';
 
-$impex_phrases['yes']										= 'Yes';
-$impex_phrases['no']										= 'No';
-$impex_phrases['userset_nohtml']							= 'User Set (no HTML)';
+$impex_phrases['yes']										= 'Oui';
+$impex_phrases['no']										= 'Non';
+$impex_phrases['userset_nohtml']							= 'Défini par l\'utilisateur (pas de HTML)';
 
 $impex_phrases['mins']										= ' min(s)';
 $impex_phrases['secs']										= ' sec(s)';
@@ -146,7 +146,7 @@ $impex_phrases['secs']										= ' sec(s)';
 
 $impex_phrases['sourceexists_true']     					= '<h4>Please set \'sourceexists = true\' in ImpExConfig.php file.</h4>';
 $impex_phrases['validtable_overridden'] 					= '<h4>ImpExDatabase::check_database - $this->_valid_tables must be overridden in the 000 module of the system</h4>';
-$impex_phrases['testing_source_against']					= 'Testing source against : ';
+$impex_phrases['testing_source_against']					= 'Test de la source depuis : ';
 $impex_phrases['file_missing_empty_hidden']					= 'File {1} is either missing, empty, or hidden.';
 $impex_phrases['save_file_failed']							= 'The file create/save command failed. Please check the target folder location and permissions.';
 $impex_phrases['halted_missing_fields_db']					= 'ImpEx cannot continue and has halted due to missing needed fields in the source database :';
@@ -181,20 +181,20 @@ $impex_phrases['errorcount']								= 'Error count of :';
 # Import common
 #####################################
 
-$impex_phrases['continue']									= 'Continue';
-$impex_phrases['reset']										= 'Reset';
-$impex_phrases['importing']									= 'Importing';
-$impex_phrases['import']									= 'Import';
-$impex_phrases['imported']									= 'Imported';
-$impex_phrases['from']										= 'From';
-$impex_phrases['to']										= 'To'; # i.e. Importing 300 posts From 500 To 800
-$impex_phrases['dependency_error']							= 'Dependency error';
-$impex_phrases['dependant_on']								= 'This module is dependent of the module \'';
-$impex_phrases['cant_run']									= '\'. It cannot run until that is complete.';
-$impex_phrases['user_id']									= 'User id';
+$impex_phrases['continue']									= 'Continuer';
+$impex_phrases['reset']										= 'Réinitialiser';
+$impex_phrases['importing']									= 'Importation';
+$impex_phrases['import']									= 'Importer';
+$impex_phrases['imported']									= 'Importé';
+$impex_phrases['from']										= 'De';
+$impex_phrases['to']										= 'À'; # i.e. Importing 300 posts From 500 To 800
+$impex_phrases['dependency_error']							= 'Erreur de dépendance';
+$impex_phrases['dependant_on']								= 'Ce module est dépendant de ce module « ';
+$impex_phrases['cant_run']									= ' ». Le script ne peut pas continuer tant que cette erreur n\'est pas résolue.';
+$impex_phrases['user_id']									= 'Identifiant utilisateur';
 $impex_phrases['updating_parent_id']						= 'Updating parent ids, please wait';
 $impex_phrases['avatar_ok']									= 'Avatar OK';
-$impex_phrases['avatar_too_big']							= 'Avatar too big';
+$impex_phrases['avatar_too_big']							= 'Avatar trop gros';
 $impex_phrases['no_rerun']									= 'You cannot RERUN this module, you need to clear the whole import and session and start again.';
 $impex_phrases['no_system']									= 'ImpEx has attempted to start a system it cannot find, this is most likely because the session was saved correctly after you chose the system. Please check database and try again or contact support.';
 $impex_phrases['units_per_page']							= 'Units per page (set to 500 per 4 Mb available in PHP)';
@@ -204,20 +204,20 @@ $impex_phrases['invalid_target_selected']					= 'The incorrect target to export 
 # 001 Setup
 #####################################
 
-$impex_phrases['check_update_db']							= 'Check and update database';
-$impex_phrases['get_db_info']								= 'Get database information';
-$impex_phrases['check_tables']								= 'This module will check the tables in the database as well as the connection.';
+$impex_phrases['check_update_db']							= 'Vérification et mise à jour de la base de données';
+$impex_phrases['get_db_info']								= 'Obtention des informations de la base de données';
+$impex_phrases['check_tables']								= 'Ce module va vérifier les tables dans la base de données ainsi que la connexion.';
 
-$impex_phrases['altering_tables']							= 'Altering tables';
-$impex_phrases['alter_desc_1']								= 'ImpEx will now alter the tables in the vB database to include import id numbers. ';
-$impex_phrases['alter_desc_2']								= 'This is needed during the import process for maintaining references between the tables during an import. ';
-$impex_phrases['alter_desc_3']								= 'If you have large tables (i.e. lots of posts) this can take some time. ';
-$impex_phrases['alter_desc_4']								= 'They will also be left after the import if you need to link back to the original vB userid.';
-$impex_phrases['valid_tables_found']    					= 'Valid found tables:';
-$impex_phrases['found']                 					= 'found';
-$impex_phrases['customtable_prefix']    					= '<b>Possibly custom tables or incorrect prefix :</b>';
-$impex_phrases['not_found']             					= '<b>NOT</b> found';
-$impex_phrases['all_red_tables']							= 'If you have all red tables, i.e. none correct this could possible be your table prefix :';
+$impex_phrases['altering_tables']							= 'Modification des tables';
+$impex_phrases['alter_desc_1']								= 'ImpEx va maintenant modifier les tables de vBulletin pour pouvoir y inclure les identifiants d\'importation. ';					# Note the trailing space
+$impex_phrases['alter_desc_2']								= 'Ceci est nécessaire durant la phase d\'importation pour maintenir les références entre les tables pendant l\'importation. ';		# Note the trailing space
+$impex_phrases['alter_desc_3']								= 'Si vous avez des tables plutôt grandes (comme beaucoup de messages), ceci peut prendre du temps. ';								# Note the trailing space
+$impex_phrases['alter_desc_4']								= 'Ils seront aussi laissés après l\'importation si vous souhaitez effectuer un retour vers l\'identifiant vB original.';
+$impex_phrases['valid_tables_found']    					= 'Tables valides trouvées :';
+$impex_phrases['found']                 					= 'trouvé(e)';
+$impex_phrases['customtable_prefix']    					= '<b>Tables potentiellement personnelles ou avec un mauvais préfixe :</b>';
+$impex_phrases['not_found']             					= '<b>NON</b> trouvé(e)';
+$impex_phrases['all_red_tables']							= 'Si vous avez toutes les tables listés en rouge, cela peut venir du préfixe de table à vérifier :';
 
 #####################################
 # Associate users

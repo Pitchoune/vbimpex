@@ -14,13 +14,12 @@
 * This handles interaction with the different types of database.
 *
 * @package 		ImpEx
-*
 */
 
 if (!class_exists('ImpExFunction')) { die('Direct class access violation'); }
+
 require_once (IDIR . '/ImpExDatabase_blog.php');
 
 class ImpExDatabase extends ImpExDatabaseBlog { }
 
-/*======================================================================*/
 ?>

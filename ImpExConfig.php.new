@@ -29,7 +29,8 @@ $impexconfig['passcode']	= 'test';
 /*
 ####
 #
-# TARGET - The target is the vBulletin database (where the  data is going to)
+# TARGET - The target is the vBulletin database (where the  data is going to).
+#          Leave it as is if you are using ImpEx integrated into vBulletin (not standalone use)
 #
 ####
 */
@@ -57,7 +58,7 @@ $impexconfig['sourceexists']			= true;
 */
 
 // mysql / mssql
-$impexconfig['source']['databasetype']	= 'mysql';  // mysql OR mssql
+$impexconfig['source']['databasetype']	= 'mysql';  // mysql, mysqli OR mssql
 $impexconfig['source']['server']		= 'localhost';
 $impexconfig['source']['user']			= 'username';
 $impexconfig['source']['password']		= 'password';
@@ -68,7 +69,7 @@ $impexconfig['source']['tableprefix']   = '';
 ####
 #
 # DUPLICATE CHECKING
-# Where unique import id's are available ImpEx can check for duplicates with some
+# Where unique import id's are available, ImpEx can check for duplicates with some
 # Tier2 systems this will need to be set to false.
 #
 # yahoo_groups, YaBB 2.1, Ikonboard 3.1.5 (for attachments)
@@ -97,7 +98,7 @@ $impexconfig['source']['persistent']	= false;
 
 //pagespeed is the second(s) wait before the page refreshes.
 
-$impexconfig['system']['language']		= '/impex_language.php';
+$impexconfig['system']['language']		= 'en';		# Available languages (more soon): 'en', 'fr'.
 $impexconfig['system']['pagespeed']		= 1;
 
 $impexconfig['system']['errorlogging']	= false;

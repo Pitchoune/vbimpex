@@ -14,21 +14,29 @@
 * If a function is used in more that two places it goes here.
 *
 * @package 		ImpEx
-*
 */
 
 if (!defined('IDIR')) { die; }
 
 class ImpExFunction
 {
-	function ImpExFunction()
+	var $source_table_cache = array();
+
+	/**
+	* Constructor
+	*/
+	public function __constructor()
 	{
 	}
 
-	// Temp till moved in ImpEx2
-	var $source_table_cache = array();
-
-	function check_table_cache($tablename)
+	/**
+	* Checks the cache of a table.
+	*
+	* @param	string		tablename	Name of the table.
+	*
+	* @return	boolean		mixed		True|False
+	*/
+	public function check_table_cache($tablename)
 	{
 		if (in_array($tablename, $this->source_table_cache))
 		{
@@ -41,19 +49,25 @@ class ImpExFunction
 	}
 
 	/**
-	* Returns unix timestamp from a timestamp(14)
+	* Returns unix timestamp from a timestamp(14).
 	*
-	* @param	string	mixed			The string to parse
+	* @param	string	mixed	The string to parse.
 	*
-	* @return	array
+	* @return	int		mixed	Unix timestamp.
 	*/
-	function time_to_stamp($old_date)
+	public function time_to_stamp($old_date)
 	{
-		return mktime (substr($old_date, 8, 2), substr($old_date, 10, 2), substr($old_date, 12, 2), substr($old_date, 4, 2), substr($old_date, 6, 2), substr($old_date, 0, 4));
+		return mktime(substr($old_date, 8, 2), substr($old_date, 10, 2), substr($old_date, 12, 2), substr($old_date, 4, 2), substr($old_date, 6, 2), substr($old_date, 0, 4));
 	}
 
-
-	function option2bin($optionstring)
+	/**
+	* Converts any passed value into boolean value.
+	*
+	* @param	string		optionstring	String of the value to pass.
+	*
+	* @return	boolean		mixed			Boolean value.
+	*/
+	public function option2bin($optionstring)
 	{
 		$optionstring = strtolower(trim($optionstring));
 
@@ -79,9 +93,14 @@ class ImpExFunction
 		}
 	}
 
-	// YYYY-MM-DD or TIMESTAMP
-
-	function is_coppa($birthday)
+	/**
+	* Checks if given birthday corresponds to a COPPA user following current date.
+	*
+	* @param	string	birthday	Birthday date. Can be in format YYYY-MM-DD or unixtime.
+	*
+	* @return	array	Array of values with COPPA status.
+	*/
+	public function is_coppa($birthday)
 	{
 		$return_array = array(
 			'status' 	=> false,
@@ -91,7 +110,7 @@ class ImpExFunction
 		$date_bits = array();
 		$unix_ts = 0;
 
-		if (stristr($birthday,"-"))
+		if (stristr($birthday, "-"))
 		{
 			//Its YYYY-MM-DD
 			$date_bits = explode('-', $birthday);
@@ -101,7 +120,7 @@ class ImpExFunction
 				return $return_array;
 			}
 
-			$birthday = @mktime(0,0,0,$date_bits[1],$date_bits[2],$date_bits[0]);
+			$birthday = @mktime(0, 0, 0, $date_bits[1], $date_bits[2], $date_bits[0]);
 		}
 
 		// 410240038 13 years of seconds
@@ -119,23 +138,37 @@ class ImpExFunction
 		return $return_array;
 	}
 
-
-	function iif($expression, $returntrue, $returnfalse = '')
+	/**
+	* Deprecated.
+	*/
+	public function iif($expression, $returntrue, $returnfalse = '')
 	{
 		return $expression ? $returntrue : $returnfalse;
 	}
 
-
-	function unhtmlspecialchars($text)
+	/**
+	* Converts specific entities into usual characters into given text.
+	*
+	* @param	string	text	Text to change characters.
+	*
+	* @return	string	mixed	Text converted.
+	*/
+	public function unhtmlspecialchars($text)
 	{
 		return str_replace(array('&lt;', '&gt;', '&quot;', '&amp;'), array('<', '>', '"', '&'), $text);
 	}
 
-
-	function vb_parse_url($messagetext)
+	/**
+	* Parse URLs.
+	*
+	* @param	string	messagetext	Text of message to parse.
+	*
+	* @return	string	mixed		Text parsed.
+	*/
+	public function vb_parse_url($messagetext)
 	{
-
 		$taglist = '\[b|\[i|\[u|\[color|\[size|\[font|\[left|\[center|\[right|\[indent|\[quote|\[highlight|\[\*';
+
 		$urlSearchArray = array(
 			"#(^|(?<=[^_a-z0-9-=\]\"'/@]|(?<=" . $taglist . ")\]))((https?|ftp|gopher|news|telnet)://|www\.)((\[(?!/)|[^\s[()^$!`\"'|{}<>])+)(?!\[/url|\[/img)(?=[,.]*([\s)[]|$))#siU"
 		);
@@ -156,12 +189,13 @@ class ImpExFunction
 
 
 		$text = preg_replace($urlSearchArray, $urlReplaceArray, $messagetext);
+
 		if (strpos($text, '@'))
 		{
 			$text = preg_replace($emailSearchArray, $emailReplaceArray, $text);
 		}
 
-		if($text)
+		if ($text)
 		{
 			return $text;
 		}
@@ -169,8 +203,14 @@ class ImpExFunction
 		return $messagetext;
 	}
 
-
-	function vb_file_get_contents($filename)
+	/**
+	* Emulates file_get_contents() PHP function if needed.
+	*
+	* @param	string	filename	Path of the file.
+	*
+	* @return	mixed	mixed		File content if valid.
+	*/
+	public function vb_file_get_contents($filename)
 	{
 		if (function_exists('file_get_contents'))
 		{
@@ -192,6 +232,7 @@ class ImpExFunction
 					}
 					$contents .= $data;
 				} while(true);
+
 				@fclose ($handle);
 				return $contents;
 			}
@@ -199,7 +240,16 @@ class ImpExFunction
 		return false;
 	}
 
-	function parse_smilie_callback_php5($imgsrc, $fulltag,$smilies)
+	/**
+	* Callback function to parse smilies.
+	*
+	* @param	string	imgsrc		URL of the image.
+	* @param	string	fulltag		Full tag of the smilie.
+	* @param	array	smilies		Array of smilies.
+	*
+	* @return	string	mixed		Smilie image url.
+	*/
+	public function parse_smilie_callback_php5($imgsrc, $fulltag, $smilies)
 	{
 		// strip extra quotes added by /e modifier
 		$imgsrc = str_replace('\"', '"', $imgsrc);
@@ -217,49 +267,28 @@ class ImpExFunction
 		}
 	}
 
-	function html_2_bb($htmlcode, $parse_smilies = 1, $parse_urls = 1)
+	/**
+	* Converts HTML code to BB Code.
+	*
+	* @param	string	htmlcode		HTML code to convert.
+	* @param	int		parse_smilies	Parse smilies?
+	* @param	int		parse_urls		Parse URLs?
+	*
+	* @return	string	mixed			Converted HTML code into BB Code.
+	*/
+	public function html_2_bb($htmlcode, $parse_smilies = 1, $parse_urls = 1)
 	{
 		$smilies = $this->_smilies;
 
-		if(!function_exists('parse_smilie_callback'))
-		{
-			function parse_smilie_callback($imgsrc, $fulltag,$smilies)
-			{
-				// strip extra quotes added by /e modifier
-				$imgsrc = str_replace('\"', '"', $imgsrc);
-				$fulltag = str_replace('\"', '"', $fulltag);
-
-				if (isset($smilies["$imgsrc"]))
-				{
-					// found this smilie by image location, replace it
-					return $smilies["$imgsrc"];
-				}
-				else
-				{
-					// didn't find a smilie, so it probably isn't one
-					return $fulltag;
-				}
-			}
-		}
 		// line breaks
 		$htmlcode = preg_replace('#<br\s*/?>#i', "\n", $htmlcode);
 		$htmlcode = preg_replace('#<p\s*/?>#i', "\n\n", $htmlcode);
 
-
 		// do smilies
 		if ($parse_smilies == 1)
 		{
-			// as generic as possible
-			if (phpversion() < '5.0.0')
-			{
-				$htmlcode = preg_replace('#<img[^>]*src=("|\')(.*)\\1[^>]*/??>#iUe', "parse_smilie_callback('\\2', '\\0', \$smilies)", $htmlcode);
-				$htmlcode = preg_replace('#<img[^>]*src=([^"\' ]*) [^>]*/??>#iUe', "parse_smilie_callback('\\1', '\\0', \$smilies)", $htmlcode);
-			}
-			else
-			{
-				$htmlcode = preg_replace('#<img[^>]*src=("|\')(.*)\\1[^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\2', '\\0', \$smilies)", $htmlcode);
-				$htmlcode = preg_replace('#<img[^>]*src=([^"\' ]*) [^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\1', '\\0', \$smilies)", $htmlcode);
-			}
+			$htmlcode = preg_replace('#<img[^>]*src=("|\')(.*)\\1[^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\2', '\\0', \$smilies)", $htmlcode);
+			$htmlcode = preg_replace('#<img[^>]*src=([^"\' ]*) [^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\1', '\\0', \$smilies)", $htmlcode);
 		}
 
 		// images (beyond any smilies stripped above)
@@ -316,11 +345,13 @@ class ImpExFunction
 		return $htmlcode;
 	}
 
-	function all_your_posts_are_belong_to_us($post)
+	/**
+	* Easter egg ;)
+	*/
+	public function all_your_posts_are_belong_to_us($post)
 	{
 		return $post;
 	}
-
 
 	/**
 	* Simple path checker
@@ -331,20 +362,17 @@ class ImpExFunction
 	*
 	* @return	boolean
 	*/
-	function check_path(&$displayobject, &$sessionobject, &$path)
+	public function check_path(&$displayobject, &$sessionobject, &$path)
 	{
 		if (is_dir($path))
 		{
-			$displayobject->display_now("\n<br /><b>path</b> - $path <font color=\"green\"><i>OK</i></font>");
+			$displayobject->display_now('<br /><b>path</b> - ' . $path . ' <font color="green"><i>' . $this->phrases['ok'] . '</i></font>');
 			return true;
 		}
 		else
 		{
-			$displayobject->display_now("\n<br /><b>$path</b> - <font color=\"red\"><i>NOT OK</i></font>");
-			$sessionobject->add_error('fatal',
-									 $this->_modulestring,
-									 "$path is incorrect",
-									 'Check the file structure of the  board');
+			$displayobject->display_now('<br /><b>' . $path . '</b> - <font color="red"><i>' . $this->phrases['not_ok'] . '</i></font>');
+			$sessionobject->add_error('fatal', $this->_modulestring, $path . $this->phrases['path_is_incorrect'], $this->phrases['check_board_structure']);
 			return false;
 		}
 	}
@@ -358,25 +386,29 @@ class ImpExFunction
 	*
 	* @return	boolean
 	*/
-	function check_file(&$displayobject, &$sessionobject, &$file)
+	public function check_file(&$displayobject, &$sessionobject, &$file)
 	{
 		if (is_file($file))
 		{
-			$displayobject->display_now("\n<br /><b>file</b> - $file <font color=\"green\"><i>OK</i></font>");
+			$displayobject->display_now('<br /><b>file</b> - ' . $file . ' <font color="green"><i>' . $this->phrases['ok'] . '</i></font>');
 			return true;
 		}
 		else
 		{
-			$displayobject->display_now("\n<br /><b>$file</b> - <font color=\"red\"><i>NOT OK</i></font>");
-			$sessionobject->add_error('fatal',
-									 $this->_modulestring,
-									 "$path is incorrect",
-									 'Check the file structure of the board');
+			$displayobject->display_now('<br /><b>' . $file . '</b> - <font color="red"><i>' . $this->phrases['not_ok'] . '</i></font>');
+			$sessionobject->add_error('fatal', $this->_modulestring, $file . $this->phrases['path_is_incorrect'], $this->phrases['check_board_structure']);
 			return false;
 		}
 	}
 
-	function scandir($dirstr)
+	/**
+	* Scans a given directory.
+	*
+	* @param	string	dirstr		Directory root.
+	*
+	* @return	string	mixed		List of files if files are found.
+	*/
+	public function scandir($dirstr)
 	{
 		if (!is_dir($dirstr))
 		{
@@ -410,8 +442,18 @@ class ImpExFunction
 		}
 	}
 
-
-	function fetch_attachment_path($userid, $base_path, $as_new, $attachmentid = 0, $thumb = false)
+	/**
+	* Fetchs the attachment path.
+	*
+	* @param	int			userid			User ID which attachment is owned.
+	* @param	string		base_path		Base path of the attachment.
+	* @param	string		as_new			Expanded paths?
+	* @param	int			attachmentid	Attachment ID to fetch path.
+	* @param	boolean		thumb			Thumb required?
+	*
+	* @return	string		mixed			Attachment path.
+	*/
+	public function fetch_attachment_path($userid, $base_path, $as_new, $attachmentid = 0, $thumb = false)
 	{
 		if ($as_new) // expanded paths
 		{
@@ -437,7 +479,15 @@ class ImpExFunction
 		return $path;
 	}
 
-	function vbmkdir($path, $mode = 0777)
+	/**
+	* Recursive creation of file path.
+	*
+	* @param	string		path	Path of the directory.
+	* @param	int			mode	Mode of the directory.
+	*
+	* @return	boolean
+	*/
+	public function vbmkdir($path, $mode = 0777)
 	{
 		if (is_dir($path))
 		{
@@ -463,7 +513,15 @@ class ImpExFunction
 		}
 	}
 
-	function check_avatar_size(&$url, &$size_allowed)
+	/**
+	* Checks the size of the given avatar.
+	*
+	* @param	string	url				URL of the avatar.
+	* @param	int		size_allowed	Size allowed for the avatar.
+	*
+	* @return	boolean
+	*/
+	public function check_avatar_size(&$url, &$size_allowed)
 	{
 		if ($url AND @fopen($url, 'r'))
 		{
@@ -484,8 +542,15 @@ class ImpExFunction
 		}
 	}
 
-
-	function vb_file_save_contents($filename, $contents)
+	/**
+	* Save content into a file.
+	*
+	* @param	string	filename	Path and name of the file.
+	* @param	string	contents	Contents to write into the file.
+	*
+	* @return	boolean
+	*/
+	public function vb_file_save_contents($filename, $contents)
 	{
 		if (function_exists('file_put_contents'))
 		{
@@ -507,5 +572,4 @@ class ImpExFunction
 	}	
 }
 
-/*======================================================================*/
 ?>
