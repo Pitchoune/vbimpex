@@ -89,7 +89,7 @@ class smf_006 extends smf_000
 		}
 
 		// Get an array of thread details
-		$thread_array 	= $this->get_smf_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page);
+		$thread_array 	= $this->get_smf_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $displayobject);
 
 		// Forum info
 		$forum_ids_array = $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix, $pad=0);
@@ -102,7 +102,7 @@ class smf_006 extends smf_000
 		foreach ($thread_array as $thread_id => $thread_details)
 		{
 			$try = (phpversion() < '5' ? $thread_object : clone($thread_object));
-			$subject = $this->get_smf_topic_subject($Db_source, $source_database_type, $source_table_prefix, $thread_details['ID_FIRST_MSG']);
+			$subject = $this->get_smf_topic_subject($Db_source, $source_database_type, $source_table_prefix, $thread_details['ID_FIRST_MSG'], $displayobject);
 
 			// Mandatory
 			if ($thread_details['subject'])

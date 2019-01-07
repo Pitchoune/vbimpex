@@ -93,7 +93,7 @@ class ubb_threads_008 extends ubb_threads_000
 
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_ubb_threads_poll_question($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_ubb_threads_poll_question($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 
 
 		// Display count and pass time
@@ -105,7 +105,7 @@ class ubb_threads_008 extends ubb_threads_000
 
 		foreach ($poll_array as $poll_id => $poll_question)
 		{
-			$poll_options 	= $this->get_ubb_threads_poll_options($Db_source, $source_database_type, $source_table_prefix, $poll_id, $poll_question['P_QuestionNum']);
+			$poll_options 	= $this->get_ubb_threads_poll_options($Db_source, $source_database_type, $source_table_prefix, $poll_id, $poll_question['P_QuestionNum'], $displayobject);
 			$import_thread	= $this->get_ubb_threads_poll_thread_id($Db_source, $source_database_type, $source_table_prefix, $poll_id);
 
 			unset($options, $votes, $numberoptions, $voters, $question);
@@ -113,7 +113,7 @@ class ubb_threads_008 extends ubb_threads_000
 			foreach($poll_options as $id => $data)
 			{
 				$options 	.=  $data['P_Option'] . '|||';
-				$votes		.=  $this->get_ubb_threads_poll_votes($Db_source, $source_database_type, $source_table_prefix, $data['P_OptionNum'], $poll_question['P_QuestionNum'] ) . '|||';
+				$votes		.=  $this->get_ubb_threads_poll_votes($Db_source, $source_database_type, $source_table_prefix, $data['P_OptionNum'], $poll_question['P_QuestionNum'], $displayobject) . '|||';
 
 				$numberoptions++;
 			}

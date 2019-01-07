@@ -95,7 +95,7 @@ class ipb_003 extends ipb_000
 		}
 
 		// Get a page worths of users groups
-		$user_groups_array  =  $this->get_ipb_user_group_details($Db_source, $source_database_type, $source_table_prefix);
+		$user_groups_array  =  $this->get_ipb_user_group_details($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 
 		// Got some numbers, lets try putting it in the dB
 		$usergroup_object = new ImpExData($Db_target, $sessionobject,'usergroup');

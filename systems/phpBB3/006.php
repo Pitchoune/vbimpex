@@ -163,8 +163,8 @@ class phpBB3_006 extends phpBB3_000
 
 						$p_try = (phpversion() < '5' ? $poll_object : clone($poll_object));
 
-						$poll = $this->get_phpbb3_polls_details($Db_source, $s_db_type, $s_tb_prefix, $import_id);
-						$poll_voters = $this->get_phpbb3_poll_voters($Db_source, $s_db_type, $s_tb_prefix, $import_id);
+						$poll = $this->get_phpbb3_polls_details($Db_source, $s_db_type, $s_tb_prefix, $import_id, $displayobject);
+						$poll_voters = $this->get_phpbb3_poll_voters($Db_source, $s_db_type, $s_tb_prefix, $import_id, $displayobject);
 
 						foreach($poll_voters AS $phpBB_user_id => $vote)
 						{

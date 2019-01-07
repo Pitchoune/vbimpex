@@ -91,7 +91,7 @@ class smf_011 extends smf_000
 		}
 
 		// Get an array of smilie details
-		$smilie_array 	= $this->get_smf_smilie_details($Db_source, $source_database_type, $source_table_prefix, $smilie_start_at, $smilie_per_page);
+		$smilie_array 	= $this->get_smf_smilie_details($Db_source, $source_database_type, $source_table_prefix, $smilie_start_at, $smilie_per_page, $displayobject);
 
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($smilie_array) . " {$displayobject->phrases['smilies']}</h4>");

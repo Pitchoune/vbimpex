@@ -782,7 +782,7 @@ class ImpExDisplay extends ImpExFunction
 	*/
 	public function page_footer()
 	{
-		$string = '<br /><table align="center"><tr><td><a href="http://www.vbulletin.com/docs/html/impex_cleanup" target="_blank">' . $this->phrases['finished_import'] . '</a></td></tr></table>';
+		$string = '<br /><table align="center"><tr><td><a href="' . $this->phrases['finished_import_url'] . '" target="_blank">' . $this->phrases['finished_import'] . '</a></td></tr></table>';
 		$string .= '</body></html>';
 		return $string;
 	}

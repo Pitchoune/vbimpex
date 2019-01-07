@@ -12,7 +12,6 @@
 * vb4_000
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_000 extends ImpExModule
 {
@@ -125,107 +124,80 @@ class vb4_000 extends ImpExModule
 	);
 
 
-	function vb4_000()
+	public function __constructor()
 	{
 	}
 
-	function get_post_parent_id($Db_object, $databasetype, $tableprefix, $import_post_id)
+	public function get_post_parent_id($Db_object, $databasetype, $tableprefix, $import_post_id)
 	{
-		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
-		{
-			$post_id = $Db_object->query_first("
-				SELECT postid
-				FROM " . $tableprefix . "post
-				WHERE importpostid = " . $import_post_id . "
-			");
+		$post_id = $Db_object->query_first("
+			SELECT postid
+			FROM " . $tableprefix . "post
+			WHERE importpostid = " . $import_post_id . "
+		");
 
-			return $post_id[0];
-		}
-		else
-		{
-			return false;
-		}
+		return $post_id[0];
 	}
 
-	function get_thread_id_from_poll_id(&$Db_object, &$databasetype, &$tableprefix, $poll_id)
+	public function get_thread_id_from_poll_id(&$Db_object, &$databasetype, &$tableprefix, $poll_id)
 	{
-		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
+		$thread_id = $Db_object->query_first("
+			SELECT importthreadid
+			FROM " . $tableprefix . "thread
+			WHERE pollid = " . $poll_id . "
+		");
+
+		return $thread_id[0];
+
+	}
+
+	public function update_poll_ids($Db_object, $databasetype, $tableprefix)
+	{
+		$result = $Db_object->query("
+			SELECT pollid, threadid, importthreadid
+			FROM " . $tableprefix . "thread
+			WHERE open = 10
+				AND pollid <> 0
+				AND importthreadid <> 0
+		");
+
+		while ($thread = $Db_object->fetch_array($result))
 		{
-			$thread_id = $Db_object->query_first("
-				SELECT importthreadid
+			$new_thread_id = $Db_object->query_first("
+				SELECT threadid
 				FROM " . $tableprefix . "thread
-				WHERE pollid = " . $poll_id . "
+				WHERE importthreadid = " . $thread['pollid'] . "
 			");
 
-			return $thread_id[0];
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	function update_poll_ids($Db_object, $databasetype, $tableprefix)
-	{
-		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
-		{
-			$result = $Db_object->query("
-				SELECT pollid, threadid, importthreadid
-				FROM " . $tableprefix . "thread
-				WHERE open=10
-					AND pollid <> 0
-					AND importthreadid <> 0
-			");
-
-			while ($thread = $Db_object->fetch_array($result))
+			if ($new_thread_id['threadid'])
 			{
-				$new_thread_id = $Db_object->query_first("
-					SELECT threadid
-					FROM " . $tableprefix . "thread
-					WHERE importthreadid = " . $thread['pollid'] . "
+				// Got it
+				$Db_object->query("
+					UPDATE " . $tableprefix . "thread SET
+						pollid = " . $new_thread_id['threadid'] . "
+					WHERE threadid=" . $thread['threadid'] . "
 				");
-
-				if ($new_thread_id['threadid'])
-				{
-					// Got it
-					$Db_object->query("
-						UPDATE " . $tableprefix . "thread SET
-							pollid = " . $new_thread_id['threadid'] . "
-						WHERE threadid=" . $thread['threadid'] . "
-					");
-				}
-				else
-				{
-					// Why does it miss some ????
-				}
+			}
+			else
+			{
+				// Why does it miss some ????
 			}
 		}
-		else
-		{
-			return false;
-		}
 	}
 
-	function get_vb4_pms(&$Db_object, &$databasetype, &$tableprefix, &$pm_text_id)
+	public function get_vb4_pms(&$Db_object, &$databasetype, &$tableprefix, &$pm_text_id)
 	{
 		$return_array = array();
 
-		if ($databasetype == 'mysql' OR $databasetype == 'mysqli')
-		{
-			$result = $Db_object->query("
-				SELECT *
-				FROM " . $tableprefix . "pm
-				WHERE pmtextid = ". $pm_text_id . "
-			");
+		$result = $Db_object->query("
+			SELECT *
+			FROM " . $tableprefix . "pm
+			WHERE pmtextid = ". $pm_text_id . "
+		");
 
-			while ($pm = $Db_object->fetch_array($result))
-			{
-				$return_array["$pm[pmid]"] = $pm;
-			}
-		}
-		else
+		while ($pm = $Db_object->fetch_array($result))
 		{
-			return false;
+			$return_array["$pm[pmid]"] = $pm;
 		}
 
 		return $return_array;

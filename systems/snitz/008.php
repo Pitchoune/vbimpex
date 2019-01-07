@@ -95,7 +95,7 @@ class snitz_008 extends snitz_000
 
 
 		// Get an array of pmtext details
-		$pm_array 	= $this->get_snitz_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$pm_array 	= $this->get_snitz_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 
 		$users_ids = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 		$user_names = $this->get_username($Db_target, $target_database_type, $target_table_prefix);

@@ -93,7 +93,7 @@ class snitz_007 extends snitz_000
 
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_snitz_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_snitz_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($poll_array) . " {$displayobject->phrases['polls']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $poll_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($poll_start_at + count($poll_array)) . "</p>");
@@ -102,7 +102,7 @@ class snitz_007 extends snitz_000
 
 		foreach ($poll_array as $poll_id => $poll_details)
 		{
-			$question = $this->get_snitz_question($Db_source, $source_database_type, $source_table_prefix, $poll_details['TOPIC_ID']);
+			$question = $this->get_snitz_question($Db_source, $source_database_type, $source_table_prefix, $poll_details['TOPIC_ID'], $displayobject);
 
 			if($question == NULL)
 			{

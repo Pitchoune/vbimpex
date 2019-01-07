@@ -806,11 +806,11 @@ class wBB_000 extends ImpExModule
 	}
 
 
-	function get_wbb_user_groups($DB_object, $database_type, $table_prefix, $user_id)
+	function get_wbb_user_groups($DB_object, $database_type, $table_prefix, $user_id, &$displayobject)
 	{
 		$return_array = array();
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'user2groups'))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'user2groups', $displayobject))
 		{
 			return $return_array;
 		}

@@ -91,7 +91,7 @@ class smf_008 extends smf_000
 		}
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_smf_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_smf_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($poll_array) . " {$displayobject->phrases['polls']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $poll_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($poll_start_at + count($poll_array)) . "</p>");
@@ -111,7 +111,7 @@ class smf_008 extends smf_000
 
 			// ***
 			// The options array
-			$poll_options = $this->get_smf_poll_options($Db_source, $source_database_type, $source_table_prefix, $poll_id);
+			$poll_options = $this->get_smf_poll_options($Db_source, $source_database_type, $source_table_prefix, $poll_id, $displayobject);
 
 			foreach ($poll_options AS $id => $details)
 			{
@@ -133,7 +133,7 @@ class smf_008 extends smf_000
 			// ***
 			// The voters array
 
-			$poll_voters = $this->get_smf_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id);
+			$poll_voters = $this->get_smf_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id, $displayobject);
 			foreach ($poll_voters AS $vote)
 			{
 				$old_id = $idcache->get_id('user', $vote['ID_MEMBER']);

@@ -116,7 +116,7 @@ class phorum3_005 extends phorum3_000
 
 
 		// Get an array of thread details
-		$thread_array 	= $this->get_phorum3_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $sessionobject->get_session_var('sourceforumtablename'));
+		$thread_array 	= $this->get_phorum3_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $sessionobject->get_session_var('sourceforumtablename'), $displayobject);
 
 		$user_ids_array = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix, $do_int_val = false);
 		$forum_ids_array = $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix, $pad=0);

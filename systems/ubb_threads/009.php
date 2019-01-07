@@ -96,7 +96,7 @@ class ubb_threads_009 extends ubb_threads_000
 		}
 
 		// Get an array of pmtext details
-		$pm_array 	= $this->get_ubb_threads_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$pm_array 	= $this->get_ubb_threads_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($pm_array) . " {$displayobject->phrases['pm']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $pm_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($pm_start_at + count($pm_array)) . "</p>");

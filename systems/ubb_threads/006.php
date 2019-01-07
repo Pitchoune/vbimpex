@@ -92,7 +92,7 @@ class ubb_threads_006 extends ubb_threads_000
 
 
 		// Get an array of thread details
-		$thread_array 	= $this->get_ubb_threads_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page);
+		$thread_array 	= $this->get_ubb_threads_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $displayobject);
 
 		$forum_ids_array 	= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 		$forum_word_array 	= $this->get_forum_by_keyword($Db_source, $source_database_type, $source_table_prefix);

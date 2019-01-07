@@ -39,61 +39,64 @@ $impex_phrases['enter_customer_number'] 					= 'Veuillez insérer le code d\'acc
 
 $impex_phrases['using_local_config']						= 'Utilisation du fichier includes/config.php comme configuration cible.';
 $impex_phrases['using_impex_config']						= 'Utilisation du fichier ImpExConfig.php comme configuration cible.';
-$impex_phrases['no_mssql_support']							= 'You do not have MSSQL support in this version/compile of php, the importer will not be able to connect to the source database.';
-$impex_phrases['no_mssql_support_link']						= '</br>Read this : <a target="_blank" href="http://www.php.net/manual/en/ref.mssql.php">PHP MSSQL</a>';
-$impex_phrases['no_source_set']								= 'A source database was not entered in ImpExConfig.php';
-$impex_phrases['source_not_exist']							= 'The source database entered in ImpExConfig.php does not exist.';
-$impex_phrases['sourceexists_is_false'] 					= 'You have set sourceexists to FALSE in ImpExConfig.php, this means you do not want to import from a database system, this system is a source database system.';
-$impex_phrases['failed_connection']							= 'Connection to source server failed. Check username and password.';
+$impex_phrases['no_mssql_support']							= '<br /><br />Vous n\'avez pas le support MSSQL dans cette version de PHP, le système ne pourra pas se connecter à la base de données source.';
+$impex_phrases['no_mssql_support_link']						= '<br />Veuillez consulter cette page : <a target="_blank" href="http://www.php.net/manual/fr/book.mssql.php">PHP MSSQL</a>';
+$impex_phrases['no_source_set']								= 'Aucune base de données source a été renseignée dans le fichier ImpExConfig.php';
+$impex_phrases['source_not_exist']							= 'La base de données source dans le fichier ImpExConfig.php n\'existe pas.';
+$impex_phrases['sourceexists_is_false'] 					= 'Vous avez défini la variable sourceexists sur FALSE dans le fichier ImpExConfig.php, ceci signifie que vous ne souhaitez pas importer depuis une base de données, ce système utilise une base de données comme source.';
+$impex_phrases['failed_connection']							= 'La connexion au serveur source a échoué. Veuillez vérifier l\'identifiant et le mot de passe associé.';
 $impex_phrases['db_cleanup']								= 'Nettoyage de la base de données &amp; redémarrage';
 $impex_phrases['online_manual']								= 'Manuel en ligne (anglais)';
+$impex_phrases['online_manual_url']							= 'http://www.vbulletin.com/docs/html/impex';
 $impex_phrases['cleanup_module_title']						= 'Nettoyer le module';
 $impex_phrases['feedback_module_title']						= 'Avis';
 $impex_phrases['build_version']								= 'ImpEx version : ';
 $impex_phrases['remove']									= 'Supprimez ImpEx une fois votre importation complète et finale !';
 $impex_phrases['finished_import']							= 'Une fois que vous avez fini d\'utiliser ces modules, suivez les instructions suivantes pour terminer l\'importation (anglais)';
+$impex_phrases['finished_import_url']						= 'http://www.vbulletin.com/docs/html/impex_cleanup';
 
 #####################################
 # help.php phrases
 #####################################
 
-$impex_phrases['action_1']									= '<p>These links will allow you to restart an import, remove a session or remove the importid\'s to allow consecutive imports.</p>';
-$impex_phrases['action_2']									= '<br /><strong>Cancel</strong><br /><a href="index.php">To cancel and return to the import, click here.</a><br />';
-$impex_phrases['action_3']									= '<br /><strong>Delete Session</strong><br /><a href="help.php?action=delsess">To delete the import session and continue with the import, click here.</a><br />';
-$impex_phrases['action_4']									= '<br />FORUM data - <a href="help.php?action=delall">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_5']									= '<br />FORUM importids - <a href="help.php?action=delids">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
-$impex_phrases['action_6']									= '<br /><strong>Remove duplicate forums/threads/posts.</strong><br /><a href="help.php?action=deldupe">This will remove anything that has a duplicate importid and a diffrent vBulletin id. Use with EXTREME caution, results will vary between source systems, <b>ALWAYS TAKE A BACK UP BEFORE USING</b></a><br />';
+$impex_phrases['help_page']									= 'Aide ImpEx';
+$impex_phrases['action_1']									= '<p>Les liens suivants vous permettront de recommencer une importation, supprimer la session actuelle ou de supprimer les identifiants d\'importations pour effectuer une nouvelle importation consécutive.</p>';
+$impex_phrases['action_2']									= '<br /><strong>Annuler</strong><br /><a href="index.php">Pour effectuer aucune action et revenir à l\'importation, cliquez ici.</a><br />';
+$impex_phrases['action_3']									= '<br /><strong>Supprimer la session</strong><br /><a href="help.php?action=delsess">Pour supprimer la session actuelle et continuer l\'importation, cliquez ici.</a><br />';
+$impex_phrases['action_4']									= '<br />Données du Forum - <a href="help.php?action=delall">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
+$impex_phrases['action_5']									= '<br />Identifiants du Forum - <a href="help.php?action=delids">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
+$impex_phrases['action_6']									= '<br /><strong>Supprimer les forums / discussions / messages en double</strong><br /><a href="help.php?action=deldupe">Ceci va supprimer toute donnée qui a un identifiant d\'importation en double. À utiliser avec une EXTRÊME précaution, les résultats peuvent varier selon les sources. <b>EFFECTUEZ UNE SAUVEGARDE DE VOTRE BASE DE DONNÉES AVANT D\'UTILISER CECI !</b></a><br />';
 
-$impex_phrases['action_7']									= '<br />CMS data - <a href="help.php?action=delall&amp;type=cms">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_8']									= '<br />CMS importids - <a href="help.php?action=delids&amp;type=cms">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
-$impex_phrases['action_9']									= '<br />BLOG data - <a href="help.php?action=delall&amp;type=blog">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_10']									= '<br />BLOG importids - <a href="help.php?action=delids&amp;type=blog">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
+$impex_phrases['action_7']									= '<br />Données du Cms - <a href="help.php?action=delall&amp;type=cms">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
+$impex_phrases['action_8']									= '<br />Identifiants du Cms - <a href="help.php?action=delids&amp;type=cms">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
+$impex_phrases['action_9']									= '<br />Données du Blog - <a href="help.php?action=delall&amp;type=blog">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
+$impex_phrases['action_10']									= '<br />Identifiants du Blog - <a href="help.php?action=delids&amp;type=blog">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
 
-$impex_phrases['dell_session_1']							= '<p><b>Deleteing Impex Session.</b></p>';
-$impex_phrases['dell_session_2']							= '<p>After this is complete any previously imported data will be left in the data base so it is advised that you re run any modules that you already have twice to ensure that data is cleaned up.</p>';
-$impex_phrases['dell_session_3']							= '<p>For instance, if the import timed out on the users import and you have come here to delete the session, once that is done and you restart the import run the import users module <b>twice</b>, that will ensure that on the start up of the second pass that <b>all</b> of the previously imported data will be removed.</p>';
-$impex_phrases['dell_session_4']							= '<p>This happens with all modules, running them more that once will clear out and data for that module that has an import id</p>';
-$impex_phrases['dell_session_5']							= '<p><b>Session deleted</b></p>';
-$impex_phrases['dell_session_6']							= '<p><a href="index.php">Click here to return to the import page.</a></p>';
+$impex_phrases['dell_session_1']							= '<p><b>Suppression de la session ImpEx.</b></p>';
+$impex_phrases['dell_session_2']							= '<p>Après avoir exécuté ceci, les données déjà importées seront laissés dans la base de données. Il est recommandé d\'exécuter de nouveau deux fois chaque module déjà terminé pour vous assurer que les données ont bien été nettoyéees.</p>';
+$impex_phrases['dell_session_3']							= '<p>Par exemple, si l\'importation a mis trop de temps sur l\'importation des utilisateurs et que vous êtes venus ici pour supprimer la session, une fois effectué, exécutez le module correspondant <b>deux fois</b>, ceci vous permettra d\'être certain qu\'à sa seconde exécution, <b>toutes</b> les données importées précédemment seront supprimées.</p>';
+$impex_phrases['dell_session_4']							= '<p>Ceci peut arriver avec tous les modules, les exécuter plus d\'une fois nettoiera les données précédentes qui ont un identifiant d\'importation.</p>';
+$impex_phrases['dell_session_5']							= '<p><b>Session supprimée avec succès !</b></p>';
+$impex_phrases['dell_session_6']							= '<p><a href="index.php">Cliquez ici pour retourner sur la page d\'importation.</a></p>';
 
-$impex_phrases['deleting_session']							= '<p><b>Deleteing Impex Session.</b></p>';
-$impex_phrases['session_deleted']							= '<p><b>Session deleted</b></p>';
-$impex_phrases['deleting_duplicates']						= '<p><b>Deleting duplicates</b></p>';
+$impex_phrases['deleting_session']							= '<p><b>Suppression de la session ImpEx</b></p>';
+$impex_phrases['session_deleted']							= '<p><b>Session supprimée avec succès !</b></p>';
+$impex_phrases['deleting_duplicates']						= '<p><b>Suppression des doublons</b></p>';
 
-$impex_phrases['delete_session_and_data']					= '<br /><strong>Delete Session and all <em>imported</em> data</strong>';
-$impex_phrases['remove_importids']							= '<br /><strong>Remove Importids</strong>';
+$impex_phrases['delete_session_and_data']					= '<br /><strong>Suppression de la session et de toutes les données <em>importées</em></strong>';
+$impex_phrases['remove_importids']							= '<br /><strong>Supprimer les identifiants d\'importation</strong>';
 
-$impex_phrases['deleting_from']								= '<p>Deleting imported data from ';
+$impex_phrases['deleting_from']								= '<p>Suppression des données importées depuis ';
 
-$impex_phrases['click_to_return']							= '<p><a href="index.php">Click here to return to the import page.</a></p>';
+$impex_phrases['click_to_return']							= '<p><a href="index.php">Cliquez ici pour retourner sur la page d\'importation.</a></p>';
 
-$impex_phrases['del_ids_1']									= 'Setting';
-$impex_phrases['del_ids_2']									= 'in table';
-$impex_phrases['del_ids_3']									= 'to 0....';
+$impex_phrases['del_ids_1']									= 'Paramètre';
+$impex_phrases['del_ids_2']									= 'dans la table';
+$impex_phrases['del_ids_3']									= 'à 0....';
 
-$impex_phrases['help_error']            					= 'Error';
-$impex_phrases['cant_read_config']							= 'ImpEx can not read the target database details from impex/ImpExConfig.php OR ../includes/config.php.<br> Please enter the target database details in ImpExConfig, or run ImpEx installed opposed to standalone.';
-$impex_phrases['cant_find_config']      					= 'Can\'t find ImpExConfig.php';
+$impex_phrases['help_error']            					= 'Erreur';
+$impex_phrases['cant_read_config']							= 'ImpEx n\'arrive pas à lire les détails de la base de données cible depuis le fichier impex/ImpExConfig.php OU ../includes/config.php.<br /> Veuillez insérer les données de connexion à la base de données cible dans le fichier ImpExConfig.php ou utilisez ImpEx intégré dans vBulletin.';
+$impex_phrases['cant_find_config']      					= 'Impossible de trouver le fichier ImpExConfig.php';
 
 #####################################
 # ImpExDisplay.php phrases
@@ -144,38 +147,38 @@ $impex_phrases['secs']										= ' sec(s)';
 # ImpExDatabaseCore.php phrases
 #####################################
 
-$impex_phrases['sourceexists_true']     					= '<h4>Please set \'sourceexists = true\' in ImpExConfig.php file.</h4>';
-$impex_phrases['validtable_overridden'] 					= '<h4>ImpExDatabase::check_database - $this->_valid_tables must be overridden in the 000 module of the system</h4>';
+$impex_phrases['sourceexists_true']     					= '<h4>Veuillez définir \'$impexconfig[\'sourceexists\'] = true\' dans le fichier ImpExConfig.php.</h4>';
+$impex_phrases['validtable_overridden'] 					= '<h4>ImpExDatabase::check_database - $this->_valid_tables doit être écrasé dans le module 000 du système.</h4>';
 $impex_phrases['testing_source_against']					= 'Test de la source depuis : ';
-$impex_phrases['file_missing_empty_hidden']					= 'File {1} is either missing, empty, or hidden.';
-$impex_phrases['save_file_failed']							= 'The file create/save command failed. Please check the target folder location and permissions.';
-$impex_phrases['halted_missing_fields_db']					= 'ImpEx cannot continue and has halted due to missing needed fields in the source database :';
-$impex_phrases['repair_source_db']							= 'Repair the source database and restart the import.';
-$impex_phrases['file_already_exists_select_target']			= 'File {1} already exists. Please select a target folder with no files with the names of those to be imported.';
+$impex_phrases['file_missing_empty_hidden']					= 'Fichier {1} est manquant, vide ou caché.';
+$impex_phrases['save_file_failed']							= 'La commande de création / sauvegarde du fichier a échoué. Veuillez vérifier la localisation du répertoire cible ainsi que ses permissions.';
+$impex_phrases['halted_missing_fields_db']					= 'ImpEx ne peut pas continuer et a arrêté suite à des champs manquants dans la base de données source :';
+$impex_phrases['repair_source_db']							= 'Veuillez réparer la base de données source et recommencer l\'importation.';
+$impex_phrases['file_already_exists_select_target']			= 'Le fichier {1} existe déjà. Veuillez sélectionner un répertoire cible avec aucun fichier comportant des noms à importer.';
 
 #####################################
 # ImpExFunction.php phrases
 #####################################
 $impex_phrases['ok']										= 'OK';
-$impex_phrases['not_ok']									= 'NOT OK';
-$impex_phrases['path_is_incorrect']							= ' is incorrect';
-$impex_phrases['check_board_structure']						= 'Check the file structure of the board';
+$impex_phrases['not_ok']									= 'PAS OK';
+$impex_phrases['path_is_incorrect']							= ' n\'est pas correct(e).';
+$impex_phrases['check_board_structure']						= 'Veuillez vérifier la structure des fichiers du forum.';
 
 #####################################
 # ImpExModule.php phrases
 #####################################
-$impex_phrases['module_cant_load_class']					= 'ImpExModule::init failed trying to find file {1}';
-$impex_phrases['module_check_readable_files']				= 'Check the path and that the file is accessible by the web server';
+$impex_phrases['module_cant_load_class']					= 'ImpExModule::init a échoué à trouver le fichier « {1} »';
+$impex_phrases['module_check_readable_files']				= 'Veuillez vérifier le chemin et que le fichier soit accessible par le serveur web.';
 
 #####################################
 # ImpExSession.php phrases
 #####################################
-$impex_phrases['timestamp']									= 'Timestamp';
+$impex_phrases['timestamp']									= 'Horodatage';
 $impex_phrases['type']										= 'Type';
 $impex_phrases['module']									= 'Module';
-$impex_phrases['errorstring']								= 'Errorstring';
-$impex_phrases['remedy']									= 'Remedy';
-$impex_phrases['errorcount']								= 'Error count of :';
+$impex_phrases['errorstring']								= 'Chaîne d\'erreur';
+$impex_phrases['remedy']									= 'Remède';
+$impex_phrases['errorcount']								= 'Nombre d\'erreurs :';
 
 #####################################
 # Import common
@@ -192,13 +195,13 @@ $impex_phrases['dependency_error']							= 'Erreur de dépendance';
 $impex_phrases['dependant_on']								= 'Ce module est dépendant de ce module « ';
 $impex_phrases['cant_run']									= ' ». Le script ne peut pas continuer tant que cette erreur n\'est pas résolue.';
 $impex_phrases['user_id']									= 'Identifiant utilisateur';
-$impex_phrases['updating_parent_id']						= 'Updating parent ids, please wait';
+$impex_phrases['updating_parent_id']						= 'Mise à jour des identifiants parents, veuillez patienter.';
 $impex_phrases['avatar_ok']									= 'Avatar OK';
 $impex_phrases['avatar_too_big']							= 'Avatar trop gros';
-$impex_phrases['no_rerun']									= 'You cannot RERUN this module, you need to clear the whole import and session and start again.';
-$impex_phrases['no_system']									= 'ImpEx has attempted to start a system it cannot find, this is most likely because the session was saved correctly after you chose the system. Please check database and try again or contact support.';
-$impex_phrases['units_per_page']							= 'Units per page (set to 500 per 4 Mb available in PHP)';
-$impex_phrases['invalid_target_selected']					= 'The incorrect target to export to has been chosen for this source system, restart the import with a new session and select the correct version and system to export to.';
+$impex_phrases['no_rerun']									= 'Vous NE pouvez PAS exécuter de nouveau ce module, vous devez nettoyer la session entière d\'importation et commencer une nouvelle session.';
+$impex_phrases['no_system']									= 'ImpEx a tenté de démarrer un système introuvable, ceci est généralement dû à la sauvegarde de la session après avoir sélectionné le système. Veuillez vérifier la base de données et recommencez.';
+$impex_phrases['units_per_page']							= 'Unités par page (défini à 500 pour 4 Mo disponible dans PHP)';
+$impex_phrases['invalid_target_selected']					= 'La cible sélectionnée n\'est pas la bonne pour la source sélectionnée, veuillez recommencer l\'importation avec une nouvelle session et sélectionnez le système et la version correctes à exporter.';
 
 #####################################
 # 001 Setup
@@ -223,16 +226,16 @@ $impex_phrases['all_red_tables']							= 'Si vous avez toutes les tables listés
 # Associate users
 #####################################
 
-$impex_phrases['associate_users']							= 'Associate Users';
+$impex_phrases['associate_users']							= 'Association des utilisateurs';
 
-$impex_phrases['assoc_desc_1']								= 'Warning !! Associated users will currently be deleted if you run the import user module twice as it removes users with an importuserid. You cannot associate with an existing admin user at this stage.';
-$impex_phrases['assoc_desc_2']								= 'If you want to associate a source user (in the left column) with an existing vBulletin user, enter the user id number of the vBulletin user in the box provided, and click the Associate Users button.';
+$impex_phrases['assoc_desc_1']								= 'Attention !! Les utilisateurs déjà associés seront supprimés si vous exécutez le module deux fois, ceci supprime les utilisateurs avec un identifiant d\'importation. Vous ne pouvez pas associer d\'administrateurs à cette étape.';
+$impex_phrases['assoc_desc_2']								= 'Si vous souhaitez associer un utilisateur source (colonne de gauche) avec un utilisateur vBulletin existant, veuillez insérer son identifiant utilisateur dans le champ fourni et cliquez sur le bouton « Associer ».';
 $impex_phrases['assoc_desc_3']								= 'To view the list of existing vBulletin users, together with their userid';
 
-$impex_phrases['assoc_list']								= 'Association list';
-$impex_phrases['assoc_match']								= 'Put the existing vBulletin userid next to the source userid that you wish to associate them with:';
+$impex_phrases['assoc_list']								= 'Liste d\'association';
+$impex_phrases['assoc_match']								= 'Insérez l\'identifiant existant à côté de la source correspondante auquel vous souhaitez associer le compte :';
 
-$impex_phrases['no_users']									= 'There are no more vBulletin users to associate, click \'Quit\' to continue.';
+$impex_phrases['no_users']									= 'Il n\'y a plus d\'utilisateurs vBulletin à associer, cliquez sur le bouton « Quitter » pour continuer.';
 $impex_phrases['assoc_not_matched']							= 'NOT done. It is most likely that vBulletin user';
 
 $impex_phrases['associating_users']							= 'Associating the users...';
@@ -250,7 +253,7 @@ $impex_phrases['associating_user_4']						= '';
 $impex_phrases['usergroup']									= 'Usergroup';
 $impex_phrases['usergroups']								= 'Usergroups';
 $impex_phrases['import_usergroup']							= 'Import usergroup';
-$impex_phrases['import_usergroups']							= 'Import usergroups';
+$impex_phrases['import_usergroups']							= 'Importation des groupes d\'utilisateurs';
 $impex_phrases['usergroups_cleared']						= 'Imported usergroup have been cleared';
 
 $impex_phrases['usergroups_per_page']						= 'Usergroups to import per cycle (must be greater than 1)';
@@ -265,7 +268,7 @@ $impex_phrases['no_usergroup_to_import']					= 'There is no usergroup to import.
 $impex_phrases['user']										= 'User';
 $impex_phrases['users']										= 'Users';
 $impex_phrases['import_user']								= 'Import user';
-$impex_phrases['import_users']								= 'Import users';
+$impex_phrases['import_users']								= 'Importation des utilisateurs';
 $impex_phrases['users_cleared']								= 'Imported users have been cleared';
 
 $impex_phrases['users_per_page']							= 'Users to import per cycle (must be greater than 1)';
@@ -288,7 +291,7 @@ $impex_phrases['no_user_to_import']							= 'There is no user to import.';
 $impex_phrases['banlist']									= 'Banlist';
 $impex_phrases['banlists']									= 'Banlists';
 $impex_phrases['import_banlist']							= 'Import banlist';
-$impex_phrases['import_banlists']							= 'Import banlists';
+$impex_phrases['import_banlists']							= 'Importation des listes d\'exclusions';
 $impex_phrases['banlists_cleared']							= 'Imported banlist have been cleared';
 
 $impex_phrases['useridban']									= 'User id ban list';
@@ -308,7 +311,7 @@ $impex_phrases['no_banlist_to_import']						= 'There is no banlist to import.';
 $impex_phrases['avatar']									= 'Avatar';
 $impex_phrases['avatars']									= 'Avatars';
 $impex_phrases['import_avatar']								= 'Import avatar';
-$impex_phrases['import_avatars']							= 'Import avatars';
+$impex_phrases['import_avatars']							= 'Importation des avatars';
 $impex_phrases['avatars_cleared']							= 'Imported avatars have been cleared';
 
 $impex_phrases['avatar_per_page']							= 'Avatars to import per cycle (must be greater than 1)';
@@ -321,7 +324,7 @@ $impex_phrases['no_avatar_to_import']						= 'There is no avatar to import.';
 $impex_phrases['custom_avatar']								= 'Custom avatar';
 $impex_phrases['custom_avatars']							= 'Custom avatars';
 $impex_phrases['import_custom_avatar']						= 'Import custom avatar';
-$impex_phrases['import_custom_avatars']						= 'Import custom avatars';
+$impex_phrases['import_custom_avatars']						= 'Importation des avatars personnalisés';
 
 $impex_phrases['no_custom_avatar_import'] 					= 'There is no custom avatar to import.';
 
@@ -332,7 +335,7 @@ $impex_phrases['no_custom_avatar_import'] 					= 'There is no custom avatar to i
 $impex_phrases['cus_pic']									= 'Custom picture';
 $impex_phrases['cust_pics']									= 'Custom pictures';
 $impex_phrases['import_cust_pic']							= 'Import custom picture';
-$impex_phrases['import_cust_pics']							= 'Import custom pictures';
+$impex_phrases['import_cust_pics']							= 'Importation des images de profil personnalisées';
 $impex_phrases['cust_pic_cleared']							= 'Imported custom pics have been cleared';
 
 $impex_phrases['cust_pics_per_page']						= 'Custom pictures to import per cycle (must be greater than 1)';
@@ -345,7 +348,7 @@ $impex_phrases['no_cust_pic_import']						= 'There is no custom picture to impor
 $impex_phrases['rank']										= 'Rank';
 $impex_phrases['ranks']										= 'Ranks';
 $impex_phrases['import_rank']								= 'Import rank';
-$impex_phrases['import_ranks']								= 'Import ranks';
+$impex_phrases['import_ranks']								= 'Importation des rangs';
 $impex_phrases['ranks_cleared']								= 'Imported ranks have been cleared';
 
 $impex_phrases['ranks_per_page']							= 'Ranks to import per cycle (must be greater than 1)';
@@ -360,7 +363,7 @@ $impex_phrases['forums']									= 'Forums';
 $impex_phrases['category']									= 'Category';
 $impex_phrases['categories']								= 'Categories';
 $impex_phrases['import_forum']								= 'Import forum';
-$impex_phrases['import_forums']								= 'Import forums';
+$impex_phrases['import_forums']								= 'Importation des forums';
 $impex_phrases['forums_cleared']							= 'Imported forums have been cleared';
 
 $impex_phrases['forums_per_page']							= 'Forums to import per cycle (must be greater than 1)';
@@ -370,10 +373,10 @@ $impex_phrases['no_forum_to_import']						= 'There is no forum to import.';
 # Import threads
 #####################################
 
-$impex_phrases['thread']									= 'Thread';
-$impex_phrases['threads']									= 'Threads';
+$impex_phrases['thread']									= 'Discussion';
+$impex_phrases['threads']									= 'Discussions';
 $impex_phrases['import_thread']								= 'Import thread';
-$impex_phrases['import_threads']							= 'Import threads';
+$impex_phrases['import_threads']							= 'Importation des discussions';
 $impex_phrases['threads_cleared']							= 'Imported threads have been cleared';
 
 $impex_phrases['threads_per_page']							= 'Threads to import per cycle (must be greater than 1)';
@@ -385,10 +388,10 @@ $impex_phrases['updating_pollids']							= 'Updating pollids for new threads';
 # Import post
 #####################################
 
-$impex_phrases['post']										= 'Post';
-$impex_phrases['posts']										= 'Posts';
+$impex_phrases['post']										= 'Message';
+$impex_phrases['posts']										= 'Messages';
 $impex_phrases['import_post']								= 'Import post';
-$impex_phrases['import_posts']								= 'Import posts';
+$impex_phrases['import_posts']								= 'Importation des messages';
 $impex_phrases['posts_cleared']								= 'Imported posts have been cleared';
 
 $impex_phrases['posts_per_page']							= 'Posts to import per cycle (must be greater than 1)';
@@ -401,7 +404,7 @@ $impex_phrases['no_post_to_import']							= 'There is no post to import.';
 $impex_phrases['smilie']									= 'Smilie';
 $impex_phrases['smilies']									= 'Smilies';
 $impex_phrases['import_smilie']								= 'Import smilie';
-$impex_phrases['import_smilies']							= 'Import smilies';
+$impex_phrases['import_smilies']							= 'Importation des smileys';
 $impex_phrases['smilies_cleared']							= 'Imported smilies have been cleared';
 
 $impex_phrases['smilies_per_page']							= 'The importer will now start to import smilies from your source board. Please remember to move the smilie images into the vB smilies directory (images/smilies/).';
@@ -419,7 +422,7 @@ $impex_phrases['no_smilie_to_import']						= 'There is no smilie to import.';
 $impex_phrases['attachment']								= 'Attachment';
 $impex_phrases['attachments']								= 'Attachments';
 $impex_phrases['import_attachment']							= 'Import attachment';
-$impex_phrases['import_attachments']						= 'Import attachments';
+$impex_phrases['import_attachments']						= 'Importation des pièces jointes';
 $impex_phrases['attachments_cleared']						= 'Imported Attachments have been cleared';
 
 $impex_phrases['attachments_per_page']						= 'Attachments to import per cycle (must be greater than 1)';
@@ -435,7 +438,7 @@ $impex_phrases['no_attachment_to_import']					= 'There is no attachment to impor
 $impex_phrases['poll']										= 'Poll';
 $impex_phrases['polls']										= 'Polls';
 $impex_phrases['import_poll']								= 'Import poll';
-$impex_phrases['import_polls']								= 'Import polls';
+$impex_phrases['import_polls']								= 'Importation des sondages';
 $impex_phrases['polls_cleared']								= 'Imported Polls have been cleared';
 
 $impex_phrases['polls_per_page']							= 'Polls to import per cycle (must be greater than 1)';
@@ -448,7 +451,7 @@ $impex_phrases['no_poll_to_import']							= 'There is no poll to import.';
 $impex_phrases['moderator']									= 'Moderator';
 $impex_phrases['moderators']								= 'Moderators';
 $impex_phrases['import_moderator']							= 'Import moderator';
-$impex_phrases['import_moderators']							= 'Import moderators';
+$impex_phrases['import_moderators']							= 'Importation des modérateurs';
 $impex_phrases['moderators_cleared']						= 'Imported moderators have been cleared';
 
 $impex_phrases['moderators_per_page']						= 'Moderators to import per cycle (must be greater than 1)';
@@ -461,7 +464,7 @@ $impex_phrases['no_moderator_to_import']					= 'There is no moderator to import.
 $impex_phrases['phrase']									= 'Phrase';
 $impex_phrases['phrases']									= 'Phrases';
 $impex_phrases['import_phrase']								= 'Import phrase';
-$impex_phrases['import_phrases']							= 'Import phrases';
+$impex_phrases['import_phrases']							= 'Importation des expressions';
 $impex_phrases['phrases_cleared']							= 'Imported phrases have been cleared';
 
 $impex_phrases['phrases_per_page']							= 'Phrases to import per cycle (must be greater than 1)';
@@ -474,7 +477,7 @@ $impex_phrases['no_phrase_to_import']						= 'There is no phrase to import.';
 $impex_phrases['subscription']								= 'Subscription';
 $impex_phrases['subscriptions']								= 'Subscriptions';
 $impex_phrases['import_subscription']						= 'Import subscription';
-$impex_phrases['import_subscriptions']						= 'Import subscriptions';
+$impex_phrases['import_subscriptions']						= 'Importation des abonnements';
 $impex_phrases['subscriptions_cleared']						= 'Imported subscriptions have been cleared';
 
 $impex_phrases['subscriptions_per_page']					= 'Subscriptions to import per cycle (must be greater than 1)';
@@ -489,7 +492,7 @@ $impex_phrases['subscriptionlogs']							= 'Subscription logs';
 $impex_phrases['pm']										= 'Private message';
 $impex_phrases['pms']										= 'Private messages';
 $impex_phrases['import_pm']									= 'Import private message';
-$impex_phrases['import_pms']								= 'Import private messages';
+$impex_phrases['import_pms']								= 'Importation des messages privés';
 $impex_phrases['pms_cleared']								= 'Imported Import Private have been cleared';
 
 $impex_phrases['pm_counter_updated']						= 'Counter updated';

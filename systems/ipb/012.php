@@ -97,7 +97,7 @@ class ipb_012 extends ipb_000
 			$sessionobject->timing($class_num,'start' ,$sessionobject->get_session_var('autosubmit'));
 		}
 
-		$attachment_array 		= $this->get_ipb_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page);
+		$attachment_array 		= $this->get_ipb_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page, $displayobject);
 
 		$attachment_object 		= new ImpExData($Db_target, $sessionobject,'attachment');
 

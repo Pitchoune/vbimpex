@@ -96,7 +96,7 @@ class phpBB2_004 extends phpBB2_000
 		$usergroups	 =	$this->get_imported_group_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		// Get a page worths of users
-		$user_array  =  $this->get_phpbb2_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page);
+		$user_array  =  $this->get_phpbb2_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, $displayobject);
 
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($user_array) . " {$displayobject->phrases['users']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $user_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($user_start_at + count($user_array)) . "</p>");
 
@@ -129,7 +129,7 @@ class phpBB2_004 extends phpBB2_000
 
 			$try->set_value('mandatory', 'importuserid',		$user_id);
 
-			$old_group_ids = $this->get_phpbb2_usergroupids($Db_source, $source_database_type, $source_table_prefix, $user_id);
+			$old_group_ids = $this->get_phpbb2_usergroupids($Db_source, $source_database_type, $source_table_prefix, $user_id, $displayobject);
 
 			if (count($old_group_ids))
 			{

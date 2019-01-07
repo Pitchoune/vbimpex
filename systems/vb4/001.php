@@ -79,7 +79,7 @@ class vb4_001 extends vb4_000
 			}
 		}
 
-		$displayobject->update_html($displayobject->table_footer());
+		$displayobject->update_html($displayobject->table_footer(2, '', '', false));
 
 		// Add the importpostid for the attachment imports and the users for good measure
 		$this->add_index($Db_target, $target_db_type, $target_table_prefix, 'post');
@@ -92,9 +92,9 @@ class vb4_001 extends vb4_000
 		{
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
+			$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['check_update_db'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
-			$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$displayobject->update_basic('displaymodules', 'FALSE');

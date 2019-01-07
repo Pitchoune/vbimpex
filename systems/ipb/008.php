@@ -91,7 +91,7 @@ class ipb_008 extends ipb_000
 			$poll_per_page = 100;
 		}
 		
-		$polls_array	= $this->get_ipb_polls_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$polls_array	= $this->get_ipb_polls_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 		$thread_ids		= $this->get_threads_ids($Db_target, $target_database_type, $target_table_prefix);
 		$users_ids		= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 		$last_pass		= $sessionobject->get_session_var('last_pass');
@@ -158,12 +158,12 @@ class ipb_008 extends ipb_000
 			$try->set_value('nonmandatory', 'public',		'1');
 
 			// If "forum_poll_voters"
-			$poll_voters = $this->get_ipb_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id, 'type1');
+			$poll_voters = $this->get_ipb_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id, 'type1', $displayobject);
 
 			if(count($poll_voters) == 0)
 			{
 				// Must be the other kind "voters"
-				$poll_voters = $this->get_ipb_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll['tid'], 'type2');
+				$poll_voters = $this->get_ipb_poll_voters($Db_source, $source_database_type, $source_table_prefix, $poll['tid'], 'type2', $displayobject);
 			}
    
 			foreach($poll_voters AS $ipb_user_id)

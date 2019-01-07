@@ -149,19 +149,19 @@ class jiveforum_mysql_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_jiveforum_mysql_cat_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_jiveforum_mysql_cat_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
 
 		if ($databasetype == 'mysql')
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, 'jiveCategories'))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, 'jiveCategories', $displayobject))
 			{
 				$sql = "SELECT * FROM {$tableprefix}jiveCategories ORDER BY id";
 				$id_type = 'id';
 			}	
-			else if ($this->check_table($Db_object, $databasetype, $tableprefix, 'jiveCategory'))
+			else if ($this->check_table($Db_object, $databasetype, $tableprefix, 'jiveCategory', $displayobject))
 			{
 				$sql = "SELECT * FROM {$tableprefix}jiveCategory ORDER BY categoryID";
 				$id_type = 'categoryID';

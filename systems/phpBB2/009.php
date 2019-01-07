@@ -104,8 +104,8 @@ class phpBB2_009 extends phpBB2_000
 			$sessionobject->timing($class_num,'start' ,$sessionobject->get_session_var('autosubmit'));
 		}
 
-		$post_array			= $this->get_phpbb2_posts_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page);
-		$truncated_smilies	= $this->get_phpbb_truncated_smilies($Db_source, $source_database_type, $source_table_prefix);
+		$post_array			= $this->get_phpbb2_posts_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, $displayobject);
+		$truncated_smilies	= $this->get_phpbb_truncated_smilies($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . $post_array['count'] . " {$displayobject->phrases['posts']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $post_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . $post_array['lastid'] . "</p>");
 

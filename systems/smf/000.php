@@ -157,7 +157,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_smf_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -169,7 +169,7 @@ class smf_000 extends ImpExModule
 			'memberName'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -192,7 +192,7 @@ class smf_000 extends ImpExModule
 	}
 
 
-	function get_smf_categories_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_smf_categories_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
@@ -201,7 +201,7 @@ class smf_000 extends ImpExModule
 			'catOrder'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "categories", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "categories", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -223,7 +223,7 @@ class smf_000 extends ImpExModule
 	}
 
 
-	function get_smf_topic_subject(&$Db_object, &$databasetype, &$tableprefix, &$msg_id)
+	function get_smf_topic_subject(&$Db_object, &$databasetype, &$tableprefix, &$msg_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -235,7 +235,7 @@ class smf_000 extends ImpExModule
 			'posterTime'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "messages", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "messages", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -253,7 +253,7 @@ class smf_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_smf_pm_recipients(&$Db_object, &$databasetype, &$tableprefix, &$pm_id)
+	function get_smf_pm_recipients(&$Db_object, &$databasetype, &$tableprefix, &$pm_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -262,12 +262,12 @@ class smf_000 extends ImpExModule
 
 		$table = null;
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'pm_recipients'))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'pm_recipients'), $displayobject)
 		{
 			$table = 'pm_recipients';
 		}
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'im_recipients'))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'im_recipients'), $displayobject)
 		{
 			$table = 'im_recipients';
 		}
@@ -303,7 +303,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -317,7 +317,7 @@ class smf_000 extends ImpExModule
 			'ID_CAT'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "boards", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "boards", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -350,7 +350,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -362,7 +362,7 @@ class smf_000 extends ImpExModule
 			'ID_MEMBER'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "moderators", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "moderators", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -397,7 +397,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -406,12 +406,12 @@ class smf_000 extends ImpExModule
 
 		$table = null;
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'personal_messages'))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'personal_messages'), $displayobject)
 		{
 			$table = 'personal_messages';
 		}
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'instant_messages'))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'instant_messages'), $displayobject)
 		{
 			$table = 'instant_messages';
 		}
@@ -450,7 +450,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -462,7 +462,7 @@ class smf_000 extends ImpExModule
 			'question'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "polls", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "polls", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -483,7 +483,7 @@ class smf_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_smf_poll_voters(&$Db_object, &$databasetype, &$tableprefix, $poll_id)
+	function get_smf_poll_voters(&$Db_object, &$databasetype, &$tableprefix, $poll_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -496,7 +496,7 @@ class smf_000 extends ImpExModule
 			'ID_CHOICE'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "log_polls", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "log_polls", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -529,7 +529,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -541,7 +541,7 @@ class smf_000 extends ImpExModule
 			'ID_MEMBER'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "messages", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "messages", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -574,7 +574,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -585,7 +585,7 @@ class smf_000 extends ImpExModule
 			'code' => 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smileys", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smileys", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -618,7 +618,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -629,7 +629,7 @@ class smf_000 extends ImpExModule
 			'ID_BOARD'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -667,7 +667,7 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -680,7 +680,7 @@ class smf_000 extends ImpExModule
 			'emailAddress'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -713,14 +713,14 @@ class smf_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_smf_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
 		// Check that there is not a empty value
 		if(empty($per_page)) { return $return_array; }
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "membergroups"))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "membergroups"), $displayobject)
 		{
 			return $return_array;
 		}
@@ -773,7 +773,7 @@ class smf_000 extends ImpExModule
 	}
 
 
-	function get_smf_poll_options(&$Db_object, &$databasetype, &$tableprefix, $poll_id)
+	function get_smf_poll_options(&$Db_object, &$databasetype, &$tableprefix, $poll_id, &$displayobject)
 	{
 
 		// Check that there is not a empty value
@@ -786,7 +786,7 @@ class smf_000 extends ImpExModule
 			'votes'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_choices", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_choices", $req_fields), $displayobject)
 		{
 			return $return_array;
 		}
@@ -808,7 +808,7 @@ class smf_000 extends ImpExModule
 	}
 
 
-	function get_smf_012_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_smf_012_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -819,7 +819,7 @@ class smf_000 extends ImpExModule
 			'filename' => 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $req_fields), $displayobject)
 		{
 			return $return_array;
 		}

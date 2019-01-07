@@ -138,7 +138,7 @@ class wBB_004 extends wBB_000
 			$try->set_value('mandatory', 'importuserid',	$user['userid']);
 
 			// Usergroups, if they have one map it, if there is more, add the membergroups other wise default import group
-			$old_groups = $this->get_wbb_user_groups($Db_source, $source_database_type, $source_table_prefix, $user_id);
+			$old_groups = $this->get_wbb_user_groups($Db_source, $source_database_type, $source_table_prefix, $user_id, $displayobject);
 
 			if($old_groups[0])
 			{

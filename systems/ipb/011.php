@@ -97,7 +97,7 @@ class ipb_011 extends ipb_000
 			$sessionobject->timing($class_num,'start' ,$sessionobject->get_session_var('autosubmit'));
 		}
 
-		$moderator_array 		= $this->get_ipb_moderators_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page);
+		$moderator_array 		= $this->get_ipb_moderators_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page, $displayobject);
 		$forumids_array			= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 		$users_ids 				= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 		$user_names				= $this->get_username($Db_target, $target_database_type, $target_table_prefix);

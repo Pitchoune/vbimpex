@@ -128,7 +128,7 @@ class phpBB3_004 extends phpBB3_000
 				$try->_auto_email_associate = true;
 			}
 
-		    $old_group_ids = $this->get_phpbb3_usergroupids($Db_source, $s_db_type, $s_tb_prefix, $import_id);
+		    $old_group_ids = $this->get_phpbb3_usergroupids($Db_source, $s_db_type, $s_tb_prefix, $import_id, $displayobject);
 
 			if (count($old_group_ids))
 			{

@@ -203,7 +203,7 @@ class drupal_6_cms_000 extends ImpExModule
     *
     * @return    array
     */
-    function get_drupal6_cms_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page)
+    function get_drupal6_cms_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page, &$displayobject)
     {
         $return_array = array();
 
@@ -216,7 +216,7 @@ class drupal_6_cms_000 extends ImpExModule
             'name'    => 'mandatory'
         );
 
-        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields, $displayobject))
         {
             return $return_array;
         }
@@ -249,7 +249,7 @@ class drupal_6_cms_000 extends ImpExModule
     *
     * @return    array
     */
-    function get_drupal6_cms_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+    function get_drupal6_cms_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
     {
         $return_array = array();
 
@@ -262,7 +262,7 @@ class drupal_6_cms_000 extends ImpExModule
             'name'    => 'mandatory'
         );
 
-        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields, $displayobject))
         {
             return $return_array;
         }
@@ -297,7 +297,7 @@ class drupal_6_cms_000 extends ImpExModule
     *
     * @return    array
     */
-    function get_drupal6_cms_node_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, $node_type = 'article')
+    function get_drupal6_cms_node_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject, $node_type = 'article')
     {
         $return_array = array('data' => array(), 'count' => 0);
 
@@ -312,7 +312,7 @@ class drupal_6_cms_000 extends ImpExModule
             'title'    => 'mandatory'
         );
 
-        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "node", $req_fields))
+        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "node", $displayobject, $req_fields))
         {
             return $return_array;
         }

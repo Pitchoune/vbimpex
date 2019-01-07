@@ -100,7 +100,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_snitz_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -109,7 +109,7 @@ class snitz_000 extends ImpExModule
 			'M_NAME'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "members" : "MEMBERS" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "members" : "MEMBERS" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -173,7 +173,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_cat_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_snitz_cat_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
@@ -182,7 +182,7 @@ class snitz_000 extends ImpExModule
 			'CAT_ORDER'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "category" : "CATEGORY" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "category" : "CATEGORY" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -231,7 +231,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -242,7 +242,7 @@ class snitz_000 extends ImpExModule
 			'FORUM_ID'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "forum" : "FORUM" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "forum" : "FORUM" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -312,7 +312,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -322,7 +322,7 @@ class snitz_000 extends ImpExModule
 			'MEMBER_ID'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "moderator" : "MODERATOR" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "moderator" : "MODERATOR" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -387,7 +387,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -399,14 +399,14 @@ class snitz_000 extends ImpExModule
 			'M_MESSAGE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "pm" : "PM" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "pm" : "PM" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
 
 		if ($databasetype == 'mysql')
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "pm" : "PM" )))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "pm" : "PM" ), $displayobject, ''))
 			{
 				$details_list = $Db_object->query("SELECT * FROM " . $tableprefix . (lowercase_table_names ? "pm" : "PM" ) . " ORDER BY M_ID LIMIT {$start_at}, {$per_page}");
 
@@ -474,7 +474,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -487,7 +487,7 @@ class snitz_000 extends ImpExModule
 
 		if ($databasetype == 'mysql')
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "polls" : "POLLS" )))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "polls" : "POLLS" ), $displayobject))
 			{
 				$details_list = $Db_object->query("SELECT * FROM " . $tableprefix . (lowercase_table_names ? "polls" : "POLLS" ) . " ORDER BY POLL_ID LIMIT {$start_at}, {$per_page}");
 
@@ -545,7 +545,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -557,7 +557,7 @@ class snitz_000 extends ImpExModule
 			'R_MESSAGE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "reply" : "REPLY" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "reply" : "REPLY" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -615,7 +615,7 @@ class snitz_000 extends ImpExModule
 	}
 
 
-	function get_snitz_archive_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_archive_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -628,7 +628,7 @@ class snitz_000 extends ImpExModule
 			'R_MESSAGE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "a_reply" : "A_REPLY" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "a_reply" : "A_REPLY" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -697,7 +697,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -705,14 +705,14 @@ class snitz_000 extends ImpExModule
 			'S_CODE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "smiles" : "SMILES" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "smiles" : "SMILES" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
 
 		if ($databasetype == 'mysql')
 		{
-			if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "smiles" : "SMILES" )))
+			if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "smiles" : "SMILES" ), $displayobject))
 			{
 				return $return_array;
 			}
@@ -780,7 +780,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -792,7 +792,7 @@ class snitz_000 extends ImpExModule
 			'T_MESSAGE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "topics" : "TOPICS" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "topics" : "TOPICS" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -853,7 +853,7 @@ class snitz_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_snitz_archive_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_archive_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -865,7 +865,7 @@ class snitz_000 extends ImpExModule
 			'T_MESSAGE'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "a_topics" : "A_TOPICS" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "a_topics" : "A_TOPICS" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -937,7 +937,7 @@ class snitz_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_snitz_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_snitz_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -950,12 +950,12 @@ class snitz_000 extends ImpExModule
 			'M_PASSWORD'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "members" : "MEMBERS" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "members" : "MEMBERS" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "avatar" : "AVATAR" )))
+		if($this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "avatar" : "AVATAR" ), $displayobject))
 		{
 			$do_avatar = true;
 		}
@@ -1037,7 +1037,7 @@ class snitz_000 extends ImpExModule
 	}
 
 
-	function get_snitz_question($Db_object, $databasetype, $tableprefix, $thread_id)
+	function get_snitz_question($Db_object, $databasetype, $tableprefix, $thread_id, &$displayobject)
 	{
 
 		$sql='';
@@ -1046,7 +1046,7 @@ class snitz_000 extends ImpExModule
 			'T_SUBJECT'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "topics" : "TOPICS" ), $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, (lowercase_table_names ? "topics" : "TOPICS" ), $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

@@ -239,14 +239,14 @@ class phpBB3_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_phpbb_truncated_smilies($DB_object, $database_type, $table_prefix)
+	function get_phpbb_truncated_smilies($DB_object, $database_type, $table_prefix, $displayobject)
 	{
 		$return_array = array();
 		if ($database_type == 'mysql')
 		{
 			$req_fields = array('code' => 'mandatory');
 
-			if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $req_fields))
+			if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $displayobject, $req_fields))
 			{
 				return $return_array;
 			}
@@ -269,13 +269,13 @@ class phpBB3_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_phpbb3_smilie_details($Db_object, $databasetype, $tableprefix)
+	function get_phpbb3_smilie_details($Db_object, $databasetype, $tableprefix, $displayobject)
 	{
 		$return_array = array();
 
 		$req_fields = array('code' => 'mandatory');
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -446,7 +446,7 @@ class phpBB3_000 extends ImpExModule
 		return false;
 	}
 
-	function get_phpbb3_polls_details($Db_object, $databasetype, $tableprefix, $source_thread_id)
+	function get_phpbb3_polls_details($Db_object, $databasetype, $tableprefix, $source_thread_id, $displayobject)
 	{
 		$return_array = array();
 
@@ -457,7 +457,7 @@ class phpBB3_000 extends ImpExModule
 			'poll_option_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_options", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_options", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -485,7 +485,7 @@ class phpBB3_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_phpbb3_poll_voters($Db_object, $databasetype, $tableprefix, $source_thread_id)
+	function get_phpbb3_poll_voters($Db_object, $databasetype, $tableprefix, $source_thread_id, $displayobject)
 	{
 		$return_array = array();
 
@@ -496,7 +496,7 @@ class phpBB3_000 extends ImpExModule
 			'topic_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_votes", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_votes", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -612,7 +612,7 @@ class phpBB3_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_phpbb3_usergroupids(&$Db_object, &$databasetype, &$tableprefix, $user_id)
+	function get_phpbb3_usergroupids(&$Db_object, &$databasetype, &$tableprefix, $user_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -624,7 +624,7 @@ class phpBB3_000 extends ImpExModule
 			'group_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "user_group", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "user_group", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

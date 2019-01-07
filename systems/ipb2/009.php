@@ -90,7 +90,7 @@ class ipb2_009 extends ipb2_000
 		}
 
 		// Get an array of pm details
-		$pm_array = $this->get_ipb2_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$pm_array = $this->get_ipb2_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 		$idcache = new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 		
 		// Display count and pass time
@@ -103,7 +103,7 @@ class ipb2_009 extends ipb2_000
 		{
 			$vB_pm_text = (phpversion() < '5' ? $pm_text_object : clone($pm_text_object));
 
-			$pm_text = $this->get_ipb2_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['mt_msg_id']);
+			$pm_text = $this->get_ipb2_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['mt_msg_id'], $displayobject);
 
 			$userid 	= $idcache->get_id('user', $pm['mt_to_id']);
 			$username	= $idcache->get_id('username', $pm['mt_to_id']);

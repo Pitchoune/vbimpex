@@ -170,7 +170,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page)
+	function get_phpbb_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -183,7 +183,7 @@ class phpBB2_000 extends ImpExModule
 			'username'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -244,7 +244,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpBB2_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_phpBB2_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -257,7 +257,7 @@ class phpBB2_000 extends ImpExModule
 			'group_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "groups", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "groups", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -307,7 +307,7 @@ class phpBB2_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_phpbb2_usergroupids(&$Db_object, &$databasetype, &$tableprefix, $user_id)
+	function get_phpbb2_usergroupids(&$Db_object, &$databasetype, &$tableprefix, $user_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -319,7 +319,7 @@ class phpBB2_000 extends ImpExModule
 			'group_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "user_group", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "user_group", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -354,7 +354,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -367,7 +367,7 @@ class phpBB2_000 extends ImpExModule
 			'username'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -464,7 +464,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_list(&$Db_object, &$databasetype, &$tableprefix, $type)
+	function get_list(&$Db_object, &$databasetype, &$tableprefix, $type, &$displayobject)
 	{
 		$return_array = array();
 
@@ -474,7 +474,7 @@ class phpBB2_000 extends ImpExModule
 			"ban_{$type}"	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "banlist", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "banlist", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -556,7 +556,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_categories_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_phpbb2_categories_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
@@ -567,7 +567,7 @@ class phpBB2_000 extends ImpExModule
 			'cat_order'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "categories", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "categories", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -616,7 +616,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_forum_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_forum_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -630,7 +630,7 @@ class phpBB2_000 extends ImpExModule
 			'forum_order'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -695,7 +695,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_threads_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_threads_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -709,7 +709,7 @@ class phpBB2_000 extends ImpExModule
 			'topic_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -780,13 +780,13 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_smilie_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_phpbb2_smilie_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
 		$req_fields = array('code' => 'mandatory');
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -836,7 +836,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_posts_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_posts_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -848,7 +848,7 @@ class phpBB2_000 extends ImpExModule
 			'post_subject'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts_text", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts_text", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -861,7 +861,7 @@ class phpBB2_000 extends ImpExModule
 			'topic_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -990,14 +990,14 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb_truncated_smilies(&$DB_object, &$database_type, &$table_prefix)
+	function get_phpbb_truncated_smilies(&$DB_object, &$database_type, &$table_prefix, &$displayobject)
 	{
 		$return_array = array();
 		if ($database_type == 'mysql')
 		{
 			$req_fields = array('code' => 'mandatory');
 
-			if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $req_fields))
+			if(!$this->check_table($Db_object, $databasetype, $tableprefix, "smilies", $displayobject, $req_fields))
 			{
 				return $return_array;
 			}
@@ -1031,7 +1031,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_polls_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_polls_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1042,7 +1042,7 @@ class phpBB2_000 extends ImpExModule
 			'vote_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_desc", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_desc", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1103,7 +1103,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_poll_results_details(&$Db_object, &$databasetype, &$tableprefix, &$poll_id)
+	function get_phpbb2_poll_results_details(&$Db_object, &$databasetype, &$tableprefix, &$poll_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1111,7 +1111,7 @@ class phpBB2_000 extends ImpExModule
 			'vote_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_results", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_results", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1167,7 +1167,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_vote_voters(&$Db_object, &$databasetype, &$tableprefix, &$poll_id)
+	function get_phpbb2_vote_voters(&$Db_object, &$databasetype, &$tableprefix, &$poll_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1175,7 +1175,7 @@ class phpBB2_000 extends ImpExModule
 			'vote_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_voters", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "vote_voters", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1222,7 +1222,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_pm_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_pm_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1243,7 +1243,7 @@ class phpBB2_000 extends ImpExModule
 			'privmsgs_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "privmsgs", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "privmsgs", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1308,13 +1308,13 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_pm_text(&$Db_object, &$databasetype, &$tableprefix, &$pm_id)
+	function get_phpbb2_pm_text(&$Db_object, &$databasetype, &$tableprefix, &$pm_id, &$displayobject)
 	{
 		if ($databasetype == 'mysql' OR $databasetype == 'mssql')
 		{
 			$req_fields = array('privmsgs_text' => 'mandatory');
 
-			$this->check_table($Db_object, $databasetype, $tableprefix, "privmsgs_text", $req_fields);
+			$this->check_table($Db_object, $databasetype, $tableprefix, "privmsgs_text", $displayobject, $req_fields);
 
 			$pms = $Db_object->query_first("SELECT privmsgs_text FROM {$tableprefix}privmsgs_text WHERE privmsgs_text_id={$pm_id}");
 
@@ -1338,7 +1338,7 @@ class phpBB2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpbb2_ranks_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpbb2_ranks_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1349,7 +1349,7 @@ class phpBB2_000 extends ImpExModule
 			'rank_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "ranks", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "ranks", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1406,7 +1406,7 @@ class phpBB2_000 extends ImpExModule
 		return hexdec($hexy_thing[0]). '.' . hexdec($hexy_thing[1]) . '.' . hexdec($hexy_thing[2]) . '.' . hexdec($hexy_thing[3]);
 	}
 
-	function get_phpBB2_attachment_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_phpBB2_attachment_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -1418,7 +1418,7 @@ class phpBB2_000 extends ImpExModule
 			'physical_filename'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'attachments_desc', $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'attachments_desc', $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -1429,7 +1429,7 @@ class phpBB2_000 extends ImpExModule
 			'user_id_1'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'attachments', $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'attachments', $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

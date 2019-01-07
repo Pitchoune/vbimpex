@@ -150,7 +150,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_ipb2_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -163,7 +163,7 @@ class ipb2_000 extends ImpExModule
 			'name'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -194,7 +194,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -207,7 +207,7 @@ class ipb2_000 extends ImpExModule
 			'attach_file'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -239,7 +239,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -254,7 +254,7 @@ class ipb2_000 extends ImpExModule
 			'parent_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -276,7 +276,7 @@ class ipb2_000 extends ImpExModule
 	}
 
 
-	function get_ipb2_categories_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_ipb2_categories_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
@@ -286,7 +286,7 @@ class ipb2_000 extends ImpExModule
 			'position'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "forums", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -318,7 +318,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -329,7 +329,7 @@ class ipb2_000 extends ImpExModule
 			'member_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "moderators", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "moderators", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -364,7 +364,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_pm_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_pm_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -380,7 +380,7 @@ class ipb2_000 extends ImpExModule
 			'mt_vid_folder' => 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "message_topics", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "message_topics", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -402,7 +402,7 @@ class ipb2_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_ipb2_pm_text(&$Db_object, &$databasetype, &$tableprefix, $mt_msg_id)
+	function get_ipb2_pm_text(&$Db_object, &$databasetype, &$tableprefix, $mt_msg_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -412,7 +412,7 @@ class ipb2_000 extends ImpExModule
 			'msg_post'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "message_text", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "message_text", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -441,7 +441,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -456,7 +456,7 @@ class ipb2_000 extends ImpExModule
 			'poll_question'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "polls", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "polls", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -489,7 +489,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -503,7 +503,7 @@ class ipb2_000 extends ImpExModule
 			'topic_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "posts", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -535,7 +535,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_smilie_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -549,7 +549,7 @@ class ipb2_000 extends ImpExModule
 			'image'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "emoticons", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "emoticons", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -581,7 +581,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -596,7 +596,7 @@ class ipb2_000 extends ImpExModule
 
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "topics", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -628,7 +628,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -642,7 +642,7 @@ class ipb2_000 extends ImpExModule
 			'email'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "members", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -714,7 +714,7 @@ class ipb2_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ipb2_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ipb2_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -726,7 +726,7 @@ class ipb2_000 extends ImpExModule
 			'g_id' 	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "groups", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "groups", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -747,7 +747,7 @@ class ipb2_000 extends ImpExModule
 		return $return_array;
 	}
 
-	function get_ipb2_vote_voters(&$Db_object, &$databasetype, &$tableprefix, $thread_id)
+	function get_ipb2_vote_voters(&$Db_object, &$databasetype, &$tableprefix, $thread_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -761,7 +761,7 @@ class ipb2_000 extends ImpExModule
 			'member_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "voters", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "voters", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

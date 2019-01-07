@@ -98,7 +98,7 @@ class phpBB2_010 extends phpBB2_000
 		}
 
 		// Get an array of poll details
-		$poll_array 			= $this->get_phpbb2_polls_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 			= $this->get_phpbb2_polls_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($poll_array) . " {$displayobject->phrases['polls']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $poll_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($poll_start_at + count($poll_array)) . "</p>");
 
@@ -108,8 +108,8 @@ class phpBB2_010 extends phpBB2_000
 
 			unset($polls_results_array, $poll_voters, $numberoptions, $voters, $options, $votes);
 
-			$polls_results_array	= $this->get_phpbb2_poll_results_details($Db_source, $source_database_type, $source_table_prefix, $poll_id);
-			$poll_voters			= $this->get_phpbb2_vote_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id);
+			$polls_results_array	= $this->get_phpbb2_poll_results_details($Db_source, $source_database_type, $source_table_prefix, $poll_id, $displayobject);
+			$poll_voters			= $this->get_phpbb2_vote_voters($Db_source, $source_database_type, $source_table_prefix, $poll_id, $displayobject);
 
 			foreach($poll_voters AS $phpBB_user_id => $vote)
 			{

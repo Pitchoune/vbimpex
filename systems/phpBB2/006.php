@@ -94,7 +94,7 @@ class phpBB2_006 extends phpBB2_000
 		if($sessionobject->get_session_var('categoriesfinished') == 'FALSE')
 		{
 			// Sort out the categories
-			$categories_array = $this->get_phpbb2_categories_details($Db_source, $source_database_type, $source_table_prefix);
+			$categories_array = $this->get_phpbb2_categories_details($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 
 			$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($categories_array) . " {$displayobject->phrases['categories']}</h4>");
 
@@ -151,7 +151,7 @@ class phpBB2_006 extends phpBB2_000
 		else
 		{
 			// Sort out the forums
-			$forum_array  	=  $this->get_phpbb2_forum_details($Db_source, $source_database_type, $source_table_prefix, $forum_start_at, $forum_per_page);
+			$forum_array  	=  $this->get_phpbb2_forum_details($Db_source, $source_database_type, $source_table_prefix, $forum_start_at, $forum_per_page, $displayobject);
 			$cat_ids 		=  $this->get_category_ids($Db_target, $target_database_type, $target_table_prefix);
 
 			$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($forum_array) . " {$displayobject->phrases['forums']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $forum_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($forum_start_at + count($forum_array)) . "</p>");

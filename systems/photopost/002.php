@@ -94,7 +94,7 @@ class photopost_002 extends photopost_000
 		if ($associate_users == 1)
 		{
 			// Get a list of the photopost members in this current selection
-			$userarray = $this->get_photopost_members_list($Db_source, $source_database_type, $source_table_prefix, $associate_start_at, $associate_per_page);
+			$userarray = $this->get_photopost_members_list($Db_source, $source_database_type, $source_table_prefix, $associate_start_at, $associate_per_page, $displayobject);
 
 
 			// Build a list of the ubb users with a box to enter a vB user id into

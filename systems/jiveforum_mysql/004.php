@@ -99,7 +99,7 @@ class jiveforum_mysql_004 extends jiveforum_mysql_000
 		{
 			// Sort out the categories
 			// NOTE: The forums and the categories are reversed in jiveForum ....... how specail ......
-			$categories_array = $this->get_jiveforum_mysql_cat_details($Db_source, $source_database_type, $source_table_prefix);
+			$categories_array = $this->get_jiveforum_mysql_cat_details($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 
 			$displayobject->display_now("<h4>Importing " . count($categories_array) . " caterories</h4>");
 

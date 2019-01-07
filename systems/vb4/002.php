@@ -39,7 +39,7 @@ class vb4_002 extends vb4_000
 			$displayobject->update_html($displayobject->make_hidden_code('002', 'WORKING'));
 			$displayobject->update_html($displayobject->make_hidden_code('associateusers', '1'));
 			$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
-			$displayobject->display_now($displayobject->make_description($displayobject->phrases['assoc_desc_1'] . ' ' . $displayobject->phrases['assoc_desc_2']));
+			$displayobject->update_html($displayobject->make_description($displayobject->phrases['assoc_desc_1'] . ' ' . $displayobject->phrases['assoc_desc_2']));
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], $displayobject->phrases['quit']));
 
 			$sessionobject->add_session_var('doassociate', '0');
@@ -85,7 +85,7 @@ class vb4_002 extends vb4_000
 		if ($associate_users == 1)
 		{
 			// Get a list of the vB members in this current selection
-			$user_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $associate_start_at, $associate_per_page, 'user', 'userid');
+			$user_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $associate_start_at, $associate_per_page, 'user', 'userid');
 
 			// Build a list of the ubb users with a box to enter a vB user id into
 			$displayobject->update_html($displayobject->do_form_header('index', '002'));
@@ -124,6 +124,9 @@ class vb4_002 extends vb4_000
 			}
 
 			// Quit button
+			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
+			$sessionobject->remove_session_var($class_num . '_start');
+			$sessionobject->add_session_var($class_num . '_objects_done', intval($counter));
 			$displayobject->update_html($displayobject->do_form_header('index', '002'));
 			$displayobject->update_html($displayobject->make_hidden_code('associateusers', '2'));
 			$displayobject->update_html($displayobject->make_hidden_code('doassociate', '0'));
@@ -148,11 +151,11 @@ class vb4_002 extends vb4_000
 				if ($this->associate_user($Db_target, $target_database_type, $target_table_prefix, substr(key($value), 12), current($value)))
 				{
 					$displayobject->update_html($displayobject->make_description('<p align="center">' . $displayobject->phrases['associating_user_1'] . '  ' . $username . $displayobject->phrases['associating_user_2'] . substr(key($value), 12) . $displayobject->phrases['associating_user_3'] . current($value) . ' - ' . $displayobject->phrases['successful'] . '.</p>'));
-					$sessionobject->add_session_var($class_num . '_objects_done',intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1 );
+					$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 				}
 				else
 				{
-					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1 );
+					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 					$displayobject->update_html($displayobject->make_description('<p align="center">' . $displayobject->phrases['associating_user_1'] . '  ' . $username . $displayobject->phrases['associating_user_2'] . substr(key($value), 12) . $displayobject->phrases['associating_user_3'] . current($value) . ' - ' . $displayobject->phrases['failed'] . '.</p>'));
 				}
 			}
@@ -170,8 +173,10 @@ class vb4_002 extends vb4_000
 		//	Finish the module
 		if ($associate_users == 2)
 		{
-			$sessionobject->set_session_var('002', 'FINISHED');
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['associate_users'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
+			$displayobject->update_basic('displaymodules', FALSE);
 
 			$displayobject->update_html($displayobject->table_header());
 			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['associate_users']));
@@ -181,5 +186,5 @@ class vb4_002 extends vb4_000
 		}
 	}
 }
-/*======================================================================*/
+
 ?>

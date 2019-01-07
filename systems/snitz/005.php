@@ -103,7 +103,7 @@ class snitz_005 extends snitz_000
 
 		if($sessionobject->get_session_var('nonarchivefinished') == 'FALSE') # NOW DO THE NORMAL THREADS
 		{
-			$thread_array 		= $this->get_snitz_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page);
+			$thread_array 		= $this->get_snitz_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $displayobejct);
 
 			// Display count and pass time
 			$displayobject->display_now('<h4>Importing normal ' . count($thread_array) . ' threads</h4><p><b>From</b> : ' . $thread_start_at . ' ::  <b>To</b> : ' . ($thread_start_at + count($thread_array)) . '</p>');			
@@ -211,7 +211,7 @@ class snitz_005 extends snitz_000
 		}
 		else # NOW DO THE ARCHIVE THREADS
 		{
-			$thread_array = $this->get_snitz_archive_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page);
+			$thread_array = $this->get_snitz_archive_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, $displayobject);
 
 			// Display count and pass time
 			$displayobject->display_now('<h4>Importing ' . count($thread_array) . ' archive threads</h4><p><b>From</b> : ' . $thread_start_at . ' ::  <b>To</b> : ' . ($thread_start_at + count($thread_array)) . '</p>');

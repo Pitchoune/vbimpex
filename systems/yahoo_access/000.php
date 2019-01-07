@@ -79,11 +79,11 @@ class yahoo_access_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_yahoo_access_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$forum)
+	function get_yahoo_access_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$forum, &$displayobject)
 	{
 		$return_array = array();
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "{$tableprefix}Ygr_{$forum}_Mmb"))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "{$tableprefix}Ygr_{$forum}_Mmb", $displayobject))
 		{
 			return $return_array;
 		}
@@ -263,12 +263,12 @@ class yahoo_access_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_yahoo_access_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $forum)
+	function get_yahoo_access_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $forum, &$displayobject)
 	{
 		$return_array = array();
 
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Ygr_{$forum}_Mmb"))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Ygr_{$forum}_Mmb", $displayobject))
 		{
 			return $return_array;
 		}

@@ -89,7 +89,7 @@ class ipb2_010 extends ipb2_000
 		}
 
 		// Get an array of moderator details
-		$moderator_array 		= $this->get_ipb2_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page);
+		$moderator_array 		= $this->get_ipb2_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page, $displayobject);
 
 		$user_ids_array 		= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 		$user_name_array 		= $this->get_username($Db_target, $target_database_type, $target_table_prefix);

@@ -90,7 +90,7 @@ class snitz_009 extends snitz_000
 		}
 
 		// Get an array of moderator details
-		$moderator_array 	= $this->get_snitz_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page);
+		$moderator_array 	= $this->get_snitz_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page, $displayobject);
 
 		$user_ids_array 	= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 		$forum_ids_array 	= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);

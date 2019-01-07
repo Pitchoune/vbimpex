@@ -220,7 +220,7 @@ class fusetalk3_010 extends fusetalk3_000
 				$try->set_value('mandatory', 'importavatarid', $icon_details['iiconid']);
 				$targetfile = $avatar_loc . $targetfile;
 
-				$result = $try->copy_avatar($Db_target, $target_database_type, $target_table_prefix, $sourcefile, $targetfile);
+				$result = $try->copy_avatar($Db_target, $target_database_type, $target_table_prefix, $sourcefile, $targetfile, $displayobject);
 
 				if ($result)
 				{

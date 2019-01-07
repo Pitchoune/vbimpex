@@ -441,7 +441,7 @@ class xmb_000 extends ImpExModule
 
 
 
-	function get_xmb_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_xmb_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -452,7 +452,7 @@ class xmb_000 extends ImpExModule
 			'attachment'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

@@ -98,7 +98,7 @@ class ipb_006 extends ipb_000
 			}
 
 			// Get all the first messagese that make up the beginning of the threads in that forum.
-			#$threads_array			= $this->get_ipb_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $threads_per_page);
+			#$threads_array			= $this->get_ipb_thread_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $threads_per_page, $displayobject);
 			$threads_array = $this->get_source_data($Db_source, $source_database_type, "{$source_table_prefix}topics", 'tid', 0, $thread_start_at, $threads_per_page);
 			$forum_ids 				= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 		#	$users_ids 				= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);

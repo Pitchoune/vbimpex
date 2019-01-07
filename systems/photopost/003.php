@@ -90,7 +90,7 @@ class photopost_003 extends photopost_000
 		}
 
 		// Get an array of usergroup details
-		$usergroup_array 	= $this->get_photopost_usergroup_details($Db_source, $source_database_type, $source_table_prefix, $usergroup_start_at, $usergroup_per_page);
+		$usergroup_array 	= $this->get_photopost_usergroup_details($Db_source, $source_database_type, $source_table_prefix, $usergroup_start_at, $usergroup_per_page, $displayobject);
 
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($usergroup_array) . " {$displayobject->phrases['usergroups']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $usergroup_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($usergroup_start_at + count($usergroup_array)) . "</p>");

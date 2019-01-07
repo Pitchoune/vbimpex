@@ -107,7 +107,7 @@ class phpBB2_011 extends phpBB2_000
 		}
 
 		// Get the PM's for this pass and some refrence arrays
-		$pm_array = $this->get_phpbb2_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$pm_array = $this->get_phpbb2_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 
 		// Give the user some info
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($pm_array) . " {$displayobject->phrases['pm']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $pm_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($pm_start_at + count($pm_array)) . "</p>");
@@ -132,7 +132,7 @@ class phpBB2_011 extends phpBB2_000
 
 			$vB_pm_text = (phpversion() < '5' ? $pm_text_object : clone($pm_text_object));
 
-			$pm_text = $this->get_phpbb2_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['privmsgs_id']);
+			$pm_text = $this->get_phpbb2_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['privmsgs_id'], $displayobject);
 
 			$userid 	= $idcache->get_id('user', $pm['privmsgs_to_userid']);
 			$username	= $idcache->get_id('username', $pm['privmsgs_to_userid']);

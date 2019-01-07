@@ -95,7 +95,7 @@ class snitz_006 extends snitz_000
         {
             // Get an array of post details
 			// TODO: get_details for new SQL
-            $post_array     = $this->get_snitz_post_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page);
+            $post_array     = $this->get_snitz_post_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page, $displayobject);
 
             // Display count and pass time
             $displayobject->display_now("<h4>{$displayobject->phrases['importing']} regular " . count($post_array) . " {$displayobject->phrases['posts']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($start_at + count($post_array)) . "</p>");
@@ -157,7 +157,7 @@ class snitz_006 extends snitz_000
         else # NOW DO THE ARCHIVE POSTS
         {
             // Get an array of post details
-            $post_array     = $this->get_snitz_archive_post_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page);
+            $post_array     = $this->get_snitz_archive_post_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page, $displayobject);
 
             // Display count and pass time
             $displayobject->display_now("<h4>{$displayobject->phrases['importing']} archive " . count($post_array) . " {$displayobject->phrases['posts']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($start_at + count($post_array)) . "</p>");

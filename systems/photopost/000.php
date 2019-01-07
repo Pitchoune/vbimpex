@@ -76,12 +76,12 @@ class photopost_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_photopost_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_photopost_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
 		// Check that there is not a empty value
-		if (empty($per_page) OR $this->check_table($DB_object, $database_type, $table_prefix, 'users') ){return $return_array; }
+		if (empty($per_page) OR $this->check_table($DB_object, $database_type, $table_prefix, 'users', $displayobject) ){return $return_array; }
 
 		if ($databasetype == 'mysql')
 		{
@@ -367,7 +367,7 @@ class photopost_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_photopost_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_photopost_usergroup_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -379,7 +379,7 @@ class photopost_000 extends ImpExModule
 			'groupid' 	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "usergroups", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "usergroups", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

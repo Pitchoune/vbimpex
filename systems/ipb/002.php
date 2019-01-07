@@ -86,7 +86,7 @@ class ipb_002 extends ipb_000
 		//	List from the start_at number
 		if ($associate_users == 1)
 		{
-			$userarray = $this->get_ipb_members_list($Db_source, $source_database_type, $source_table_prefix, $associate_start_at, $associate_per_page);
+			$userarray = $this->get_ipb_members_list($Db_source, $source_database_type, $source_table_prefix, $associate_start_at, $associate_per_page, $displayobject);
 
 			// Build a list of the IPB users with a box to enter a vB user id into
 			$displayobject->update_html($displayobject->do_form_header('index','002'));

@@ -92,7 +92,7 @@ class snitz_010 extends snitz_000
 
 
 		// Get an array of smilie details
-		$smilie_array 	= $this->get_snitz_smilie_details($Db_source, $source_database_type, $source_table_prefix, $smilie_start_at, $smilie_per_page);
+		$smilie_array 	= $this->get_snitz_smilie_details($Db_source, $source_database_type, $source_table_prefix, $smilie_start_at, $smilie_per_page, $displayobject);
 
 		// If the image category dosn't exsist for the imported smilies, create it
 		$imported_smilie_group = new ImpExData($Db_target, $sessionobject, 'imagecategory');

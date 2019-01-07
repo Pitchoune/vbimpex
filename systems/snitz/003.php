@@ -89,7 +89,7 @@ class snitz_003 extends snitz_000
 		}
 
 		// Get an array of user details
-		$user_array 	= $this->get_snitz_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page);
+		$user_array 	= $this->get_snitz_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, $displayobject);
 
 		$user_group_ids_array = $this->get_imported_group_ids($Db_target, $target_database_type, $target_table_prefix);
 

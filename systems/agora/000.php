@@ -319,14 +319,14 @@ class agora_000 extends ImpExModule
 		}
 	}
 
-	function get_agora_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_agora_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
 		// Check that there is not a empty value
 		if(empty($per_page)) { return $return_array; }
 		
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, '_attachments'))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, '_attachments', $displayobject))
 		{
 			return $return_array;
 		}

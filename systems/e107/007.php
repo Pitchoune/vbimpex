@@ -105,7 +105,7 @@ class e107_007 extends e107_000
 
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_e107_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_e107_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 
 
 		// Get some refrence arrays (use and delete as nessesary).

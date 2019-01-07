@@ -100,7 +100,7 @@ class ipb_005 extends ipb_000
 		if($sessionobject->get_session_var('categoriesfinished') == 'FALSE')
 		{
 			// Get all the details
-			$categories_array  	=  $this->get_ipb_category_details($Db_source, $source_database_type, $source_table_prefix);
+			$categories_array  	=  $this->get_ipb_category_details($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 			$category_object	= new ImpExData($Db_target, $sessionobject,'forum');
 
 			$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($categories_array) . " {$displayobject->phrases['categories']}</h4>");
@@ -156,7 +156,7 @@ class ipb_005 extends ipb_000
 		{
 			// Weve done the categories have a go at the forums
 			// Get all the details
-			$forum_array  	= $this->get_ipb_forum_details($Db_source, $source_database_type, $source_table_prefix, $forum_start_at,$forum_per_page);
+			$forum_array  	= $this->get_ipb_forum_details($Db_source, $source_database_type, $source_table_prefix, $forum_start_at, $forum_per_page, $displayobject);
 
 			$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($forum_array) . " {$displayobject->phrases['forums']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $forum_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($forum_start_at + count($forum_array)) . "</p>");
 

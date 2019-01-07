@@ -94,7 +94,7 @@ class ipb_007 extends ipb_000
 			$posts_per_page = 500;
 		}
 
-		#$post_array				= $this->get_ipb_posts_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $posts_per_page);
+		#$post_array				= $this->get_ipb_posts_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $posts_per_page, $displayobject);
 		$post_array = $this->get_source_data($Db_source, $source_database_type, "{$source_table_prefix}posts", 'pid', 0, $post_start_at, $posts_per_page);
 		#$thread_ids				= $this->get_threads_ids($Db_target, $target_database_type, $target_table_prefix);
 		#$users_ids 				= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);

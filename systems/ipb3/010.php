@@ -89,7 +89,7 @@ class ipb3_010 extends ipb3_000
 		}
 
 		// Get an array of moderator details
-		$results =  $this->get_ipb3_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page);
+		$results =  $this->get_ipb3_moderator_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page, $displayobject);
 		$moderator_array 		= $results['mods'];
 		$count							= $results['count'];
 

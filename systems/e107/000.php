@@ -244,7 +244,7 @@ class e107_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_e107_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_e107_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -256,7 +256,7 @@ class e107_000 extends ImpExModule
 			'poll_id'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

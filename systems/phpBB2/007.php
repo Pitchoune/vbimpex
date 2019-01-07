@@ -93,7 +93,7 @@ class phpBB2_007 extends phpBB2_000
 			$sessionobject->timing($class_num,'start' ,$sessionobject->get_session_var('autosubmit'));
 		}
 
-		$thread_array 			= $this->get_phpbb2_threads_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $threads_per_page);
+		$thread_array 			= $this->get_phpbb2_threads_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $threads_per_page, $displayobject);
 		$forum_ids 				= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		// Sort out the threads

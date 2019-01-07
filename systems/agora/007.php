@@ -91,7 +91,7 @@ class agora_007 extends agora_000
 		}
 
 		// Get an array of attachment details
-		$attachment_array 	= $this->get_agora_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page);
+		$attachment_array 	= $this->get_agora_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page, $displayobject);
 
 		$user_ids_array = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix, $do_int_val = false);
 

@@ -122,7 +122,7 @@ class joomla_cms_003 extends joomla_cms_000
         $usergroups     =    $this->get_imported_group_ids($Db_target, $target_database_type, $target_table_prefix);
 
         // Get a page worths of users
-        $user_array  =  $this->get_joomla_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page);
+        $user_array  =  $this->get_joomla_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, $displayobject);
 
         $displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . $user_array['count'] . " {$displayobject->phrases['users']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $user_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($user_start_at + $user_array['count']) . "</p>");
 

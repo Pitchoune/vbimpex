@@ -148,15 +148,14 @@ else
 	$using_local_config = '<p>' . $impex_phrases['using_impex_config'] . '</p>';
 }
 
-
 // #############################################################################
 // Database connect & session start
 // #############################################################################
-
 $ImpEx = new ImpExController();
 
 $dbtype = strtolower($impexconfig['target']['databasetype']);
 
+// Mysql and Mysqli support only - vBulletin never adopted any other storage method.
 if ($dbtype == 'mysqli')
 {
 	$Db_target = new ImpEx_Database_Mysqli($ImpEx);
@@ -203,11 +202,9 @@ else
 	$ImpExSession = new ImpExSession();
 }
 
-
 // #############################################################################
 // Requires ImpExDatabase version (has to be done here as it needs the session)
 // #############################################################################
-
 require_once(IDIR . '/ImpExDatabaseCore.php');
 
 #ImpExDatabase_<product>_version.php
@@ -247,7 +244,6 @@ require_once (IDIR . '/ImpExData.php');
 // #############################################################################
 // Instantiate ImpExDisplay
 // #############################################################################
-
 if ($usewrapper)
 {
 	// Use internal vBulletin rendering functions from AdminCP
@@ -264,7 +260,6 @@ $ImpExDisplay->phrases =& $impex_phrases;
 // #############################################################################
 // create vbfields
 // #############################################################################
-
 if ($ImpExSession->get_session_var('vbfields') != 'done')
 {
 	require_once(IDIR. '/vbfields.php');
@@ -281,7 +276,6 @@ if ($ImpExSession->get_session_var('vbfields') != 'done')
 // #############################################################################
 // initalise error store
 // #############################################################################
-
 if ($ImpExSession->get_session_var('errortable') != 'done')
 {
 	// Just incase the session was removed and the error table is still there.
@@ -324,7 +318,6 @@ $ImpExSession->_target_db =& $Db_target;
 // #############################################################################
 // Add vars to session
 // #############################################################################
-
 $ImpExSession->add_session_var('systempath', IDIR);
 $ImpExSession->add_session_var('sourceexists', $impexconfig['sourceexists']);
 
@@ -344,7 +337,7 @@ if ($impexconfig['sourceexists'])
 		// Check if mssql support is in php or should a connection be made via pure style .......
 		if (!function_exists('mssql_connect'))
 		{
-			if (function_exists('sqlsrv_connect'))
+			if (function_exists('sqlsrev_connect'))
 			{
 				$impexconfig['source']['databasetype'] = 'sqlsrv';
 			}
@@ -402,18 +395,14 @@ if ($impexconfig['sourceexists'])
 
 $ImpEx->get_post_values($ImpExSession, $_POST);
 
-
 // #############################################################################
 // Autosubmit
 // #############################################################################
-
 $ImpExDisplay->update_basic('autosubmit', $ImpExSession->get_session_var('autosubmit'));
-
 
 // #############################################################################
 // Autosubmit & Home
 // #############################################################################
-
 $currentmoduleworking	= $ImpExSession->any_working();
 $system					= $ImpExSession->get_session_var('system');
 $module 				= $ImpExSession->get_session_var('module');
@@ -451,21 +440,16 @@ if ($module == '000' OR $module == NULL)
 	}
 }
 
-echo $ImpExDisplay->page_header() .
-		'<br /> <div align="center"><a href="help.php">' . $ImpExDisplay->phrases['db_cleanup'] .
-		'</a> ||| <a href="http://www.vbulletin.com/docs/html/impex" target="blank_"> ' .
-		$ImpExDisplay->phrases['online_manual'] . '</a></div>';
+echo $ImpExDisplay->page_header() . '<br /> <div align="center"><a href="help.php">' . $ImpExDisplay->phrases['db_cleanup'] . '</a> ||| <a href="' . $ImpExDisplay->phrases['online_manual_url'] . '" target="blank_">' . $ImpExDisplay->phrases['online_manual'] . '</a></div>';
 
 if ($using_local_config)
 {
 	echo '<div align="center"> ' . $using_local_config . '</div><br />';
 }
 
-
 // #############################################################################
 // Resume
 // #############################################################################
-
 if ($currentmoduleworking != NULL)
 {
 	// Ensure we have the $system_000.php module to extend from
@@ -492,7 +476,6 @@ if ($currentmoduleworking != NULL)
 // #############################################################################
 // Init
 // #############################################################################
-
 if ($module != '000' AND $module != NULL AND $currentmoduleworking == FALSE)
 {
 	$ImpExDisplay->update_basic('displaymodules', 'FALSE');
@@ -537,11 +520,9 @@ if ($module != '000' AND $module != NULL AND $currentmoduleworking == FALSE)
 	$ModuleCall->init($ImpExSession, $ImpExDisplay, $Db_target, $Db_source);
 }
 
-
 // #############################################################################
 // Update & Display
 // #############################################################################
-
 $ImpEx->updateDisplay($ImpExSession, $ImpExDisplay);
 echo $ImpExDisplay->display($ImpExSession);
 
@@ -553,7 +534,6 @@ if ($displayerrors)
 // #############################################################################
 // Session End
 // #############################################################################
-
 $ImpEx->store_session($Db_target, $impexconfig['target']['tableprefix'], $ImpExSession);
 
 echo "\n<!-- From {$system} to " . $ImpExSession->get_session_var('targetsystem') . "-->\n";

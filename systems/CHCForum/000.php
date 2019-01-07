@@ -167,11 +167,11 @@ class CHCForum_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_CHCForum_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_CHCForum_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'tx_cwtcommunity_message'))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, 'tx_cwtcommunity_message', $displayobject))
 		{
 			return $return_array;		
 		}

@@ -105,7 +105,7 @@ class phpBB1_008 extends phpBB1_000
 
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_phpBB1_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_phpBB1_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 
 
 		// Get some refrence arrays (use and delete as nessesary).

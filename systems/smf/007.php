@@ -89,7 +89,7 @@ class smf_007 extends smf_000
 		}
 
 		// Get an array of post details
-		$post_array 			= $this->get_smf_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page);
+		$post_array 			= $this->get_smf_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, $displayobject);
 
 		$idcache = new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 

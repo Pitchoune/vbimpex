@@ -118,7 +118,7 @@ class phorum3_006 extends phorum3_000
 
 
 		// Get an array of post details
-		$post_array = $this->get_phorum3_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, $sessionobject->get_session_var('sourceforumtablename'));
+		$post_array = $this->get_phorum3_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, $sessionobject->get_session_var('sourceforumtablename'), $displayobject);
 
 
 		$user_ids_array = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix, $do_int_val = false);
@@ -138,7 +138,7 @@ class phorum3_006 extends phorum3_000
 			$threadid = $thread_and_forum_array[$importforumid]["$post_details[thread]"];
 			if(!$threadid)
 			{
-				$threadid = $this->get_parent_post_threadid($Db_source, $source_database_type, $source_table_prefix, $sessionobject->get_session_var('sourceforumtablename'), $post_details['thread']);
+				$threadid = $this->get_parent_post_threadid($Db_source, $source_database_type, $source_table_prefix, $sessionobject->get_session_var('sourceforumtablename'), $post_details['thread'], $displayobject);
 
 				if(!$threadid)
 				{

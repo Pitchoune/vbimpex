@@ -3511,11 +3511,11 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	array
 	*/
-	public function get_details($Db_object, $databasetype, $tableprefix, $start, $per_page, $type, $orderby = false)
+	public function get_details($Db_object, $databasetype, $tableprefix, $displayobject, $start, $per_page, $type, $orderby = false)
 	{
 		$return_array = array();
 
-		$is_table = $this->check_table($Db_object, $databasetype, $tableprefix, $type);
+		$is_table = $this->check_table($Db_object, $databasetype, $tableprefix, $type, $displayobject);
 
 		// Check that there isn't a empty value
 		if (empty($per_page) OR !$is_table)
@@ -6035,7 +6035,7 @@ class ImpExDatabaseCore extends ImpExFunction
 	* @param	string	mixed			The type of database 'mysql', 'mysqli', etc.
 	* @param	string	mixed			The prefix to the table name i.e. 'vb3_'.
 	*/
-	public function check_table($Db_object, $databasetype, $tableprefix, $table_name, $req_fields = false, &$displayobject)
+	public function check_table($Db_object, $databasetype, $tableprefix, $table_name, &$displayobject, $req_fields = false)
 	{
 		$tables = $Db_object->query("
 			SHOW TABLES
@@ -6503,8 +6503,7 @@ class ImpExCache
 	}
 
 	/**
-	* Imports the users avatar from a local file or URL including saving the new avatar
-	*  and optionally assigning it to a user.
+	* Imports the users avatar from a local file or URL including saving the new avatar and optionally assigning it to a user.
 	*
 	* @param	object	databaseobject	The database that the function is going to interact with.
 	* @param	string	mixed			The type of database 'mysql', 'mysqli', etc

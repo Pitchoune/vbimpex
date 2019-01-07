@@ -384,13 +384,13 @@ class phpBB1_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phpBB1_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_phpBB1_poll_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
 
 		// Check that there is not a empty value
-		if(empty($per_page) OR !$this->check_table($DB_object, $database_type, $table_prefix, 'poll_topics'))
+		if(empty($per_page) OR !$this->check_table($DB_object, $database_type, $table_prefix, 'poll_topics', $displayobject))
 		{
 			return $return_array;
 		}

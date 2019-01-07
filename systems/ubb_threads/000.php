@@ -71,7 +71,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+	function get_ubb_threads_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -82,7 +82,7 @@ class ubb_threads_000 extends ImpExModule
 			'U_Username'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Users", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Users", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -116,7 +116,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_cat_details(&$Db_object, &$databasetype, &$tableprefix)
+	function get_ubb_threads_cat_details(&$Db_object, &$databasetype, &$tableprefix, &$displayobject)
 	{
 		$return_array = array();
 
@@ -125,7 +125,7 @@ class ubb_threads_000 extends ImpExModule
 			'Cat_Number'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Category", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Category", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -158,7 +158,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_forum_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -172,7 +172,7 @@ class ubb_threads_000 extends ImpExModule
 			'Bo_Keyword'	=> 'mandatory' // For get_forum_by_keyword()
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Boards", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Boards", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -205,7 +205,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_moderator_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -216,7 +216,7 @@ class ubb_threads_000 extends ImpExModule
 			'Mod_Board'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Moderators", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Moderators", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -249,7 +249,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_pmtext_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -264,7 +264,7 @@ class ubb_threads_000 extends ImpExModule
 			'M_Message'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Messages", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Messages", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -297,7 +297,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_poll_question(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_poll_question(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -307,7 +307,7 @@ class ubb_threads_000 extends ImpExModule
 			'P_Question'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollQuestions", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollQuestions", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -360,7 +360,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_poll_options(&$Db_object, &$databasetype, &$tableprefix, $Poll_id, $question_num)
+	function get_ubb_threads_poll_options(&$Db_object, &$databasetype, &$tableprefix, $Poll_id, $question_num, &$displayobject)
 	{
 		$return_array = array();
 
@@ -369,7 +369,7 @@ class ubb_threads_000 extends ImpExModule
 			'P_OptionNum'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollOptions", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollOptions", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -391,7 +391,7 @@ class ubb_threads_000 extends ImpExModule
 	}
 
 
-	function get_ubb_threads_poll_votes(&$Db_object, &$databasetype, &$tableprefix, $option, $questionnum)
+	function get_ubb_threads_poll_votes(&$Db_object, &$databasetype, &$tableprefix, $option, $questionnum, &$displayobject)
 	{
 		$return_array = array();
 
@@ -399,7 +399,7 @@ class ubb_threads_000 extends ImpExModule
 			'P_OptionNum'	=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollVotes", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "PollVotes", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -430,7 +430,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -442,7 +442,7 @@ class ubb_threads_000 extends ImpExModule
 			'B_Main'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Posts", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Posts", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -548,7 +548,7 @@ class ubb_threads_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_ubb_threads_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page)
+	function get_ubb_threads_user_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, &$displayobject)
 	{
 		$return_array = array();
 
@@ -558,7 +558,7 @@ class ubb_threads_000 extends ImpExModule
 			'U_Number'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Users", $req_fields))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "Users", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

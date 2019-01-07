@@ -199,7 +199,7 @@ class joomla_cms_000 extends ImpExModule
     *
     * @return    array
     */
-    function get_joomla_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page)
+    function get_joomla_members_list(&$Db_object, &$databasetype, &$tableprefix, &$start_at, &$per_page, &$displayobject)
     {
         $return_array = array();
 
@@ -212,7 +212,7 @@ class joomla_cms_000 extends ImpExModule
             'name'    => 'mandatory'
         );
 
-        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $displayobject, $req_fields))
         {
             return $return_array;
         }
@@ -245,7 +245,7 @@ class joomla_cms_000 extends ImpExModule
     *
     * @return    array
     */
-    function get_joomla_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page)
+    function get_joomla_user_details(&$Db_object, &$databasetype, &$tableprefix, &$start, &$per_page, &$displayobject)
     {
         $return_array = array();
 
@@ -258,7 +258,7 @@ class joomla_cms_000 extends ImpExModule
             'name'    => 'mandatory'
         );
 
-        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $req_fields))
+        if(!$this->check_table($Db_object, $databasetype, $tableprefix, "users", $displayobject, $req_fields))
         {
             return $return_array;
         }

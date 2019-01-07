@@ -96,7 +96,7 @@ class ubb_threads_007 extends ubb_threads_000
 		}
 
 		// Get an array of post details
-		$post_array 	= $this->get_ubb_threads_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page);
+		$post_array 	= $this->get_ubb_threads_post_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, $displayobject);
 
 		// Check for page end
 		if ($source_database_type == 'mysql')

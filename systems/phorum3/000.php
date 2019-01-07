@@ -216,7 +216,7 @@ class phorum3_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phorum3_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename)
+	function get_phorum3_post_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename, &$displayobject)
 	{
 		$return_array = array();
 
@@ -224,9 +224,9 @@ class phorum3_000 extends ImpExModule
 		if(empty($per_page) OR empty($sourceforumtablename)) { return $return_array; }
 
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename, $displayobject))
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename)))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
 				$sourceforumtablename = strtolower($sourceforumtablename);		
 			}
@@ -276,7 +276,7 @@ class phorum3_000 extends ImpExModule
 	*
 	* @return	array
 	*/
-	function get_phorum3_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename)
+	function get_phorum3_thread_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename, &$displayobject)
 	{
 		$return_array = array();
 
@@ -284,9 +284,9 @@ class phorum3_000 extends ImpExModule
 		if(empty($per_page) OR empty($sourceforumtablename)) { return $return_array; }
 
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename)))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
 				$sourceforumtablename = strtolower($sourceforumtablename);		
 			}
@@ -429,7 +429,7 @@ class phorum3_000 extends ImpExModule
 	}
 	
 	
-	function get_phorum3_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename)
+	function get_phorum3_attachment_details(&$Db_object, &$databasetype, &$tableprefix, $start_at, $per_page, $sourceforumtablename, &$displayobject)
 	{
 		$return_array = array();
 		
@@ -437,9 +437,9 @@ class phorum3_000 extends ImpExModule
 		if(empty($per_page) OR empty($sourceforumtablename)) { return $return_array; }
 		
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename)))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
 				$sourceforumtablename = strtolower($sourceforumtablename);		
 			}
@@ -475,7 +475,7 @@ class phorum3_000 extends ImpExModule
 		return $return_array;
 	}
 	
-	function get_parent_post_threadid(&$Db_object, &$databasetype, &$tableprefix, $sourceforumtablename, $post_id)
+	function get_parent_post_threadid(&$Db_object, &$databasetype, &$tableprefix, $sourceforumtablename, $post_id, &$displayobject)
 	{
 		$return_array = array();
 
@@ -483,9 +483,9 @@ class phorum3_000 extends ImpExModule
 		if(empty($sourceforumtablename)) { return $return_array; }
 
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename))
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
 		{
-			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename)))
+			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
 				$sourceforumtablename = strtolower($sourceforumtablename);		
 			}

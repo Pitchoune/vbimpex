@@ -81,7 +81,7 @@ class phpBB3_007 extends phpBB3_000
 
 		$over_write_smilies		= $sessionobject->get_session_var('over_write_smilies');
 
-		$smilie_array 			= $this->get_phpbb3_smilie_details($Db_source, $source_database_type, $source_table_prefix);
+		$smilie_array 			= $this->get_phpbb3_smilie_details($Db_source, $source_database_type, $source_table_prefix, $displayobject);
 
 		$class_num				= substr(get_class($this) , -3);
 

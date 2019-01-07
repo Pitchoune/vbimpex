@@ -47,16 +47,19 @@ $impex_phrases['sourceexists_is_false'] 					= 'You have set sourceexists to FAL
 $impex_phrases['failed_connection']							= 'Connection to source server failed. Check username and password.';
 $impex_phrases['db_cleanup']								= 'Database cleanup &amp; restart';
 $impex_phrases['online_manual']								= 'Online manual';
+$impex_phrases['online_manual_url']							= 'http://www.vbulletin.com/docs/html/impex';
 $impex_phrases['cleanup_module_title']						= 'Clean up module';
 $impex_phrases['feedback_module_title']						= 'Feedback';
 $impex_phrases['build_version']								= 'ImpEx build version : ';
 $impex_phrases['remove']									= 'Remove ImpEx once import is complete and final';
 $impex_phrases['finished_import']							= 'Once you have finished these modules follow these instructions to complete the import';
+$impex_phrases['finished_import_url']						= 'http://www.vbulletin.com/docs/html/impex_cleanup';
 
 #####################################
 # help.php phrases
 #####################################
 
+$impex_phrases['help_page']									= 'Impex Help page';
 $impex_phrases['action_1']									= '<p>These links will allow you to restart an import, remove a session or remove the importid\'s to allow consecutive imports.</p>';
 $impex_phrases['action_2']									= '<br /><strong>Cancel</strong><br /><a href="index.php">To cancel and return to the import, click here.</a><br />';
 $impex_phrases['action_3']									= '<br /><strong>Delete Session</strong><br /><a href="help.php?action=delsess">To delete the import session and continue with the import, click here.</a><br />';
@@ -119,8 +122,8 @@ $impex_phrases['module']									= 'Module';
 $impex_phrases['action']									= 'Action';
 $impex_phrases['completed']									= 'Completed';
 
-$impex_phrases['second']									= 'Second';
-$impex_phrases['seconds']									= 'Seconds';
+$impex_phrases['second']									= 'second';  # lowercase
+$impex_phrases['seconds']									= 'seconds';  # lowercase
 
 $impex_phrases['successful']								= 'Successful';
 $impex_phrases['failed']									= 'Failed';
@@ -209,9 +212,9 @@ $impex_phrases['get_db_info']								= 'Get database information';
 $impex_phrases['check_tables']								= 'This module will check the tables in the database as well as the connection.';
 
 $impex_phrases['altering_tables']							= 'Altering tables';
-$impex_phrases['alter_desc_1']								= 'ImpEx will now alter the tables in the vB database to include import id numbers. ';
-$impex_phrases['alter_desc_2']								= 'This is needed during the import process for maintaining references between the tables during an import. ';
-$impex_phrases['alter_desc_3']								= 'If you have large tables (i.e. lots of posts) this can take some time. ';
+$impex_phrases['alter_desc_1']								= 'ImpEx will now alter the tables in the vB database to include import id numbers. ';								# Note the trailing space
+$impex_phrases['alter_desc_2']								= 'This is needed during the import process for maintaining references between the tables during an import. ';		# Note the trailing space
+$impex_phrases['alter_desc_3']								= 'If you have large tables (i.e. lots of posts) this can take some time. ';										# Note the trailing space
 $impex_phrases['alter_desc_4']								= 'They will also be left after the import if you need to link back to the original vB userid.';
 $impex_phrases['valid_tables_found']    					= 'Valid found tables:';
 $impex_phrases['found']                 					= 'found';

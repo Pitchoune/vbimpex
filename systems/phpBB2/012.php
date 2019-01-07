@@ -94,7 +94,7 @@ class phpBB2_012 extends phpBB2_000
 			$ranks_per_page = 200;
 		}
 
-		$ranks_array = $this->get_phpbb2_ranks_details($Db_source, $source_database_type, $source_table_prefix, $ranks_start_at, $ranks_per_page);
+		$ranks_array = $this->get_phpbb2_ranks_details($Db_source, $source_database_type, $source_table_prefix, $ranks_start_at, $ranks_per_page, $displayobject);
 
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($ranks_array) . " {$displayobject->phrases['ranks']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $ranks_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($ranks_start_at + count($ranks_array)) . "</p>");
 

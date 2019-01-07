@@ -115,7 +115,7 @@ class ipb_004 extends ipb_000
 		$doneusers	 	=  $this->get_done_user_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		// Get a page worths of users
-		$user_array  =  $this->get_ipb_user_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page);
+		$user_array  =  $this->get_ipb_user_details($Db_source, $source_database_type, $source_table_prefix, $start_at, $per_page, $displayobject);
 
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($user_array) . " {$displayobject->phrases['users']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($start_at + count($user_array)) . "</p>");
 

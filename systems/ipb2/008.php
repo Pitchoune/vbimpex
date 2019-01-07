@@ -90,7 +90,7 @@ class ipb2_008 extends ipb2_000
 		}
 
 		// Get an array of poll details
-		$poll_array 	= $this->get_ipb2_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page);
+		$poll_array 	= $this->get_ipb2_poll_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, $displayobject);
 		$user_ids_array = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix, $do_int_val = false);
 
 		// Display count and pass time
@@ -112,7 +112,7 @@ class ipb2_008 extends ipb2_000
 			unset($poll_voters_array);
 			unset($ipb_voters_array);
 
-			$ipb_voters_array		= $this->get_ipb2_vote_voters($Db_source, $source_database_type, $source_table_prefix, $poll['tid']);
+			$ipb_voters_array		= $this->get_ipb2_vote_voters($Db_source, $source_database_type, $source_table_prefix, $poll['tid'], $displayobject);
 
 			if(count($ipb_voters_array) == 0)
 			{

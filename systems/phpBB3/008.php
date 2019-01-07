@@ -86,7 +86,7 @@ class phpBB3_008 extends phpBB3_000
 		$class_num		= substr(get_class($this) , -3);
 		$idcache 		= new ImpExCache($Db_target, $t_db_type, $t_tb_prefix);
 		$ImpExData		= new ImpExData($Db_target, $sessionobject, 'post');
-		$truncated_smilies	= $this->get_phpbb_truncated_smilies($Db_source, $s_db_type, $t_tb_prefix);
+		$truncated_smilies	= $this->get_phpbb_truncated_smilies($Db_source, $s_db_type, $t_tb_prefix, $displayobject);
 		// Start the timing
 		if(!$sessionobject->get_session_var("{$class_num}_start"))
 		{

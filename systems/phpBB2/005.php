@@ -82,9 +82,9 @@ class phpBB2_005 extends phpBB2_000
 		}
 
 		// Get the lists
-		$userid 		= $this->get_list($Db_source, $sdt, $stp, 'userid');
-		$iplist 		= $this->get_list($Db_source, $sdt, $stp, 'ip');
-		$email 			= $this->get_list($Db_source, $sdt, $stp, 'email');
+		$userid 		= $this->get_list($Db_source, $sdt, $stp, 'userid', $displayobject);
+		$iplist 		= $this->get_list($Db_source, $sdt, $stp, 'ip', $displayobject);
+		$email 			= $this->get_list($Db_source, $sdt, $stp, 'email', $displayobject);
 
 		// If there is any thing
 		if(count($userid) > 0)

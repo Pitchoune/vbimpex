@@ -92,7 +92,7 @@ class smf_009 extends smf_000
 		}
 
 		// Get an array of pmtext details
-		$pm_array 			= $this->get_smf_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$pm_array 			= $this->get_smf_pmtext_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 		// Display count and pass time
 		$displayobject->display_now("<h4>{$displayobject->phrases['importing']} " . count($pm_array) . " {$displayobject->phrases['pm']}</h4><p><b>{$displayobject->phrases['from']}</b> : " . $pm_start_at . " ::  <b>{$displayobject->phrases['to']}</b> : " . ($pm_start_at + count($pm_array)) . "</p>");
 
@@ -104,7 +104,7 @@ class smf_009 extends smf_000
 
 			$vB_pm_text = (phpversion() < '5' ? $vB_pm_text_object : clone($vB_pm_text_object));
 
-			$im_recipients = $this->get_smf_pm_recipients($Db_source, $source_database_type, $source_table_prefix, $pm['ID_PM']);
+			$im_recipients = $this->get_smf_pm_recipients($Db_source, $source_database_type, $source_table_prefix, $pm['ID_PM'], $displayobject);
 
 			unset($touserarray);
 

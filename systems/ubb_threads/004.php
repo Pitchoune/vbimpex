@@ -118,7 +118,7 @@ class ubb_threads_004 extends ubb_threads_000
 		$importcustomavatars	= $sessionobject->get_session_var('importcustomavatars');
 
 		// Get an array of user details
-		$user_array 	= $this->get_ubb_threads_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page);
+		$user_array 	= $this->get_ubb_threads_user_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, $displayobject);
 
 		// Groups info
 		$user_group_ids_array = $this->get_imported_group_ids($Db_target, $target_database_type, $target_table_prefix);

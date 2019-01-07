@@ -92,7 +92,7 @@ class xmb_010 extends xmb_000
 
 
 		// Get an array of attachment details
-		$attachment_array 	= $this->get_xmb_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page);
+		$attachment_array 	= $this->get_xmb_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page, $displayobject);
 
 
 		// Display count and pass time

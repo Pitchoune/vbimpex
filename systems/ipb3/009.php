@@ -90,7 +90,7 @@ class ipb3_009 extends ipb3_000
 		}
 
 		// Get an array of pm details
-		$results = $this->get_ipb3_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page);
+		$results = $this->get_ipb3_pm_details($Db_source, $source_database_type, $source_table_prefix, $pm_start_at, $pm_per_page, $displayobject);
 		$pm_array = $results['pms'];
 		$count = $results['count'];
 		$idcache = new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
@@ -105,7 +105,7 @@ class ipb3_009 extends ipb3_000
 		{
 			$vB_pm_text = (phpversion() < '5' ? $pm_text_object : clone($pm_text_object));
 
-			$pm_text = $this->get_ipb3_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['msg_id']);
+			$pm_text = $this->get_ipb3_pm_text($Db_source, $source_database_type, $source_table_prefix, $pm['msg_id'], $displayobject);
 
 			$userid 	= $idcache->get_id('user', $pm['mt_to_member_id']);
 			$username	= $idcache->get_id('username', $pm['mt_to_member_id']);
