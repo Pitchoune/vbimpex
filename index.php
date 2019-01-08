@@ -368,6 +368,10 @@ if ($impexconfig['sourceexists'])
 	{ // got connected
 		switch ($Db_source->errno())
 		{
+			case 1044:
+				$ImpExDisplay->display_error($ImpExDisplay->phrases['no_source_connection_check_login']);
+				exit;
+			break;
 			case 1046:
 				$ImpExDisplay->display_error($ImpExDisplay->phrases['no_source_set']);
 				exit;

@@ -43,6 +43,7 @@ $impex_phrases['no_mssql_support']							= 'You do not have MSSQL support in thi
 $impex_phrases['no_mssql_support_link']						= '</br>Read this : <a target="_blank" href="http://www.php.net/manual/en/ref.mssql.php">PHP MSSQL</a>';
 $impex_phrases['no_source_set']								= 'A source database was not entered in ImpExConfig.php';
 $impex_phrases['source_not_exist']							= 'The source database entered in ImpExConfig.php does not exist.';
+$impex_phrases['no_source_connection_check_login']			= 'Source database has not been selected. Are you sure about the source db login informations?';
 $impex_phrases['sourceexists_is_false'] 					= 'You have set sourceexists to FALSE in ImpExConfig.php, this means you do not want to import from a database system, this system is a source database system.';
 $impex_phrases['failed_connection']							= 'Connection to source server failed. Check username and password.';
 $impex_phrases['db_cleanup']								= 'Database cleanup &amp; restart';

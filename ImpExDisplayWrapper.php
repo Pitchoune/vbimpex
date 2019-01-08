@@ -81,8 +81,6 @@ class ImpExDisplayWrapper extends ImpExDisplay
 		$this->call('print_cp_header', array($outtitle, $this->_screenbasic['autosubmit'] != '0' ? 'document.name.submit();' : '', $style));
 		$this->_screenbasic['donehead'] = 'TRUE';
 
-		
-
 		$string .= "\n" . '<b>' . $this->phrases['build_version'] . $this->_build_version . '</b>';
 		
 		return $string;
@@ -143,17 +141,32 @@ class ImpExDisplayWrapper extends ImpExDisplay
 
 	public function make_hidden_code($name, $value = '', $htmlise = 1)
 	{
-		/*
-		if ($htmlise)
-		{
-			$value=htmlspecialchars($value);
-		}
-		$return_string = "\n<input type=\"hidden\" name=\"$name\" value=\"$value\" />";
-
-		echo $return_string;
-		*/
-
 		$this->call('construct_hidden_code', array($name, $value, $htmlise));
+	}
+
+	/**
+	* Return the display string for the completed module.
+	*
+	* @param	string		mixed			The name of the module.
+	* @param	int			mixed			The seconds taken to complete.
+	* @param	int			mixed			Number of successful.
+	* @param	int			mixed			Number of failed.
+	*
+	* @return	mixed		string|NULL		The formed HTML.
+	*/
+	public function module_finished($modulestring, $seconds, $successful, $failed)
+	{
+		if ($seconds <= 1)
+		{
+			$secondphrase = '1 ' . $this->phrases['second'];
+		}
+		else
+		{
+			$secondphrase = $seconds . ' ' . $this->phrases['seconds'];
+		}
+
+		echo '<p align="center">' . $this->phrases['module'] . ' : <b>' . $modulestring . '</b>. <i>' . $this->phrases['successful'] . '</i>, ' . $secondphrase . '.</p>
+				<p align="center">' . $this->phrases['successful'] . ': <b>' . $successful . '</b>. ' . $this->phrases['failed'] . ': <b>' . $failed . '</b>.</p>';
 	}
 }
 

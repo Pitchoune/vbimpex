@@ -57,8 +57,8 @@ $impexconfig['sourceexists']			= true;
 ####
 */
 
-// mysql / mssql
-$impexconfig['source']['databasetype']	= 'mysql';  // mysql, mysqli OR mssql
+// mysql / mysqli / mssql
+$impexconfig['source']['databasetype']	= 'mysqli';  // mysql, mysqli OR mssql
 $impexconfig['source']['server']		= 'localhost';
 $impexconfig['source']['user']			= 'username';
 $impexconfig['source']['password']		= 'password';
@@ -88,7 +88,7 @@ define('dupe_checking', false);
 */
 
 // Advanced Target
-$impexconfig['target']['databasetype']	= 'mysql';	// currently mysql only
+$impexconfig['target']['databasetype']	= 'mysqli';	// mysql / mysqli
 $impexconfig['target']['charset']		= '';
 $impexconfig['target']['persistent']	= false; 	// (true/false) use mysql_pconnect
 

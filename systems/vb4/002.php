@@ -18,12 +18,12 @@ class vb4_002 extends vb4_000
 {
 	var $_dependent = '001';
 
-	function vb4_002(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['associate_users'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		$proceed = $this->check_order($sessionobject, $this->_dependent);
 
@@ -57,7 +57,7 @@ class vb4_002 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -124,9 +124,6 @@ class vb4_002 extends vb4_000
 			}
 
 			// Quit button
-			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
-			$sessionobject->remove_session_var($class_num . '_start');
-			$sessionobject->add_session_var($class_num . '_objects_done', intval($counter));
 			$displayobject->update_html($displayobject->do_form_header('index', '002'));
 			$displayobject->update_html($displayobject->make_hidden_code('associateusers', '2'));
 			$displayobject->update_html($displayobject->make_hidden_code('doassociate', '0'));
@@ -173,15 +170,20 @@ class vb4_002 extends vb4_000
 		//	Finish the module
 		if ($associate_users == 2)
 		{
+			$displayobject->update_html($displayobject->table_header());
+			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['associate_users']));
+			$displayobject->update_html($displayobject->make_description('<p align="center">' . $displayobject->phrases['completed'] . '. ' . $displayobject->phrases['redirecting'] . '</p>'));
+			$displayobject->update_html($displayobject->table_footer());
+
+			
+			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
+			$sessionobject->remove_session_var($class_num . '_start');
+			$sessionobject->add_session_var($class_num . '_objects_done', intval($counter));
 			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['associate_users'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$displayobject->update_basic('displaymodules', FALSE);
 
-			$displayobject->update_html($displayobject->table_header());
-			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['associate_users']));
-			$displayobject->update_html($displayobject->make_description('<p align="center">' . $displayobject->phrases['completed'] . '. ' . $displayobject->phrases['redirecting'] . '</p>'));
-			$displayobject->update_html($displayobject->table_footer());
 			$displayobject->update_html($displayobject->print_redirect('index.php', $sessionobject->get_session_var('pagespeed')));
 		}
 	}

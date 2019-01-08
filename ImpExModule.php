@@ -150,7 +150,7 @@ class ImpExModule extends ImpExDatabase
 	*
 	* Empty
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 

@@ -76,9 +76,8 @@ class ImpExSession
 	* Constructor
 	*
 	* Empty
-	*
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 
@@ -277,7 +276,7 @@ class ImpExSession
 	}
 
 	/**
-	* Accessor : Adds a module title, if the variable exsists it sets it if it dosen't exsist it creates it
+	* Accessor : Adds a module title, if the variable exists, it sets it, if it doesn't exist, it creates it
 	*
 	* @param	string	mixed	The 3 digit number of the module
 	* @param	mixed	mixed	The value to set the module title to

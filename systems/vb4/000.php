@@ -124,7 +124,7 @@ class vb4_000 extends ImpExModule
 	);
 
 
-	public function __constructor()
+	public function __construct()
 	{
 	}
 

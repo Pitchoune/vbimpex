@@ -37,7 +37,7 @@ class ImpExDatabase extends ImpExDatabaseCore
 	*
 	* Empty
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 

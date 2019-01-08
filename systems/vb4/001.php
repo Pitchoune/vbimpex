@@ -16,12 +16,12 @@
 */
 class vb4_001 extends vb4_000
 {
-	function vb4_001(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['check_update_db'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		$displayobject->update_basic('title', $displayobject->phrases['get_db_info']);
 		$displayobject->update_html($displayobject->do_form_header('index', ''));
@@ -35,7 +35,7 @@ class vb4_001 extends vb4_000
 		$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		if (!$sessionobject->get_session_var('sourceexists'))
 		{

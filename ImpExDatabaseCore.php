@@ -33,7 +33,7 @@ class ImpExDatabaseCore extends ImpExFunction
 	/**
 	* Constructor
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 
@@ -983,7 +983,6 @@ class ImpExDatabaseCore extends ImpExFunction
 				return $avatar_info['avatarid'];
 			}
 		}
-		break;
 
 		// first we need to save the file.
 		$file_contents = $this->vb_file_get_contents($sourcefile);

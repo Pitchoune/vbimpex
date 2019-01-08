@@ -43,6 +43,7 @@ $impex_phrases['no_mssql_support']							= '<br /><br />Vous n\'avez pas le supp
 $impex_phrases['no_mssql_support_link']						= '<br />Veuillez consulter cette page : <a target="_blank" href="http://www.php.net/manual/fr/book.mssql.php">PHP MSSQL</a>';
 $impex_phrases['no_source_set']								= 'Aucune base de données source a été renseignée dans le fichier ImpExConfig.php';
 $impex_phrases['source_not_exist']							= 'La base de données source dans le fichier ImpExConfig.php n\'existe pas.';
+$impex_phrases['no_source_connection_check_login']			= 'La base de données source n\'a pas été sélectionnée. Êtes-vous certain des informations de connexion à la base de données source ?';
 $impex_phrases['sourceexists_is_false'] 					= 'Vous avez défini la variable sourceexists sur FALSE dans le fichier ImpExConfig.php, ceci signifie que vous ne souhaitez pas importer depuis une base de données, ce système utilise une base de données comme source.';
 $impex_phrases['failed_connection']							= 'La connexion au serveur source a échoué. Veuillez vérifier l\'identifiant et le mot de passe associé.';
 $impex_phrases['db_cleanup']								= 'Nettoyage de la base de données &amp; redémarrage';
@@ -238,7 +239,7 @@ $impex_phrases['assoc_match']								= 'Insérez l\'identifiant existant à côt
 $impex_phrases['no_users']									= 'Il n\'y a plus d\'utilisateurs vBulletin à associer, cliquez sur le bouton « Quitter » pour continuer.';
 $impex_phrases['assoc_not_matched']							= 'NOT done. It is most likely that vBulletin user';
 
-$impex_phrases['associating_users']							= 'Associating the users...';
+$impex_phrases['associating_users']							= 'Association des utilisateurs en cours...';
 
 $impex_phrases['associating_user_1']						= 'Associating user ';
 $impex_phrases['associating_user_2']						= ' (userid ';

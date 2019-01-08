@@ -25,7 +25,7 @@ class ImpExFunction
 	/**
 	* Constructor
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 

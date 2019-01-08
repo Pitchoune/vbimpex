@@ -94,7 +94,7 @@ class ImpExDisplay extends ImpExFunction
 	/**
 	* Constructor.
 	*/
-	public function __constructor()
+	public function __construct()
 	{
 	}
 
@@ -837,7 +837,7 @@ class ImpExDisplay extends ImpExFunction
 		}
 		else
 		{
-			$secondphrase = $seconds . $this->phrases['seconds'];
+			$secondphrase = $seconds . ' ' . $this->phrases['seconds'];
 		}
 
 		return '<p align="center">' . $this->phrases['module'] . ' : <b>' . $modulestring . '</b>. <i>' . $this->phrases['successful'] . '</i>, ' . $secondphrase . '.</p>
@@ -889,7 +889,8 @@ class ImpExDisplay extends ImpExFunction
 
 			$rt .= "\n</script>\n";
 
-			return $rt;
+			// No return here, we want to have the JS code to work, not something to display.
+			echo $rt;
 		}
 	}
 

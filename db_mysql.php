@@ -94,6 +94,8 @@ class ImpEx_Database_Mysql
 
 	var $querycount = 0;
 
+	var $require_db_reselect = false; // deal with bentness in php < 4.2.0
+
 	function __construct(&$registry)
 	{
 		if (is_object($registry))
