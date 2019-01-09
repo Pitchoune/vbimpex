@@ -203,6 +203,7 @@ $impex_phrases['no_rerun']									= 'You cannot RERUN this module, you need to 
 $impex_phrases['no_system']									= 'ImpEx has attempted to start a system it cannot find, this is most likely because the session was saved correctly after you chose the system. Please check database and try again or contact support.';
 $impex_phrases['units_per_page']							= 'Units per page (set to 500 per 4 Mb available in PHP)';
 $impex_phrases['invalid_target_selected']					= 'The incorrect target to export to has been chosen for this source system, restart the import with a new session and select the correct version and system to export to.';
+$impex_phrases['resume_failed']								= 'resume failed';
 
 #####################################
 # 001 Setup
@@ -271,6 +272,7 @@ $impex_phrases['users']										= 'Users';
 $impex_phrases['import_user']								= 'Import user';
 $impex_phrases['import_users']								= 'Import users';
 $impex_phrases['users_cleared']								= 'Imported users have been cleared';
+$impex_phrases['all_users_deleted']							= 'All users have been deleted.';
 
 $impex_phrases['users_per_page']							= 'Users to import per cycle (must be greater than 1)';
 $impex_phrases['email_match']								= 'Would you like to associated imported users with existing users if the <b>email</b> address matches ?';
@@ -284,6 +286,7 @@ $impex_phrases['avatar_size']								= 'Select largest avatar size allowed (sett
 $impex_phrases['path_x_not_found']	    					= 'Path: %1$s not found';
 
 $impex_phrases['no_user_to_import']							= 'There is no user to import.';
+$impex_phrases['userid_error']								= 'Userid error';
 
 #####################################
 # Import banlists
@@ -317,6 +320,7 @@ $impex_phrases['avatars_cleared']							= 'Imported avatars have been cleared';
 
 $impex_phrases['avatar_per_page']							= 'Avatars to import per cycle (must be greater than 1)';
 $impex_phrases['no_avatar_to_import']						= 'There is no avatar to import.';
+$impex_phrases['invalid_avatar_skipping']					= 'Invalid avatar object, skipping.';
 
 #####################################
 # Import custom avatars
@@ -530,6 +534,7 @@ $impex_phrases['user_not_imported']							= 'User not imported';
 $impex_phrases['user_not_imported_rem']						= 'Check source users profile is as complete as possible';
 $impex_phrases['user_restart_failed']						= 'Restart failed, clear_imported_users';
 $impex_phrases['user_restart_ok']							= 'Imported users have been cleared';
+$impex_phrases['user_check_db_perms']						= 'Check database permissions and user table';
 
 $impex_phrases['smilie_not_imported']						= 'Smilie not imported';
 $impex_phrases['smilie_not_imported_rem']					= 'Check source smilie details are as complete as possible';

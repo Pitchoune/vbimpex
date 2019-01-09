@@ -164,7 +164,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	none
 	*/
-	function ImpExData(&$Db_object, &$sessionobject, $type, $product = 'vbulletin')
+	public function __construct(&$Db_object, &$sessionobject, $type, $product = 'vbulletin')
 	{
 		$targetdatabasetype = $sessionobject->get_session_var('targetdatabasetype');
 		$targettableprefix = $sessionobject->get_session_var('targettableprefix');
@@ -173,11 +173,11 @@ class ImpExData extends ImpExDatabase
 		$this->_producttype = $product;
 
 		$this->_values = $this->create_data_type(
-				$Db_object,
-				$targetdatabasetype,
-				$targettableprefix,
-				$type,
-				$product
+			$Db_object,
+			$targetdatabasetype,
+			$targettableprefix,
+			$type,
+			$product
 		);
 
 		if (!$this->_values)
@@ -199,7 +199,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	none
 	*/
-	function is_valid()
+	public function is_valid()
 	{
 		$return_state = true;
 
@@ -279,12 +279,11 @@ class ImpExData extends ImpExDatabase
 	/**
 	* Returns the percentage completness of the object
 	*
-	* Calculated the NULL's from the total amount of elements to discover the percentage
-	* complete that the object is
+	* Calculated the NULL's from the total amount of elements to discover the percentage complete that the object is.
 	*
 	* @return	double
 	*/
-	function how_complete()
+	public function how_complete()
 	{
 		$totalelements = 0;
 		$nullelements = 0;
@@ -314,7 +313,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	mixed	string|NULL
 	*/
-	function get_value($section, $name)
+	public function get_value($section, $name)
 	{
 		if ($this->_values[$this->_datatype][$section][$name] != 'NULL')
 		{
@@ -326,7 +325,6 @@ class ImpExData extends ImpExDatabase
 		}
 	}
 
-
 	/**
 	* Accessor
 	*
@@ -336,7 +334,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	boolean
 	*/
-	function set_value($section, $name, $value)
+	public function set_value($section, $name, $value)
 	{
 		if (@array_key_exists($name, $this->_values[$this->_datatype][$section]))
 		{
@@ -348,7 +346,6 @@ class ImpExData extends ImpExDatabase
 			return false;
 		}
 	}
-
 
 	/**
 	* Accessor
@@ -374,7 +371,6 @@ class ImpExData extends ImpExDatabase
 		return $this->_has_default_values;
 	}
 
-
 	/**
 	* Accessor : Returns the array of default value
 	*
@@ -382,11 +378,10 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	boolean|array
 	*/
-	function get_default_values()
+	public function get_default_values()
 	{
 		return $this->_default_values;
 	}
-
 
 	/**
 	* Accessor
@@ -396,7 +391,7 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	boolean
 	*/
-	function add_custom_value($key, $value)
+	public function add_custom_value($key, $value)
 	{
 		if (empty($this->_custom_types[$key]))
 		{
@@ -420,10 +415,10 @@ class ImpExData extends ImpExDatabase
 	*
 	* @return	boolean|array
 	*/
-	function get_custom_values()
+	public function get_custom_values()
 	{
 		return $this->_custom_types;
 	}
 }
-/*======================================================================*/
+
 ?>

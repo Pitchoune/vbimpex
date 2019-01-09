@@ -8,22 +8,23 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Avatars
 *
 * @package 		ImpEx.vb4
-*
 */
+
 class vb4_007 extends vb4_000
 {
 	var $_dependent 	= '004';
 
-	function vb4_007(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_forums'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
@@ -74,7 +75,7 @@ class vb4_007 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules','FALSE');
@@ -93,15 +94,15 @@ class vb4_007 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		$forum_array 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $forum_start_at, $forum_per_page, 'forum', 'forumid');
+		$forum_array 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $forum_start_at, $forum_per_page, 'forum', 'forumid');
 		$users_ids 		= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		$forum_object = new ImpExData($Db_target, $sessionobject, 'forum');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['forums']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_forums']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($forum_array) . ' ' . $displayobject->phrases['forums'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $forum_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($forum_start_at + count($forum_array))));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($forum_array) . ' ' . $displayobject->phrases['forums'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($forum_start_at + 1) . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($forum_start_at + count($forum_array))));
 
 		if ($forum_array)
 		{
@@ -157,7 +158,7 @@ class vb4_007 extends vb4_000
 
 				// Can't get the id's for things that haven't been imported yet, will need to clean up afterwards
 				#$try->set_value('nonmandatory', 'childlist',		$details['childlist']);
-				#$try->set_value('nonmandatory', 'lastthreadid',		$details['lastthreadid']);
+				#$try->set_value('nonmandatory', 'lastthreadid',	$details['lastthreadid']);
 
 				if ($try->is_valid())
 				{
@@ -194,7 +195,7 @@ class vb4_007 extends vb4_000
 			$sessionobject->remove_session_var($class_num . '_start');
 			$this->build_forum_child_lists($Db_target, $target_database_type, $target_table_prefix);
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_forums'],
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -208,9 +209,9 @@ class vb4_007 extends vb4_000
 		else
 		{
 			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
-			$sessionobject->set_session_var('forumstartat', $forum_start_at+$forum_per_page);
+			$sessionobject->set_session_var('forumstartat', $forum_start_at + $forum_per_page);
 		}
 	}
 }
-/*======================================================================*/
+
 ?>

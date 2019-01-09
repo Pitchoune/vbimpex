@@ -12,18 +12,18 @@
 * vb4 Import Users groups and ranks
 *
 * @package 		ImpEx.vb4
-*
 */
+
 class vb4_003 extends vb4_000
 {
 	var $_dependent 	= '001';
 
-	function vb4_003($displayobject)
+	public function __construct($displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_usergroups'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
@@ -67,12 +67,12 @@ class vb4_003 extends vb4_000
 			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['dependency_error']));
 			$displayobject->update_html($displayobject->make_description('<p>' . $displayobject->phrases['dependant_on'] . '<i><b>' . $sessionobject->get_module_title($this->_dependent) . '</b>' . $displayobject->phrases['cant_run'] . '</i>.'));
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], ''));
-			$sessionobject->set_session_var(substr(get_class($this) , -3), 'FALSE');
+			$sessionobject->set_session_var(substr(get_class($this), -3), 'FALSE');
 			$sessionobject->set_session_var('module', '000');
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -82,27 +82,23 @@ class vb4_003 extends vb4_000
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
 
-		$class_num		= substr(get_class($this), -3);
+		$class_num = substr(get_class($this), -3);
 
 		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
-			$sessionobject->timing($class_num ,'start' ,$sessionobject->get_session_var('autosubmit'));
+			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		// *************
-		// Usergroups
-		// *************
-
 		// Get all the user groups
-		$usergroup_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, 0, -1, 'usergroup', 'usergroupid');
+		$usergroup_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, 0, -1, 'usergroup', 'usergroupid');
 
 		$usergroup_object = new ImpExData($Db_target, $sessionobject, 'usergroup');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_usergroup']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_usergroups']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($usergroup_array) . ' ' . $displayobject->phrases['usergroups'] . '</b>'));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($usergroup_array) . ' ' . $displayobject->phrases['usergroups'] . '</b>'));
 
 		// Do the user group array
 		foreach ($usergroup_array AS $user_group_id => $user_group)
@@ -141,46 +137,39 @@ class vb4_003 extends vb4_000
 			$try->set_value('nonmandatory', 'profilepicmaxheight',	$user_group['profilepicmaxheight']);
 			$try->set_value('nonmandatory', 'profilepicmaxsize',	$user_group['profilepicmaxsize']);
 
-
 			if ($try->is_valid())
 			{
 				if ($try->import_user_group($Db_target, $target_database_type, $target_table_prefix))
 				{
 					$displayobject->update_html($displayobject->make_description('<span class="isucc"><b>' . $try->how_complete() . '%</b></span> ' . $displayobject->phrases['usergroup'] . ' -> ' . $user_group['title']));
-					$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1 );
+					$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 				}
 				else
 				{
-					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1 );
+					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 					$sessionobject->add_error($user_group_id, $displayobject->phrases['usergroup_not_imported'], $displayobject->phrases['usergroup_not_imported_rem']);
 					$displayobject->update_html($displayobject->make_description($displayobject->phrases['failed'] . ' :: ' . $displayobject->phrases['usergroup_not_imported']));
 				}
 			}
 			else
 			{
-				$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1 );
-				$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object']  ."" . $try->_failedon));
+				$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
+				$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object']  . '' . $try->_failedon));
 			}
 		}
 		$displayobject->update_html($displayobject->table_footer());
 
-		// *************
-		// Ranks
-		// *************
-
 		$rank_object = new ImpExData($Db_target, $sessionobject, 'ranks');
 
-
 		// Get all the user group details from the target dB so we can match them to the
-		$usergroup_array = $this->get_details($Db_target, $targete_database_type, $target_table_prefix, 0, -1, 'usergroup', 'importusergroupid');
+		$usergroup_array = $this->get_details($Db_target, $targete_database_type, $target_table_prefix, $displayobject, 0, -1, 'usergroup', 'importusergroupid');
 
 		// Get the ranks from the source database to import
-		$ranks_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, 0, -1, 'ranks', 'rankid');
+		$ranks_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, 0, -1, 'ranks', 'rankid');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['ranks']));
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($ranks_array) . ' ' . $displayobject->phrases['ranks'] . '</b>'));
-
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_ranks']));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($ranks_array) . ' ' . $displayobject->phrases['ranks'] . '</b>'));
 
 		// Do the ranks array
 		if ($ranks_array)
@@ -201,7 +190,6 @@ class vb4_003 extends vb4_000
 				$try->set_value('nonmandatory', 'stack',		$rank['stack']);
 				$try->set_value('nonmandatory', 'display',		$rank['display']);
 
-
 				if ($try->is_valid())
 				{
 					if ($try->import_rank($Db_target, $target_database_type, $target_table_prefix))
@@ -219,9 +207,9 @@ class vb4_003 extends vb4_000
 				else
 				{
 					$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object'] . $try->_failedon));
-					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
+					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 				}
-			}// foreach
+			}
 		}
 		else
 		{
@@ -234,11 +222,7 @@ class vb4_003 extends vb4_000
 		$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 		$sessionobject->remove_session_var($class_num . '_start');
 
-		$displayobject->update_html($displayobject->module_finished($this->_modulestring,
-			$sessionobject->return_stats($class_num, '_time_taken'),
-			$sessionobject->return_stats($class_num, '_objects_done'),
-			$sessionobject->return_stats($class_num, '_objects_failed')
-		));
+		$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_usergroups'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
 		$sessionobject->set_session_var($class_num, 'FINISHED');
 		$sessionobject->set_session_var('module', '000');
@@ -247,10 +231,5 @@ class vb4_003 extends vb4_000
 		$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
 	}
 }
-/*======================================================================*\
-|| ####################################################################
-|| # Downloaded: [#]zeveuilddate[#]
-|| # CVS: $RCSfile$ - $Revision: $
-|| ####################################################################
-\*======================================================================*/
+
 ?>

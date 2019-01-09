@@ -412,13 +412,12 @@ if ($_GET['action'] == 'deldupe')
 	echo $ImpExDisplay->phrases['deleting_duplicates'];
 
 	// Users
-	/*$dupe_users = $Db_target->query("
+	$dupe_users = $Db_target->query("
 		SELECT MAX(userid) AS userid,
 			COUNT(*) AS count
 		FROM " . $targettableprefix . "user
 		WHERE importuserid > 0
 		GROUP BY importuserid
-			HAVING count > 1
 	");
 
 	while ($user = $Db_target->fetch_array($dupe_users))
@@ -426,7 +425,14 @@ if ($_GET['action'] == 'deldupe')
 		$user_to_delete[] = $user['userid'];
 	}
 
-	$users_found = count($user_to_delete);
+	if ($user_to_delete)
+	{
+		$users_found = count($user_to_delete);
+	}
+	else
+	{
+		$users_found = 0;
+	}
 
 	if ($users_found)
 	{
@@ -434,7 +440,7 @@ if ($_GET['action'] == 'deldupe')
 			DELETE FROM " . $targettableprefix . "user
 			WHERE userid IN(" . implode(',', $user_to_delete) . ")
 		");
-	}*/
+	}
 
 	// Forums
 	$dupe_forums = $Db_target->query("
@@ -443,7 +449,6 @@ if ($_GET['action'] == 'deldupe')
 		FROM " . $targettableprefix . "forum
 		WHERE importforumid > 0
 		GROUP BY importforumid
-			HAVING count > 1
 	");
 
 	while ($forum = $Db_target->fetch_array($dupe_forums))
@@ -451,7 +456,14 @@ if ($_GET['action'] == 'deldupe')
 		$forum_to_delete[] = $forum['forumid'];
 	}
 
-	$forums_found = count($forum_to_delete);
+	if ($forum_to_delete)
+	{
+		$forums_found = count($forum_to_delete);
+	}
+	else
+	{
+		$forums_found = 0;
+	}
 
 	if ($forums_found)
 	{
@@ -468,7 +480,6 @@ if ($_GET['action'] == 'deldupe')
 		FROM " . $targettableprefix . "thread
 		WHERE importthreadid > 0
 		GROUP BY importthreadid
-			HAVING count > 1
 	");
 
 	while ($thread = $Db_target->fetch_array($dupe_threads))
@@ -476,7 +487,14 @@ if ($_GET['action'] == 'deldupe')
 		$thread_to_delete[] = $thread['threadid'];
 	}
 
-	$threads_found = count($thread_to_delete);
+	if ($thread_to_delete)
+	{
+		$threads_found = count($thread_to_delete);
+	}
+	else
+	{
+		$threads_found = 0;
+	}
 
 	if ($threads_found)
 	{
@@ -493,7 +511,6 @@ if ($_GET['action'] == 'deldupe')
 		FROM " . $targettableprefix . "post
 		WHERE importpostid > 0
 		GROUP BY importpostid
-			HAVING count > 1
 	");
 
 	while ($post = $Db_target->fetch_array($dupe_posts))
@@ -501,7 +518,14 @@ if ($_GET['action'] == 'deldupe')
 		$post_to_delete[] = $post['postid'];
 	}
 
-	$posts_found = count($post_to_delete);
+	if ($post_to_delete)
+	{
+		$posts_found = count($post_to_delete);
+	}
+	else
+	{
+		$posts_found = 0;
+	}
 
 	if ($posts_found)
 	{
@@ -511,12 +535,12 @@ if ($_GET['action'] == 'deldupe')
 		");
 	}
 
-	//echo "<br>{$ImpExDisplay->phrases['users']} :: {$users_found}";
-	echo "<br />" . $ImpExDisplay->phrases['forums'] . " :: " . $forums_found . "";
-	echo "<br />" . $ImpExDisplay->phrases['threads'] . " :: " . $threads_found . "";
-	echo "<br />" . $ImpExDisplay->phrases['posts'] . " :: " . $posts_found . "";
+	echo '<br />' . $ImpExDisplay->phrases['users'] . ' :: ' . $users_found . '';
+	echo '<br />' . $ImpExDisplay->phrases['forums'] . ' :: ' . $forums_found . '';
+	echo '<br />' . $ImpExDisplay->phrases['threads'] . ' :: ' . $threads_found . '';
+	echo '<br />' . $ImpExDisplay->phrases['posts'] . ' :: ' . $posts_found . '';
 
-	echo "<br /><br />...<b>" . $ImpExDisplay->phrases['completed'] . "</b></p>";
+	echo '<br /><br />...<b>' . $ImpExDisplay->phrases['completed'] . '</b></p>';
 	echo $ImpExDisplay->phrases['click_to_return'];
 }
 

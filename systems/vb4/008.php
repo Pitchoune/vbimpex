@@ -8,28 +8,29 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Threads
 *
 * @package 		ImpEx.vb4
-*
 */
+
 class vb4_008 extends vb4_000
 {
 	var $_dependent 	= '007';
 
-	function vb4_008(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_threads'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
 			if ($this->_restart)
 			{
-				if ($this->restart($sessionobject, $displayobject, $Db_target, $Db_source,'clear_imported_threads'))
+				if ($this->restart($sessionobject, $displayobject, $Db_target, $Db_source, 'clear_imported_threads'))
 				{
 					$displayobject->update_html($displayobject->table_header());
 					$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
@@ -72,7 +73,7 @@ class vb4_008 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -92,15 +93,15 @@ class vb4_008 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		$thread_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $thread_start_at, $thread_per_page, 'thread', 'threadid');
+		$thread_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $thread_start_at, $thread_per_page, 'thread', 'threadid');
 		$forum_ids = $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		$thread_object = new ImpExData($Db_target, $sessionobject, 'thread');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['threads']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_threads']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($thread_array) . ' ' . $displayobject->phrases['threads'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $thread_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($thread_start_at + count($thread_array))));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($thread_array) . ' ' . $displayobject->phrases['threads'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($thread_start_at + 1) . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($thread_start_at + count($thread_array))));
 
 		if ($thread_array)
 		{
@@ -174,7 +175,7 @@ class vb4_008 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_threads'],
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -192,5 +193,5 @@ class vb4_008 extends vb4_000
 		}
 	}
 }
-/*======================================================================*/
+
 ?>

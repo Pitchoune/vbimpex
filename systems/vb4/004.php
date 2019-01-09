@@ -18,12 +18,12 @@ class vb4_004 extends vb4_000
 {
 	var $_dependent = '003';
 
-	function vb4_004(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_users'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
@@ -51,13 +51,13 @@ class vb4_004 extends vb4_000
 
 			// Ask some questions
 			$displayobject->update_html($displayobject->make_input_code($displayobject->phrases['users_per_page'], 'perpage', 500));
-			$displayobject->update_html($displayobject->make_yesno_code($displayobject->phrases['email_match'], "email_match", 0));
+			$displayobject->update_html($displayobject->make_yesno_code($displayobject->phrases['email_match'], 'email_match', 0));
 
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], $displayobject->phrases['reset']));
 
-			$sessionobject->add_session_var(substr(get_class($this) , -3) . '_objects_done', '0');
-			$sessionobject->add_session_var(substr(get_class($this) , -3) . '_objects_failed', '0');
-			$sessionobject->add_session_var('startat','0');
+			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
+			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
+			$sessionobject->add_session_var('startat', '0');
 		}
 		else
 		{
@@ -66,12 +66,12 @@ class vb4_004 extends vb4_000
 			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['dependency_error']));
 			$displayobject->update_html($displayobject->make_description('<p>' . $displayobject->phrases['dependant_on'] . '<i><b>' . $sessionobject->get_module_title($this->_dependent) . '</b>' . $displayobject->phrases['cant_run'] . '</i>.'));
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], ''));
-			$sessionobject->set_session_var(substr(get_class($this),  -3), 'FALSE');
+			$sessionobject->set_session_var(substr(get_class($this), -3), 'FALSE');
 			$sessionobject->set_session_var('module', '000');
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -83,13 +83,12 @@ class vb4_004 extends vb4_000
 
 		$user_start_at			= $sessionobject->get_session_var('startat');
 		$user_per_page			= $sessionobject->get_session_var('perpage');
-		$class_num				= substr(get_class($this) , -3);
-
+		$class_num				= substr(get_class($this), -3);
 
 		// Start the timing
-		if(!$sessionobject->get_session_var($class_num . '_start'))
+		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
-			$sessionobject->timing($class_num ,'start' ,$sessionobject->get_session_var('autosubmit'));
+			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
 		// Check and clear the NON admin users
@@ -97,29 +96,29 @@ class vb4_004 extends vb4_000
 		{
 			if ($this->clear_non_admin_users($Db_target, $target_database_type, $target_table_prefix))
 			{
-				$displayobject->display_now("<b>All users deleted</b>");
-				$sessionobject->set_session_var('clear_non_admin_users','0');
+				$displayobject->display_now('<b>' . $displayobject->phrases['all_users_deleted'] . '</b>');
+				$sessionobject->set_session_var('clear_non_admin_users', '0');
 			}
 			else
 			{
-				$sessionobject->add_error('fatal', $this->_modulestring, get_class($this) . "::resume failed , clear_non_admin_users", 'Check database permissions and user table');
+				$sessionobject->add_error('fatal', $this->_modulestring, get_class($this) . '::' . $displayobject->phrases['resume_failed'] . ' , clear_non_admin_users', $displayobject->phrases['user_check_db_perms']);
 			}
 		}
 
 		// Get the banned and done (associated users)
-		$bannedgroup =  $this->get_banned_group($Db_target, $target_database_type, $target_table_prefix);
-		$doneusers	 =  $this->get_done_user_ids($Db_target, $target_database_type, $target_table_prefix);
+		$bannedgroup = $this->get_banned_group($Db_target, $target_database_type, $target_table_prefix);
+		$doneusers	 = $this->get_done_user_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		// Get a page worths of users and their various details
-		$user_array 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, 'user', 'userid');
-		$signatures 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, 'usertextfield', 'userid');
-		$userfield 		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $user_start_at, $user_per_page, 'userfield', 'userid');
-		$usergroup 		= $this->get_details($Db_target, $target_database_type, $target_table_prefix, 0, -1, 'usergroup', 'importusergroupid');
+		$user_array 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $user_start_at, $user_per_page, 'user', 'userid');
+		$signatures 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $user_start_at, $user_per_page, 'usertextfield', 'userid');
+		$userfield		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $user_start_at, $user_per_page, 'userfield', 'userid');
+		$usergroup		= $this->get_details($Db_target, $target_database_type, $target_table_prefix, $displayobject, 0, -1, 'usergroup', 'importusergroupid');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['users']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_users']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($user_array) . ' ' . $displayobject->phrases['users'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $user_start_at . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($user_start_at + count($user_array))));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($user_array) . ' ' . $displayobject->phrases['users'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($user_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($user_start_at + count($user_array))));
 
 		$user_object = new ImpExData($Db_target, $sessionobject, 'user');
 
@@ -139,7 +138,6 @@ class vb4_004 extends vb4_000
 			$try->set_value('mandatory', 'username',			$user['username']);
 			$try->set_value('mandatory', 'email',				$user['email']);
 			$try->set_value('mandatory', 'importuserid',		$user_id);
-
 
 			if ($user['referrerid'])
 			{
@@ -195,7 +193,7 @@ class vb4_004 extends vb4_000
 			$old_groups = explode(",", $user['membergroupids']);
 			$new_groups = '';
 
-			foreach($old_groups AS $old_id)
+			foreach ($old_groups AS $old_id)
 			{
 				$new_groups .= $usergroup[$old_id]['usergroupid'] . ',';
 			}
@@ -241,17 +239,12 @@ class vb4_004 extends vb4_000
 
 		if (count($user_array) == 0 OR count($user_array) < $user_per_page)
 		{
-			// build_user_statistics();
 			$this->build_user_statistics($Db_target, $target_database_type, $target_table_prefix);
 
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
-				$sessionobject->return_stats($class_num, '_time_taken'),
-				$sessionobject->return_stats($class_num, '_objects_done'),
-				$sessionobject->return_stats($class_num, '_objects_failed')
-			));
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_users'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
 			$sessionobject->set_session_var($class_num , 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
@@ -260,11 +253,10 @@ class vb4_004 extends vb4_000
 		}
 		else
 		{
-			$sessionobject->set_session_var('startat', $user_start_at+$user_per_page);
+			$sessionobject->set_session_var('startat', $user_start_at + $user_per_page);
 			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
 		}
 	}
 }
-/*======================================================================*/
-?>
 
+?>

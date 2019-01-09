@@ -8,22 +8,23 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Posts
 *
 * @package 		ImpEx.vb4
-*
 */
+
 class vb4_009 extends vb4_000
 {
 	var $_dependent 	= '007';
 
-	function vb4_009(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_posts'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
@@ -72,7 +73,7 @@ class vb4_009 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -83,6 +84,7 @@ class vb4_009 extends vb4_000
 
 		$post_start_at 			= $sessionobject->get_session_var('poststartat');
 		$post_per_page 			= $sessionobject->get_session_var('postperpage');
+
 		$idcache 				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 		$class_num				= substr(get_class($this), -3);
 
@@ -96,12 +98,12 @@ class vb4_009 extends vb4_000
 			$post_per_page = 150;
 		}
 
-		$post_array	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $post_start_at, $post_per_page, 'post', 'postid');
+		$post_array	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $post_start_at, $post_per_page, 'post', 'postid');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['posts']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_posts']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($post_array) . ' ' . $displayobject->phrases['posts'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $post_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($post_start_at + count($post_array))));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($post_array) . ' ' . $displayobject->phrases['posts'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($post_start_at + 1) . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($post_start_at + count($post_array))));
 
 		$post_object = new ImpExData($Db_target, $sessionobject, 'post');
 
@@ -165,7 +167,7 @@ class vb4_009 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_posts'],
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -178,10 +180,10 @@ class vb4_009 extends vb4_000
 		}
 		else
 		{
-			$sessionobject->set_session_var('poststartat', $post_start_at+$post_per_page);
+			$sessionobject->set_session_var('poststartat', $post_start_at + $post_per_page);
 			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
 		}
 	}
 }
-/*======================================================================*/
+
 ?>

@@ -8,22 +8,23 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Avatars
 *
 * @package 		ImpEx.vb4
-*
 */
+
 class vb4_006 extends vb4_000
 {
 	var $_dependent = '004';
 
-	function vb4_006(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_cust_pics'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		$proceed = $this->check_order($sessionobject, $this->_dependent);
 
@@ -52,7 +53,7 @@ class vb4_006 extends vb4_000
 			$displayobject->update_html($displayobject->make_hidden_code(substr(get_class($this), -3), 'WORKING'));
 			$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
 
-			$displayobject->update_html($displayobject->make_input_code($displayobject->phrases['cust_pics_per_page'], 'custompicsperpage',50));
+			$displayobject->update_html($displayobject->make_input_code($displayobject->phrases['cust_pics_per_page'], 'custompicsperpage', 50));
 
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], $displayobject->phrases['reset']));
 
@@ -68,12 +69,12 @@ class vb4_006 extends vb4_000
 			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['dependency_error']));
 			$displayobject->update_html($displayobject->make_description('<p>' . $displayobject->phrases['dependant_on'] . '<i><b>' . $sessionobject->get_module_title($this->_dependent) . '</b>' . $displayobject->phrases['cant_run'] . '</i>.'));
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], ''));
-			$sessionobject->set_session_var(substr(get_class($this) , -3),'FALSE');
-			$sessionobject->set_session_var('module','000');
+			$sessionobject->set_session_var(substr(get_class($this) , -3), 'FALSE');
+			$sessionobject->set_session_var('module', '000');
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -93,14 +94,14 @@ class vb4_006 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		$customprofilepic_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $custom_pics_start_at, $custom_pics_per_page, 'customprofilepic', 'userid');
+		$customprofilepic_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $custom_pics_start_at, $custom_pics_per_page, 'customprofilepic', 'userid');
 
 		$customprofilepic_object = new ImpExData($Db_target, $sessionobject, 'customprofilepic');
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['cust_pics']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_cust_pics']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($customprofilepic_array) . ' ' . $displayobject->phrases['cust_pics'] . '</b>'));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($customprofilepic_array) . ' ' . $displayobject->phrases['cust_pics'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($custom_pics_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($custom_pics_start_at + count($customprofilepic_array))));
 
 		if ($customprofilepic_array)
 		{
@@ -114,8 +115,8 @@ class vb4_006 extends vb4_000
 
 				if (!$userid)
 				{
-					$displayobject->display_now("<br />Userid error");
-					$sessionobject->set_session_var($class_num . '_objects_failed',$sessionobject->get_session_var($class_num. '_objects_failed') + 1 );
+					$displayobject->display_now('<br />' . $displayobject->phrases['userid_error']);
+					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 					continue;
 				}
 				$try->set_value('nonmandatory', 'userid',					$userid);
@@ -128,19 +129,19 @@ class vb4_006 extends vb4_000
 				{
 					if ($try->import_custom_profile_pic($Db_target, $target_database_type, $target_table_prefix))
 					{
-						$displayobject->display_now('<br /><span class="isucc"><b>' . $try->how_complete() . '%</b></span> ' . $displayobject->phrases['cus_pic'] . ' -> ' . $try->get_value('nonmandatory', 'filename'));
-						$sessionobject->add_session_var($class_num  . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
+						$displayobject->update_html($displayobject->make_description('<span class="isucc"><b>' . $try->how_complete() . '%</b></span> ' . $displayobject->phrases['cus_pic'] . ' -> ' . $try->get_value('nonmandatory', 'filename')));
+						$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
 					}
 					else
 					{
-						$sessionobject->set_session_var($class_num . '_objects_failed',$sessionobject->get_session_var($class_num. '_objects_failed') + 1 );
+						$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 						$sessionobject->add_error($cust_pic_id, $displayobject->phrases['custom_profile_pic_not_imported'], $displayobject->phrases['custom_profile_pic_not_imported_rem']);
-						$displayobject->display_now("<br />{$displayobject->phrases['failed']} :: {$displayobject->phrases['custom_profile_pic_not_imported']}");
+						$displayobject->update_html($displayobject->make_description($displayobject->phrases['failed'] . ' :: ' . $displayobject->phrases['custom_profile_pic_not_imported']));
 					}
 				}
 				else
 				{
-					$displayobject->display_now("<br />Invalid avatar object, skipping." . $try->_failedon);
+					$displayobject->display_now('<br />' . $displayobject->phrases['invalid_avatar_skipping'] . $try->_failedon);
 				}
 				unset($try);
 			}
@@ -157,11 +158,7 @@ class vb4_006 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
-				$sessionobject->return_stats($class_num, '_time_taken'),
-				$sessionobject->return_stats($class_num, '_objects_done'),
-				$sessionobject->return_stats($class_num, '_objects_failed')
-			));
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_cust_pics'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
@@ -175,6 +172,5 @@ class vb4_006 extends vb4_000
 		}
 	}
 }
-/*======================================================================*/
-?>
 
+?>

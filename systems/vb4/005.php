@@ -18,12 +18,12 @@ class vb4_005 extends vb4_000
 {
 	var $_dependent = '004';
 
-	function vb4_005(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_avatars'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		$proceed = $this->check_order($sessionobject, $this->_dependent);
 
@@ -41,7 +41,7 @@ class vb4_005 extends vb4_000
 				}
 				else
 				{
-					$sessionobject->add_error(substr(get_class($this) , -3), $displayobject->phrases['avatar_restart_failed'], $displayobject->phrases['check_db_permissions']);
+					$sessionobject->add_error(substr(get_class($this), -3), $displayobject->phrases['avatar_restart_failed'], $displayobject->phrases['check_db_permissions']);
 				}
 			}
 
@@ -72,7 +72,7 @@ class vb4_005 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Set up working variables.
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -92,19 +92,16 @@ class vb4_005 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		// ************
-		// Do the normal avatars first
-		// ************
 		if ($sessionobject->get_session_var('normal_avatars_done') != 'yes')
 		{
-			$avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, 0, -1, 'avatar', 'avatarid');
+			$avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, 0, -1, 'avatar', 'avatarid');
 
 			$displayobject->update_html($displayobject->table_header());
-			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['avatars']));
+			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_avatars']));
 
 			$avatar_object = new ImpExData($Db_target, $sessionobject, 'avatar');
 
-			$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($avatar_array) . ' ' . $displayobject->phrases['avatars'] . '</b>'));
+			$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($avatar_array) . ' ' . $displayobject->phrases['avatars'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($avatar_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($avatar_start_at + count($avatar_array))));
 
 			if ($avatar_array)
 			{
@@ -150,19 +147,15 @@ class vb4_005 extends vb4_000
 
 		$displayobject->update_html($displayobject->table_footer());
 
-		// ************
-		// Now do the custom ones
-		// ************
-
 		$customavatar_object = new ImpExData($Db_target, $sessionobject, 'customavatar');
 
-		$custom_avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $avatar_start_at, $avatar_per_page, 'customavatar', 'userid');
+		$custom_avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $avatar_start_at, $avatar_per_page, 'customavatar', 'userid');
 		$users_ids = $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['custom_avatars']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_custom_avatars']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($custom_avatar_array) . ' ' . $displayobject->phrases['custom_avatars'] . '</b>'));
+		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($custom_avatar_array) . ' ' . $displayobject->phrases['custom_avatars'] . '</b>'));
 
 		if ($custom_avatar_array)
 		{
@@ -253,11 +246,7 @@ class vb4_005 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
-				$sessionobject->return_stats($class_num, '_time_taken'),
-				$sessionobject->return_stats($class_num, '_objects_done'),
-				$sessionobject->return_stats($class_num, '_objects_failed')
-			));
+			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_avatars'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
 			$sessionobject->set_session_var($class_num ,'FINISHED');
 			$sessionobject->set_session_var('module', '000');
@@ -271,5 +260,5 @@ class vb4_005 extends vb4_000
 		}
 	}
 }
-/*======================================================================*/
+
 ?>

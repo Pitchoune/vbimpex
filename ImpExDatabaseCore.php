@@ -500,15 +500,15 @@ class ImpExDatabaseCore extends ImpExFunction
 				" . intval($this->get_value('mandatory', 'importuserid')) . ",
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'password')) . "',
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'salt')) . "',
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'passworddate')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'passworddate')) . "',
 				" . intval($this->get_value('nonmandatory', 'options')) . ",
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'homepage')) . "',
 				" . intval($this->get_value('nonmandatory', 'posts')) . ",
 				" . intval($this->get_value('nonmandatory', 'joindate')) . ",
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'icq')) . "',
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'daysprune')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'daysprune')) . "',
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'aim')) . "',
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'membergroupids')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'membergroupids')) . "',
 				" . intval($this->get_value('nonmandatory', 'displaygroupid')) . ",
 				" . intval($this->get_value('nonmandatory', 'styleid')) . ",
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'parentemail')) . "',
@@ -521,15 +521,15 @@ class ImpExDatabaseCore extends ImpExFunction
 				" . intval($this->get_value('nonmandatory', 'lastpost')) . ",
 				" . intval($this->get_value('nonmandatory', 'reputation')) . ",
 				" . intval($this->get_value('nonmandatory', 'reputationlevelid')) . ",
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'timezoneoffset')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'timezoneoffset')) . "',
 				" . intval($this->get_value('nonmandatory', 'pmpopup')) . ",
 				" . intval($this->get_value('nonmandatory', 'avatarid')) . ",
 				" . intval($this->get_value('nonmandatory', 'avatarrevision')) . ",
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'birthday')) . "',
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'birthday_search')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'birthday')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'birthday_search')) . "',
 				" . intval($this->get_value('nonmandatory', 'maxposts')) . ",
 				" . intval($this->get_value('nonmandatory', 'startofweek')) . ",
-				'" . $Db_onject->escape_string($this->get_value('nonmandatory', 'ipaddress')) . "',
+				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'ipaddress')) . "',
 				" . intval($this->get_value('nonmandatory', 'referrerid')) . ",
 				" . intval($this->get_value('nonmandatory', 'languageid')) . ",
 				'" . $Db_object->escape_string($this->get_value('nonmandatory', 'msn')) . "',
@@ -3233,7 +3233,7 @@ class ImpExDatabaseCore extends ImpExFunction
 			$file_sz = 0;
 		}
 
-		$sql = $Db_object->query("
+		$sql = "
 			INSERT INTO " . $tableprefix . "customprofilepic
 				(importcustomprofilepicid, userid, filedata, dateline, filename, visible, filesize, height, width)
 			VALUES
@@ -3246,7 +3246,7 @@ class ImpExDatabaseCore extends ImpExFunction
 				" . intval($file_sz) . ",
 				" . intval($height) . ",
 				" . intval($width)  .")
-		");
+		";
 
 		if ($Db_object->query($sql))
 		{
@@ -3522,15 +3522,6 @@ class ImpExDatabaseCore extends ImpExFunction
 			return $return_array;
 		}
 
-		/*if (!$orderby)
-		{
-			$sql = "SELECT * FROM " . $tableprefix . $type;
-		}
-		else
-		{
-			$sql = "SELECT * FROM " . $tableprefix . $type . " ORDER BY " . $orderby;
-		}*/
-
 		if ($per_page != -1)
 		{
 			$sql .= " LIMIT " . $start . "," . $per_page;
@@ -3538,7 +3529,7 @@ class ImpExDatabaseCore extends ImpExFunction
 
 		$details_list = $Db_object->query("
 			SELECT * FROM " . $tableprefix . $type . "
-			" . ($orderby ? " ORDER BY " . $orderby : '') . "
+			" . ($orderby ? " ORDER BY " . $orderby : '') . $sql . "
 		");
 
 		while ($detail = $Db_object->fetch_array($details_list))
