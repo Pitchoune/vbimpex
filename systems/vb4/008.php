@@ -60,6 +60,7 @@ class vb4_008 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('threadstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -75,13 +76,17 @@ class vb4_008 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$thread_start_at		= $sessionobject->get_session_var('threadstartat');
 		$thread_per_page		= $sessionobject->get_session_var('threadperpage');
 		$idcache 				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
@@ -93,15 +98,21 @@ class vb4_008 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($pthread_per_page) == 0)
+		{
+			$thread_per_page = 150;
+		}
+
 		$thread_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $thread_start_at, $thread_per_page, 'thread', 'threadid');
 		$forum_ids = $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		$thread_object = new ImpExData($Db_target, $sessionobject, 'thread');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_threads']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($thread_array) . ' ' . $displayobject->phrases['threads'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($thread_start_at + 1) . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($thread_start_at + count($thread_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($thread_array), $displayobject->phrases['threads_lower'], $thread_start_at));
 
 		if ($thread_array)
 		{
@@ -175,7 +186,7 @@ class vb4_008 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_threads'],
+			$displayobject->update_html($displayobject->module_finished($modulestring,
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -184,12 +195,12 @@ class vb4_008 extends vb4_000
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
 		{
-			$sessionobject->set_session_var('threadstartat', $thread_start_at+$thread_per_page);
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$sessionobject->set_session_var('threadstartat', $thread_start_at + $thread_per_page);
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }

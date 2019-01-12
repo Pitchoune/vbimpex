@@ -8,24 +8,24 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Polls
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_010 extends vb4_000
 {
 	var $_dependent 	= '008';
 
-	function vb4_010(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_polls'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
-		if ($this->check_order($sessionobject,$this->_dependent))
+		if ($this->check_order($sessionobject, $this->_dependent))
 		{
 			if ($this->_restart)
 			{
@@ -59,6 +59,7 @@ class vb4_010 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('pollstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -72,18 +73,21 @@ class vb4_010 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
-		$displayobject->update_basic('displaymodules','FALSE');
+		// Turn off the modules display
+		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type 	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$poll_start_at 			= $sessionobject->get_session_var('pollstartat');
 		$poll_per_page 			= $sessionobject->get_session_var('pollperpage');
-
 		$class_num				= substr(get_class($this), -3);
 		$displayobject->update_basic('displaymodules', 'FALSE');
 
@@ -101,10 +105,11 @@ class vb4_010 extends vb4_000
 		$poll_array	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $poll_start_at, $poll_per_page, 'poll', 'pollid');
 		$thread_ids = $this->get_threads_ids($Db_target, $target_database_type, $target_table_prefix);
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['polls']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_polls']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($poll_array) . ' ' . $displayobject->phrases['polls'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $poll_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($poll_start_at + count($poll_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($poll_array), $displayobject->phrases['polls_lower'], $poll_start_at));
 
 		$poll_object = new ImpExData($Db_target, $sessionobject, 'poll');
 
@@ -178,7 +183,7 @@ class vb4_010 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($modulestring,
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -187,19 +192,14 @@ class vb4_010 extends vb4_000
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
 		{
 			$sessionobject->set_session_var('pollstartat', $poll_start_at + $poll_per_page);
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }
-/*======================================================================*\
-|| ####################################################################
-|| # Downloaded: [#]zeveuilddate[#]
-|| # CVS: $RCSfile$ - $Revision: $
-|| ####################################################################
-\*======================================================================*/
+
 ?>

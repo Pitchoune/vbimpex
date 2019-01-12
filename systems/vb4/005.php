@@ -8,11 +8,11 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Avatars
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_005 extends vb4_000
 {
@@ -59,6 +59,7 @@ class vb4_005 extends vb4_000
 
 			$sessionobject->add_session_var('avatarsstartat', '0');
 			$sessionobject->add_session_var('normal_avatars_done', 'no');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -74,14 +75,17 @@ class vb4_005 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix	= $sessionobject->get_session_var('targettableprefix');
-
 		$source_database_type	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$avatar_start_at		= $sessionobject->get_session_var('avatarsstartat');
 		$avatar_per_page		= $sessionobject->get_session_var('avatarperpage');
 		$class_num				= substr(get_class($this), -3);
@@ -96,12 +100,13 @@ class vb4_005 extends vb4_000
 		{
 			$avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, 0, -1, 'avatar', 'avatarid');
 
+			// Give the user some info
 			$displayobject->update_html($displayobject->table_header());
 			$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_avatars']));
 
 			$avatar_object = new ImpExData($Db_target, $sessionobject, 'avatar');
 
-			$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($avatar_array) . ' ' . $displayobject->phrases['avatars'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($avatar_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($avatar_start_at + count($avatar_array))));
+			$displayobject->update_html($displayobject->print_per_page_pass(count($avatar_array), $displayobject->phrases['avatars_lower'], $avatar_start_at));
 
 			if ($avatar_array)
 			{
@@ -230,7 +235,6 @@ class vb4_005 extends vb4_000
 					$sessionobject->set_session_var($class_num . '_objects_failed',$sessionobject->get_session_var($class_num. '_objects_failed') + 1);
 					$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object'] . $try->_failedon));
 				}
-
 				unset($try);
 			}
 		}
@@ -246,17 +250,21 @@ class vb4_005 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_avatars'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+			$displayobject->update_html($displayobject->module_finished($modulestring,
+				$sessionobject->return_stats($class_num, '_time_taken'),
+				$sessionobject->return_stats($class_num, '_objects_done'),
+				$sessionobject->return_stats($class_num, '_objects_failed')
+			));
 
 			$sessionobject->set_session_var($class_num ,'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
-		{
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+		{	
 			$sessionobject->set_session_var('avatarsstartat', $avatar_start_at+$avatar_per_page);
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }

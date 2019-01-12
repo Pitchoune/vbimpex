@@ -8,22 +8,22 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Moderators
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_012 extends vb4_000
 {
 	var $_dependent 	= '007';
 
-	function vb4_012(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_moderators'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject, $this->_dependent))
 		{
@@ -59,6 +59,7 @@ class vb4_012 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('moderatorstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -74,14 +75,17 @@ class vb4_012 extends vb4_000
 
 	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
 
-		// Set up working variables.
+		// Get some more usable local vars
 		$target_database_type 	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$moderator_start_at		= $sessionobject->get_session_var('moderatorstartat');
 		$moderator_per_page		= $sessionobject->get_session_var('moderatorperpage');
 
@@ -89,25 +93,27 @@ class vb4_012 extends vb4_000
 		$moderator_object 		= new ImpExData($Db_target, $sessionobject, 'moderator');
 		$idcache 				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 
-		if (intval($moderator_per_page) == 0)
-		{
-			$moderator_per_page = 200;
-		}
-
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		$moderator_array 		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $moderator_start_at, $moderator_per_page, 'moderator', 'moderatorid');
+		if (intval($moderator_per_page) == 0)
+		{
+			$moderator_per_page = 200;
+		}
+
+		$moderator_array 		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $moderator_start_at, $moderator_per_page, 'moderator', 'moderatorid');
 		$forumids_array			= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 
 		$last_pass 				= $sessionobject->get_session_var('last_pass');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['moderators']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_moderators']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($moderator_array) . ' ' . $displayobject->phrases['moderators'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $moderator_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($moderator_start_at + count($moderator_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($moderator_array), $displayobject->phrases['moderators_lower'], $moderator_start_at));
 
 		if ($moderator_array)
 		{
@@ -159,7 +165,7 @@ class vb4_012 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($modulestring,
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -168,7 +174,7 @@ class vb4_012 extends vb4_000
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', '1'));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
 		{
@@ -177,10 +183,5 @@ class vb4_012 extends vb4_000
 		}
 	}
 }
-/*======================================================================*\
-|| ####################################################################
-|| # Downloaded: [#]zDCFmuilddate[#]
-|| # CVS: $RCSfile$ - $Revision: $
-|| ####################################################################
-\*======================================================================*/
+
 ?>

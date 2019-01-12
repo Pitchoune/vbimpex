@@ -8,11 +8,11 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Associate Users
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_002 extends vb4_000
 {
@@ -44,6 +44,7 @@ class vb4_002 extends vb4_000
 
 			$sessionobject->add_session_var('doassociate', '0');
 			$sessionobject->add_session_var('associatestartat', '0');
+			$sessionobject->add_session_Var('modulestring', $this->modulestring);
 		}
 		else
 		{
@@ -69,13 +70,14 @@ class vb4_002 extends vb4_000
 		$target_table_prefix	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
 		// Get some usable variables
 		$associate_users		= 	$sessionobject->get_session_var('associateusers');
 		$do_associate			=	$sessionobject->get_session_var('doassociate');
 		$class_num				= 	substr(get_class($this) , -3);
 
-		// Start the timings
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
@@ -99,7 +101,7 @@ class vb4_002 extends vb4_000
 			// Build the list
 			foreach ($user_array AS $userid => $user_details)
 			{
-				$displayobject->update_html($displayobject->make_input_code("$counter) " . $displayobject->phrases['user_id'] . " - " . $userid . " :: " . $user_details['username'], 'user_to_ass_' . $userid, '', 10));
+				$displayobject->update_html($displayobject->make_input_code($counter . ') ' . $displayobject->phrases['user_id'] . ' - ' . $userid . ' :: ' . $user_details['username'], 'user_to_ass_' . $userid, '', 10));
 				$any_more = true;
 				$counter++;
 			}
@@ -175,11 +177,16 @@ class vb4_002 extends vb4_000
 			$displayobject->update_html($displayobject->make_description('<p align="center">' . $displayobject->phrases['completed'] . '. ' . $displayobject->phrases['redirecting'] . '</p>'));
 			$displayobject->update_html($displayobject->table_footer());
 
-			
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 			$sessionobject->add_session_var($class_num . '_objects_done', intval($counter));
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['associate_users'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+
+			$displayobject->update_html($displayobject->module_finished($modulestring,
+				$sessionobject->return_stats($class_num, '_time_taken'),
+				$sessionobject->return_stats($class_num, '_objects_done'),
+				$sessionobject->return_stats($class_num, '_objects_failed')
+			));
+
 			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$displayobject->update_basic('displaymodules', FALSE);

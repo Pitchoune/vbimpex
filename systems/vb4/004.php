@@ -8,11 +8,11 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Users module
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_004 extends vb4_000
 {
@@ -58,6 +58,7 @@ class vb4_004 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('startat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -73,14 +74,17 @@ class vb4_004 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix	= $sessionobject->get_session_var('targettableprefix');
-
 		$source_database_type	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$user_start_at			= $sessionobject->get_session_var('startat');
 		$user_per_page			= $sessionobject->get_session_var('perpage');
 		$class_num				= substr(get_class($this), -3);
@@ -115,124 +119,131 @@ class vb4_004 extends vb4_000
 		$userfield		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $user_start_at, $user_per_page, 'userfield', 'userid');
 		$usergroup		= $this->get_details($Db_target, $target_database_type, $target_table_prefix, $displayobject, 0, -1, 'usergroup', 'importusergroupid');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_users']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($user_array) . ' ' . $displayobject->phrases['users'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($user_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($user_start_at + count($user_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($user_array), $displayobject->phrases['users_lower'], $user_start_at));
 
 		$user_object = new ImpExData($Db_target, $sessionobject, 'user');
 
-		foreach ($user_array AS $user_id => $user)
+		if ($user_array)
 		{
-			$try = (phpversion() < '5' ? $user_object : clone($user_object));
-
-			// Auto associate
-			if ($sessionobject->get_session_var('email_match'))
+			foreach ($user_array AS $user_id => $user)
 			{
-				$try->_auto_email_associate = true;
-			}
+				$try = (phpversion() < '5' ? $user_object : clone($user_object));
 
-			// ID mapping
-
-			$try->set_value('mandatory', 'usergroupid',			$usergroup["$user[usergroupid]"]['usergroupid']);
-			$try->set_value('mandatory', 'username',			$user['username']);
-			$try->set_value('mandatory', 'email',				$user['email']);
-			$try->set_value('mandatory', 'importuserid',		$user_id);
-
-			if ($user['referrerid'])
-			{
-				$try->set_value('nonmandatory', 'referrerid',	$this->get_vb_userid($Db_target, $target_database_type, $target_table_prefix, $user['referrerid']));
-			}
-
-			$try->set_value('nonmandatory', 'password',			$user['password']);
-			$try->set_value('nonmandatory', 'passworddate',		$user['passworddate']);
-			$try->set_value('nonmandatory', 'parentemail',		$user['parentemail']);
-			$try->set_value('nonmandatory', 'homepage',			$user['homepage']);
-			$try->set_value('nonmandatory', 'icq',				$user['icq']);
-			$try->set_value('nonmandatory', 'aim',				$user['aim']);
-			$try->set_value('nonmandatory', 'yahoo',			$user['yahoo']);
-			$try->set_value('nonmandatory', 'showvbcode',		$user['showvbcode']);
-			$try->set_value('nonmandatory', 'usertitle',		$user['usertitle']);
-			$try->set_value('nonmandatory', 'customtitle',		$user['customtitle']);
-			$try->set_value('nonmandatory', 'joindate',			$user['joindate']);
-			$try->set_value('nonmandatory', 'daysprune',		$user['daysprune']);
-			$try->set_value('nonmandatory', 'lastvisit',		$user['lastvisit']);
-			$try->set_value('nonmandatory', 'lastactivity',		$user['lastactivity']);
-			$try->set_value('nonmandatory', 'lastpost',			$user['lastpost']);
-			$try->set_value('nonmandatory', 'posts',			$user['posts']);
-			$try->set_value('nonmandatory', 'reputation',		$user['reputation']);
-			$try->set_value('nonmandatory', 'timezoneoffset',	$user['timezoneoffset']);
-			$try->set_value('nonmandatory', 'pmpopup',			$user['pmpopup']);
-			$try->set_value('nonmandatory', 'avatarid',			$user['avatarid']);
-			$try->set_value('nonmandatory', 'avatarrevision',	$user['avatarrevision']);
-			$try->set_value('nonmandatory', 'options',			$user['options']);
-			$try->set_value('nonmandatory', 'birthday',			$user['birthday']);
-			$try->set_value('nonmandatory', 'maxposts',			$user['maxposts']);
-			$try->set_value('nonmandatory', 'startofweek',		$user['startofweek']);
-			$try->set_value('nonmandatory', 'ipaddress',		$user['ipaddress']);
-			$try->set_value('nonmandatory', 'languageid',		$user['languageid']);
-			$try->set_value('nonmandatory', 'msn',				$user['msn']);
-			$try->set_value('nonmandatory', 'emailstamp',		$user['emailstamp']);
-			$try->set_value('nonmandatory', 'threadedmode',		$user['threadedmode']);
-			$try->set_value('nonmandatory', 'pmtotal',			$user['pmtotal']);
-			$try->set_value('nonmandatory', 'pmunread',			$user['pmunread']);
-			$try->set_value('nonmandatory', 'salt',				$user['salt']);
-			$try->set_value('nonmandatory', 'autosubscribe',	$user['autosubscribe']);
-			$try->set_value('nonmandatory', 'avatar',			$user['avatar']);
-			$try->set_value('nonmandatory', 'birthday_search',	$user['birthday_search']);
-
-			$this->_has_default_values = true;
-
-			$try->add_default_value('Biography',			$userfield[$user_id]['field1']);
-			$try->add_default_value('Location', 			$userfield[$user_id]['field2']);
-			$try->add_default_value('Interests',			$userfield[$user_id]['field3']);
-			$try->add_default_value('Occupation',			$userfield[$user_id]['field4']);
-
-
-			// Explode the memeber groups and map them to the new membergroup id's
-			$old_groups = explode(",", $user['membergroupids']);
-			$new_groups = '';
-
-			foreach ($old_groups AS $old_id)
-			{
-				$new_groups .= $usergroup[$old_id]['usergroupid'] . ',';
-			}
-
-			$new_groups = substr($new_groups, 0, -1);
-			$try->set_value('nonmandatory', 'membergroupids',	$new_groups);
-
-			// ID mapping needed
-			// TODO: Mapping
-			$try->set_value('nonmandatory', 'reputationlevelid',$user['reputationlevelid']);
-			$try->set_value('nonmandatory', 'displaygroupid',	$user['displaygroupid']);
-			$try->set_value('nonmandatory', 'styleid',			$user['styleid']);
-
-			// If its not blank slash it and get it
-			if ($signatures[$user_id] != '')
-			{
-				$try->add_default_value('signature', 			$signatures[$user_id]['signature']);
-			}
-
-			if ($try->is_valid())
-			{
-				if ($try->import_vb3_user($Db_target, $target_database_type, $target_table_prefix))
+				// Auto associate
+				if ($sessionobject->get_session_var('email_match'))
 				{
-					$displayobject->update_html($displayobject->make_description('<span class="isucc"><b>' . $try->how_complete() . '%</b></span> ' . $displayobject->phrases['user'] . ' -> ' . $try->get_value('mandatory','username')));
-					$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
+					$try->_auto_email_associate = true;
+				}
+
+				// ID mapping
+				$try->set_value('mandatory', 'usergroupid',			$usergroup["$user[usergroupid]"]['usergroupid']);
+				$try->set_value('mandatory', 'username',			$user['username']);
+				$try->set_value('mandatory', 'email',				$user['email']);
+				$try->set_value('mandatory', 'importuserid',		$user_id);
+
+				if ($user['referrerid'])
+				{
+					$try->set_value('nonmandatory', 'referrerid',	$this->get_vb_userid($Db_target, $target_database_type, $target_table_prefix, $user['referrerid']));
+				}
+
+				$try->set_value('nonmandatory', 'password',			$user['password']);
+				$try->set_value('nonmandatory', 'passworddate',		$user['passworddate']);
+				$try->set_value('nonmandatory', 'parentemail',		$user['parentemail']);
+				$try->set_value('nonmandatory', 'homepage',			$user['homepage']);
+				$try->set_value('nonmandatory', 'icq',				$user['icq']);
+				$try->set_value('nonmandatory', 'aim',				$user['aim']);
+				$try->set_value('nonmandatory', 'yahoo',			$user['yahoo']);
+				$try->set_value('nonmandatory', 'showvbcode',		$user['showvbcode']);
+				$try->set_value('nonmandatory', 'usertitle',		$user['usertitle']);
+				$try->set_value('nonmandatory', 'customtitle',		$user['customtitle']);
+				$try->set_value('nonmandatory', 'joindate',			$user['joindate']);
+				$try->set_value('nonmandatory', 'daysprune',		$user['daysprune']);
+				$try->set_value('nonmandatory', 'lastvisit',		$user['lastvisit']);
+				$try->set_value('nonmandatory', 'lastactivity',		$user['lastactivity']);
+				$try->set_value('nonmandatory', 'lastpost',			$user['lastpost']);
+				$try->set_value('nonmandatory', 'posts',			$user['posts']);
+				$try->set_value('nonmandatory', 'reputation',		$user['reputation']);
+				$try->set_value('nonmandatory', 'timezoneoffset',	$user['timezoneoffset']);
+				$try->set_value('nonmandatory', 'pmpopup',			$user['pmpopup']);
+				$try->set_value('nonmandatory', 'avatarid',			$user['avatarid']);
+				$try->set_value('nonmandatory', 'avatarrevision',	$user['avatarrevision']);
+				$try->set_value('nonmandatory', 'options',			$user['options']);
+				$try->set_value('nonmandatory', 'birthday',			$user['birthday']);
+				$try->set_value('nonmandatory', 'maxposts',			$user['maxposts']);
+				$try->set_value('nonmandatory', 'startofweek',		$user['startofweek']);
+				$try->set_value('nonmandatory', 'ipaddress',		$user['ipaddress']);
+				$try->set_value('nonmandatory', 'languageid',		$user['languageid']);
+				$try->set_value('nonmandatory', 'msn',				$user['msn']);
+				$try->set_value('nonmandatory', 'emailstamp',		$user['emailstamp']);
+				$try->set_value('nonmandatory', 'threadedmode',		$user['threadedmode']);
+				$try->set_value('nonmandatory', 'pmtotal',			$user['pmtotal']);
+				$try->set_value('nonmandatory', 'pmunread',			$user['pmunread']);
+				$try->set_value('nonmandatory', 'salt',				$user['salt']);
+				$try->set_value('nonmandatory', 'autosubscribe',	$user['autosubscribe']);
+				$try->set_value('nonmandatory', 'avatar',			$user['avatar']);
+				$try->set_value('nonmandatory', 'birthday_search',	$user['birthday_search']);
+
+				$this->_has_default_values = true;
+
+				$try->add_default_value('Biography',			$userfield[$user_id]['field1']);
+				$try->add_default_value('Location', 			$userfield[$user_id]['field2']);
+				$try->add_default_value('Interests',			$userfield[$user_id]['field3']);
+				$try->add_default_value('Occupation',			$userfield[$user_id]['field4']);
+
+
+				// Explode the memeber groups and map them to the new membergroup id's
+				$old_groups = explode(",", $user['membergroupids']);
+				$new_groups = '';
+
+				foreach ($old_groups AS $old_id)
+				{
+					$new_groups .= $usergroup[$old_id]['usergroupid'] . ',';
+				}
+
+				$new_groups = substr($new_groups, 0, -1);
+				$try->set_value('nonmandatory', 'membergroupids',	$new_groups);
+
+				// ID mapping needed
+				// TODO: Mapping
+				$try->set_value('nonmandatory', 'reputationlevelid',$user['reputationlevelid']);
+				$try->set_value('nonmandatory', 'displaygroupid',	$user['displaygroupid']);
+				$try->set_value('nonmandatory', 'styleid',			$user['styleid']);
+
+				// If its not blank slash it and get it
+				if ($signatures[$user_id] != '')
+				{
+					$try->add_default_value('signature', 			$signatures[$user_id]['signature']);
+				}
+
+				if ($try->is_valid())
+				{
+					if ($try->import_vb3_user($Db_target, $target_database_type, $target_table_prefix))
+					{
+						$displayobject->update_html($displayobject->make_description('<span class="isucc"><b>' . $try->how_complete() . '%</b></span> ' . $displayobject->phrases['user'] . ' -> ' . $try->get_value('mandatory','username')));
+						$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
+					}
+					else
+					{
+						$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
+						$sessionobject->add_error($user_id, $displayobject->phrases['user_not_imported'], $displayobject->phrases['user_not_imported_rem']);
+						$displayobject->update_html($displayobject->make_description($displayobject->phrases['failed'] . ' :: ' . $displayobject->phrases['user_not_imported']));
+					}
 				}
 				else
 				{
-					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
-					$sessionobject->add_error($user_id, $displayobject->phrases['user_not_imported'], $displayobject->phrases['user_not_imported_rem']);
-					$displayobject->update_html($displayobject->make_description($displayobject->phrases['failed'] . ' :: ' . $displayobject->phrases['user_not_imported']));
+					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
+					$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object'] . $try->_failedon));
 				}
+				unset($try);
 			}
-			else
-			{
-				$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
-				$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object'] . $try->_failedon));
-			}
-			unset($try);
+		}
+		else
+		{
+			$displayobject->update_html($displayobject->make_description($displayobject->phrases['no_user_import']));
 		}
 
 		$displayobject->update_html($displayobject->table_footer());
@@ -244,17 +255,21 @@ class vb4_004 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_users'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+			$displayobject->update_html($displayobject->module_finished($modulestring,
+				$sessionobject->return_stats($class_num, '_time_taken'),
+				$sessionobject->return_stats($class_num, '_objects_done'),
+				$sessionobject->return_stats($class_num, '_objects_failed')
+			));
 
 			$sessionobject->set_session_var($class_num , 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
 		{
 			$sessionobject->set_session_var('startat', $user_start_at + $user_per_page);
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }

@@ -921,12 +921,9 @@ class ImpExDisplay extends ImpExFunction
 	*/
 	public function print_per_page_pass($count, $datatypename, $startat)
 	{
-		$to = $count + $startat;
+		$rt = $this->make_description('<b>' . $this->phrases['importing'] . ' ' . $count . ' ' . $datatypename . '</b><br /><br /><b>' . $this->phrases['from'] . '</b> : ' . (($count + $startat == 0) ? 0 : ($startat + 1)) . ' :: <b>' . $this->phrases['to'] . '</b> : ' . ($startat + $count) . '');
 
-		$rt =  '<h4>' . $this->phrases['importing'] . ' ' . $count . ' ' . $datatypename . '</h4>';
-		$rt .= '<p><b>' . $this->phrases['from'] . '</b> : ' . $startat . ' ::  <b>' . $this->phrases['to'] . '</b> : ' . $to . ' </p>';
-
-		echo $rt;
+		return $rt;
 	}
 
 	/**

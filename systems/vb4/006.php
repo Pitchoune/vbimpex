@@ -14,7 +14,6 @@
 *
 * @package 		ImpEx.vb4
 */
-
 class vb4_006 extends vb4_000
 {
 	var $_dependent = '004';
@@ -57,10 +56,10 @@ class vb4_006 extends vb4_000
 
 			$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['continue'], $displayobject->phrases['reset']));
 
-
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('custompicsstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -76,13 +75,17 @@ class vb4_006 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$custom_pics_start_at	= $sessionobject->get_session_var('custompicsstartat');
 		$custom_pics_per_page	= $sessionobject->get_session_var('custompicsperpage');
 		$class_num				= substr(get_class($this), -3);
@@ -98,10 +101,11 @@ class vb4_006 extends vb4_000
 
 		$customprofilepic_object = new ImpExData($Db_target, $sessionobject, 'customprofilepic');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_cust_pics']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($customprofilepic_array) . ' ' . $displayobject->phrases['cust_pics'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($custom_pics_start_at + 1) . ' :: <b>' . $displayobject->phrases['to'] . '</b> : ' . ($custom_pics_start_at + count($customprofilepic_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($customprofilepic_array), $displayobject->phrases['custom_avatars_lower'], $custom_pics_start_at));
 
 		if ($customprofilepic_array)
 		{
@@ -119,6 +123,7 @@ class vb4_006 extends vb4_000
 					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num . '_objects_failed') + 1);
 					continue;
 				}
+
 				$try->set_value('nonmandatory', 'userid',					$userid);
 				$try->set_value('nonmandatory', 'filedata',					$Db_target->escape_string($cus_pic['profilepicdata']));
 				$try->set_value('nonmandatory', 'dateline',					$cus_pic['dateline']);
@@ -158,17 +163,21 @@ class vb4_006 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_cust_pics'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+			$displayobject->update_html($displayobject->module_finished($modulestring,
+				$sessionobject->return_stats($class_num, '_time_taken'),
+				$sessionobject->return_stats($class_num, '_objects_done'),
+				$sessionobject->return_stats($class_num, '_objects_failed')
+			));
 
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
-		{
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+		{	
 			$sessionobject->set_session_var('custompicsstartat', $custom_pics_start_at+$custom_pics_per_page);
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }

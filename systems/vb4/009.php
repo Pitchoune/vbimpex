@@ -14,7 +14,6 @@
 *
 * @package 		ImpEx.vb4
 */
-
 class vb4_009 extends vb4_000
 {
 	var $_dependent 	= '007';
@@ -60,6 +59,7 @@ class vb4_009 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('poststartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -75,19 +75,23 @@ class vb4_009 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type 	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$post_start_at 			= $sessionobject->get_session_var('poststartat');
 		$post_per_page 			= $sessionobject->get_session_var('postperpage');
-
 		$idcache 				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 		$class_num				= substr(get_class($this), -3);
 
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
@@ -100,10 +104,11 @@ class vb4_009 extends vb4_000
 
 		$post_array	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $post_start_at, $post_per_page, 'post', 'postid');
 
+		// Give the user more info
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_posts']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['imported'] . ' ' . count($post_array) . ' ' . $displayobject->phrases['posts'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . ($post_start_at + 1) . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($post_start_at + count($post_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($post_array), $displayobject->phrases['post_lower'], $post_start_at));
 
 		$post_object = new ImpExData($Db_target, $sessionobject, 'post');
 
@@ -163,11 +168,10 @@ class vb4_009 extends vb4_000
 
 		if (count($post_array) == 0 OR count($post_array) < $post_per_page)
 		{
-
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_posts'],
+			$displayobject->update_html($displayobject->module_finished($modulestring,
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -176,12 +180,12 @@ class vb4_009 extends vb4_000
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 		else
 		{
 			$sessionobject->set_session_var('poststartat', $post_start_at + $post_per_page);
-			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
 	}
 }

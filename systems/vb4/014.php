@@ -8,22 +8,22 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Attachments
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_014 extends vb4_000
 {
 	var $_dependent = '009';
 
-	function vb4_014(&$displayobject)
+	public function __construct(&$displayobject)
 	{
 		$this->_modulestring = $displayobject->phrases['import_attachments'];
 	}
 
-	function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
+	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
 		if ($this->check_order($sessionobject,$this->_dependent))
 		{
@@ -38,7 +38,7 @@ class vb4_014 extends vb4_000
 				{
 					$displayobject->update_html($displayobject->table_header());
 					$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
-					$displayobject->update_html($displayobject->make_description($displayobject->phrases['attachment_restart_ok']));
+					$displayobject->update_html($displayobject->make_description($displayobject->phrases['attachment_cleaned']));
 					$displayobject->update_html($displayobject->table_footer());
 					$this->_restart = true;
 				}
@@ -65,6 +65,7 @@ class vb4_014 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('attachmentstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -80,36 +81,41 @@ class vb4_014 extends vb4_000
 
 	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
 
-		// Set up working variables.
+		// Get some more usable local vars
 		$target_database_type 	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$attachment_start_at	= $sessionobject->get_session_var('attachmentstartat');
 		$attachment_per_page	= $sessionobject->get_session_var('attachmentperpage');
 
 		$attachment_object 		= new ImpExData($Db_target, $sessionobject, 'attachment');
 		$class_num				= substr(get_class($this) , -3);
 
-		if(intval($attachment_per_page) == 0)
-		{
-			$attachment_per_page = 200;
-		}
-
-		if(!$sessionobject->get_session_var($class_num . '_start'))
+		// Start the timings.
+		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($attachment_per_page) == 0)
+		{
+			$attachment_per_page = 200;
+		}
+
 		$attachment_array = $this->get_vb4_attachment_details($Db_source, $source_database_type, $source_table_prefix, $attachment_start_at, $attachment_per_page, 'vbulletin', 'Post');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['attachments']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_attachments']));
 
-		$displayobject->update_html($displayobject->make_description('<b>' . $displayobject->phrases['importing'] . ' ' . count($attachment_array) . ' ' . $displayobject->phrases['attachments'] . '</b><br /><br /><b>' . $displayobject->phrases['from'] . '</b> : ' . $attachment_start_at . ' ::  <b>' . $displayobject->phrases['to'] . '</b> : ' . ($attachment_start_at + count($attachment_array))));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($attachment_array), $displayobject->phrases['attachments_lower'], $attachment_start_at));
 
 		if ($attachment_array)
 		{
@@ -117,13 +123,13 @@ class vb4_014 extends vb4_000
 			{
 				$try = (phpversion() < '5' ? $attachment_object : clone($attachment_object));
 
-				// If its null its stored in the source file system
+				// If its null, its stored in the source file system
 				if (strlen($sessionobject->get_session_var('attachmentsfolder')) > 1)
 				{
 					$id_string = strval($attachment['userid']);
 					$attach_path = '/';
 
-					for ($i=0; $i <= strlen($id_string); $i++)
+					for ($i = 0; $i <= strlen($id_string); $i++)
 					{
 						$attach_path .= $id_string[$i] . '/';
 					}
@@ -181,7 +187,7 @@ class vb4_014 extends vb4_000
 					}
 					else
 					{
-						$displayobject->update_html($displayobject->make_description("{$displayobject->phrases['invalid_object']}" . $try->_failedon));
+						$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object'] . $try->_failedon));
 					}
 					$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
 				}
@@ -200,7 +206,7 @@ class vb4_014 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 
-			$displayobject->update_html($displayobject->module_finished($this->_modulestring,
+			$displayobject->update_html($displayobject->module_finished($modulestring,
 				$sessionobject->return_stats($class_num, '_time_taken'),
 				$sessionobject->return_stats($class_num, '_objects_done'),
 				$sessionobject->return_stats($class_num, '_objects_failed')
@@ -209,11 +215,14 @@ class vb4_014 extends vb4_000
 			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$sessionobject->set_session_var('autosubmit', '0');
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 		}
-
-		$sessionobject->set_session_var('attachmentstartat', $attachment_start_at + $attachment_per_page);
-		$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+		else
+		{
+			$sessionobject->set_session_var('attachmentstartat', $attachment_start_at + $attachment_per_page);
+			$displayobject->update_html($displayobject->print_redirect_001('index.php'));
+		}
 	}
 }
-/*======================================================================*/
+
 ?>

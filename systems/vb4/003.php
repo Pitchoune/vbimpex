@@ -8,12 +8,12 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4 Import Users groups and ranks
 *
 * @package 		ImpEx.vb4
 */
-
 class vb4_003 extends vb4_000
 {
 	var $_dependent 	= '001';
@@ -59,6 +59,7 @@ class vb4_003 extends vb4_000
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 			$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
 			$sessionobject->add_session_var('usergroupstartat', '0');
+			$sessionobject->add_session_var('modulestring', $this->_modulestring);
 		}
 		else
 		{
@@ -74,14 +75,17 @@ class vb4_003 extends vb4_000
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
-		// Set up working variables.
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_database_type 	= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
-
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$class_num = substr(get_class($this), -3);
 
 		// Start the timing
@@ -95,6 +99,7 @@ class vb4_003 extends vb4_000
 
 		$usergroup_object = new ImpExData($Db_target, $sessionobject, 'usergroup');
 
+		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_usergroups']));
 
@@ -156,6 +161,7 @@ class vb4_003 extends vb4_000
 				$sessionobject->set_session_var($class_num . '_objects_failed', $sessionobject->get_session_var($class_num. '_objects_failed') + 1);
 				$displayobject->update_html($displayobject->make_description($displayobject->phrases['invalid_object']  . '' . $try->_failedon));
 			}
+			unset($try);
 		}
 		$displayobject->update_html($displayobject->table_footer());
 
@@ -222,13 +228,17 @@ class vb4_003 extends vb4_000
 		$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 		$sessionobject->remove_session_var($class_num . '_start');
 
-		$displayobject->update_html($displayobject->module_finished($displayobject->phrases['import_usergroups'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
+		$displayobject->update_html($displayobject->module_finished($modulestring,
+			$sessionobject->return_stats($class_num, '_time_taken'),
+			$sessionobject->return_stats($class_num, '_objects_done'),
+			$sessionobject->return_stats($class_num, '_objects_failed')
+		));
 
 		$sessionobject->set_session_var($class_num, 'FINISHED');
 		$sessionobject->set_session_var('module', '000');
 		$sessionobject->set_session_var('autosubmit', '0');
 
-		$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));
+		$displayobject->update_html($displayobject->print_redirect_001('index.php'));
 	}
 }
 

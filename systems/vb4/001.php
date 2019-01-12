@@ -8,11 +8,11 @@
 || # http://www.vbulletin.com 
 || ####################################################################
 \*======================================================================*/
+
 /**
 * vb4
 *
 * @package 		ImpEx.vb4
-*
 */
 class vb4_001 extends vb4_000
 {
@@ -30,9 +30,11 @@ class vb4_001 extends vb4_000
 
 		$displayobject->update_html($displayobject->make_description($displayobject->phrases['check_tables']));
 
-		$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['check_update_db'],''));
+		$displayobject->update_html($displayobject->do_form_footer($displayobject->phrases['check_update_db'], ''));
 		$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_done', '0');
 		$sessionobject->add_session_var(substr(get_class($this), -3) . '_objects_failed', '0');
+
+		$sessionobject->add_session_var('modulestring', $this->_modulestring);
 	}
 
 	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
@@ -43,16 +45,21 @@ class vb4_001 extends vb4_000
 			exit;
 		}
 
-		// Setup some working variables
+		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
+
+		// Get some more usable local vars
 		$target_db_type 		= $sessionobject->get_session_var('targetdatabasetype');
 		$target_table_prefix 	= $sessionobject->get_session_var('targettableprefix');
 		$source_db_type			= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix 	= $sessionobject->get_session_var('sourcetableprefix');
+		$modulestring			= $sessionobject->get_session_var('modulestring');
 
+		// Get some usable variables
 		$class_num        = substr(get_class($this), -3);
 		$databasedone     = true;
 
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
@@ -74,7 +81,7 @@ class vb4_001 extends vb4_000
 				}
 				else
 				{
-					$sessionobject->add_error(substr(get_class($this) , -3), $displayobject->phrases['table_alter_fail'], $displayobject->phrases['table_alter_fail_rem']);
+					$sessionobject->add_error($class_num, $displayobject->phrases['table_alter_fail'], $displayobject->phrases['table_alter_fail_rem']);
 				}
 			}
 		}
@@ -93,9 +100,14 @@ class vb4_001 extends vb4_000
 			$sessionobject->timing($class_num, 'stop', $sessionobject->get_session_var('autosubmit'));
 			$sessionobject->remove_session_var($class_num . '_start');
 			$sessionobject->add_session_var($class_num . '_objects_done', intval($sessionobject->get_session_var($class_num . '_objects_done')) + 1);
-			$displayobject->update_html($displayobject->module_finished($displayobject->phrases['check_update_db'], $sessionobject->return_stats($class_num, '_time_taken'), $sessionobject->return_stats($class_num, '_objects_done'), $sessionobject->return_stats($class_num, '_objects_failed')));
 
-			$sessionobject->set_session_var(substr(get_class($this), -3), 'FINISHED');
+			$displayobject->update_html($displayobject->module_finished($modulestring,
+				$sessionobject->return_stats($class_num, '_time_taken'),
+				$sessionobject->return_stats($class_num, '_objects_done'),
+				$sessionobject->return_stats($class_num, '_objects_failed')
+			));
+
+			$sessionobject->set_session_var($class_num, 'FINISHED');
 			$sessionobject->set_session_var('module', '000');
 			$displayobject->update_basic('displaymodules', 'FALSE');
 			$displayobject->update_html($displayobject->print_redirect_001('index.php', $sessionobject->get_session_var('pagespeed')));

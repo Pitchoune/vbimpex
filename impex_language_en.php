@@ -190,6 +190,7 @@ $impex_phrases['reset']										= 'Reset';
 $impex_phrases['importing']									= 'Importing';
 $impex_phrases['import']									= 'Import';
 $impex_phrases['imported']									= 'Imported';
+$impex_phrases['imported_qty']								= 'Importé :';
 $impex_phrases['from']										= 'From';
 $impex_phrases['to']										= 'To'; # i.e. Importing 300 posts From 500 To 800
 $impex_phrases['dependency_error']							= 'Dependency error';
@@ -232,7 +233,6 @@ $impex_phrases['associate_users']							= 'Associate Users';
 
 $impex_phrases['assoc_desc_1']								= 'Warning !! Associated users will currently be deleted if you run the import user module twice as it removes users with an importuserid. You cannot associate with an existing admin user at this stage.';
 $impex_phrases['assoc_desc_2']								= 'If you want to associate a source user (in the left column) with an existing vBulletin user, enter the user id number of the vBulletin user in the box provided, and click the Associate Users button.';
-$impex_phrases['assoc_desc_3']								= 'To view the list of existing vBulletin users, together with their userid';
 
 $impex_phrases['assoc_list']								= 'Association list';
 $impex_phrases['assoc_match']								= 'Put the existing vBulletin userid next to the source userid that you wish to associate them with:';
@@ -246,6 +246,7 @@ $impex_phrases['associating_user_1']						= 'Associating user ';
 $impex_phrases['associating_user_2']						= ' (userid ';
 $impex_phrases['associating_user_3']						= ') to userid ';
 $impex_phrases['associating_user_4']						= '';
+$impex_phrases['no_user_import']							= 'There is no user to import.';
 
 
 #####################################
@@ -254,6 +255,7 @@ $impex_phrases['associating_user_4']						= '';
 
 $impex_phrases['usergroup']									= 'Usergroup';
 $impex_phrases['usergroups']								= 'Usergroups';
+$impex_phrases['usergroups_lower']							= 'usergroups';
 $impex_phrases['import_usergroup']							= 'Import usergroup';
 $impex_phrases['import_usergroups']							= 'Import usergroups';
 $impex_phrases['usergroups_cleared']						= 'Imported usergroup have been cleared';
@@ -269,10 +271,10 @@ $impex_phrases['no_usergroup_to_import']					= 'There is no usergroup to import.
 
 $impex_phrases['user']										= 'User';
 $impex_phrases['users']										= 'Users';
+$impex_phrases['users_lower']								= 'users';
 $impex_phrases['import_user']								= 'Import user';
 $impex_phrases['import_users']								= 'Import users';
 $impex_phrases['users_cleared']								= 'Imported users have been cleared';
-$impex_phrases['all_users_deleted']							= 'All users have been deleted.';
 
 $impex_phrases['users_per_page']							= 'Users to import per cycle (must be greater than 1)';
 $impex_phrases['email_match']								= 'Would you like to associated imported users with existing users if the <b>email</b> address matches ?';
@@ -294,6 +296,7 @@ $impex_phrases['userid_error']								= 'Userid error';
 
 $impex_phrases['banlist']									= 'Banlist';
 $impex_phrases['banlists']									= 'Banlists';
+$impex_phrases['banlists_lower']							= 'banlists';
 $impex_phrases['import_banlist']							= 'Import banlist';
 $impex_phrases['import_banlists']							= 'Import banlists';
 $impex_phrases['banlists_cleared']							= 'Imported banlist have been cleared';
@@ -314,6 +317,7 @@ $impex_phrases['no_banlist_to_import']						= 'There is no banlist to import.';
 
 $impex_phrases['avatar']									= 'Avatar';
 $impex_phrases['avatars']									= 'Avatars';
+$impex_phrases['avatars_lower']								= 'avatars';
 $impex_phrases['import_avatar']								= 'Import avatar';
 $impex_phrases['import_avatars']							= 'Import avatars';
 $impex_phrases['avatars_cleared']							= 'Imported avatars have been cleared';
@@ -328,6 +332,7 @@ $impex_phrases['invalid_avatar_skipping']					= 'Invalid avatar object, skipping
 
 $impex_phrases['custom_avatar']								= 'Custom avatar';
 $impex_phrases['custom_avatars']							= 'Custom avatars';
+$impex_phrases['custom_avatars_lower']						= 'custom avatars';
 $impex_phrases['import_custom_avatar']						= 'Import custom avatar';
 $impex_phrases['import_custom_avatars']						= 'Import custom avatars';
 
@@ -339,6 +344,7 @@ $impex_phrases['no_custom_avatar_import'] 					= 'There is no custom avatar to i
 
 $impex_phrases['cus_pic']									= 'Custom picture';
 $impex_phrases['cust_pics']									= 'Custom pictures';
+$impex_phrases['cust_pics_lower']							= 'custom pictures';
 $impex_phrases['import_cust_pic']							= 'Import custom picture';
 $impex_phrases['import_cust_pics']							= 'Import custom pictures';
 $impex_phrases['cust_pic_cleared']							= 'Imported custom pics have been cleared';
@@ -352,6 +358,7 @@ $impex_phrases['no_cust_pic_import']						= 'There is no custom picture to impor
 
 $impex_phrases['rank']										= 'Rank';
 $impex_phrases['ranks']										= 'Ranks';
+$impex_phrases['ranks_lower']								= 'ranks';
 $impex_phrases['import_rank']								= 'Import rank';
 $impex_phrases['import_ranks']								= 'Import ranks';
 $impex_phrases['ranks_cleared']								= 'Imported ranks have been cleared';
@@ -365,8 +372,10 @@ $impex_phrases['no_rank_to_import']							= 'There is no rank to import.';
 
 $impex_phrases['forum']										= 'Forum';
 $impex_phrases['forums']									= 'Forums';
+$impex_phrases['forums_lower']								= 'forums';
 $impex_phrases['category']									= 'Category';
 $impex_phrases['categories']								= 'Categories';
+$impex_phrases['categories_lower']							= 'categories';
 $impex_phrases['import_forum']								= 'Import forum';
 $impex_phrases['import_forums']								= 'Import forums';
 $impex_phrases['forums_cleared']							= 'Imported forums have been cleared';
@@ -380,6 +389,7 @@ $impex_phrases['no_forum_to_import']						= 'There is no forum to import.';
 
 $impex_phrases['thread']									= 'Thread';
 $impex_phrases['threads']									= 'Threads';
+$impex_phrases['threads_lower']								= 'threads';
 $impex_phrases['import_thread']								= 'Import thread';
 $impex_phrases['import_threads']							= 'Import threads';
 $impex_phrases['threads_cleared']							= 'Imported threads have been cleared';
@@ -395,6 +405,7 @@ $impex_phrases['updating_pollids']							= 'Updating pollids for new threads';
 
 $impex_phrases['post']										= 'Post';
 $impex_phrases['posts']										= 'Posts';
+$impex_phrases['posts_lower']								= 'posts';
 $impex_phrases['import_post']								= 'Import post';
 $impex_phrases['import_posts']								= 'Import posts';
 $impex_phrases['posts_cleared']								= 'Imported posts have been cleared';
@@ -408,11 +419,13 @@ $impex_phrases['no_post_to_import']							= 'There is no post to import.';
 
 $impex_phrases['smilie']									= 'Smilie';
 $impex_phrases['smilies']									= 'Smilies';
+$impex_phrases['smilies_lower']								= 'smilies';
 $impex_phrases['import_smilie']								= 'Import smilie';
 $impex_phrases['import_smilies']							= 'Import smilies';
 $impex_phrases['smilies_cleared']							= 'Imported smilies have been cleared';
 
-$impex_phrases['smilies_per_page']							= 'The importer will now start to import smilies from your source board. Please remember to move the smilie images into the vB smilies directory (images/smilies/).';
+$impex_phrases['smilies_per_page']							= 'Smilies to import per cycle (must be greater than 1)';
+$impex_phrases['smilies_desc']								= 'The importer will now start to import smilies from your source board. Please remember to move the smilie images into the vB smilies directory (images/smilies/).';
 $impex_phrases['smilie_overwrite']							= 'Would you like the source smilies to over write the vBulletin ones if there is a duplication ?';
 
 $impex_phrases['too_long']									= 'Too long';
@@ -426,6 +439,7 @@ $impex_phrases['no_smilie_to_import']						= 'There is no smilie to import.';
 
 $impex_phrases['attachment']								= 'Attachment';
 $impex_phrases['attachments']								= 'Attachments';
+$impex_phrases['attachments_lower']							= 'attachments';
 $impex_phrases['import_attachment']							= 'Import attachment';
 $impex_phrases['import_attachments']						= 'Import attachments';
 $impex_phrases['attachments_cleared']						= 'Imported Attachments have been cleared';
@@ -442,6 +456,7 @@ $impex_phrases['no_attachment_to_import']					= 'There is no attachment to impor
 
 $impex_phrases['poll']										= 'Poll';
 $impex_phrases['polls']										= 'Polls';
+$impex_phrases['polls_lower']								= 'polls';
 $impex_phrases['import_poll']								= 'Import poll';
 $impex_phrases['import_polls']								= 'Import polls';
 $impex_phrases['polls_cleared']								= 'Imported Polls have been cleared';
@@ -455,6 +470,7 @@ $impex_phrases['no_poll_to_import']							= 'There is no poll to import.';
 
 $impex_phrases['moderator']									= 'Moderator';
 $impex_phrases['moderators']								= 'Moderators';
+$impex_phrases['moderators_lower']							= 'modérateurs';
 $impex_phrases['import_moderator']							= 'Import moderator';
 $impex_phrases['import_moderators']							= 'Import moderators';
 $impex_phrases['moderators_cleared']						= 'Imported moderators have been cleared';
@@ -468,6 +484,7 @@ $impex_phrases['no_moderator_to_import']					= 'There is no moderator to import.
 
 $impex_phrases['phrase']									= 'Phrase';
 $impex_phrases['phrases']									= 'Phrases';
+$impex_phrases['phrases_lower']								= 'phrases';
 $impex_phrases['import_phrase']								= 'Import phrase';
 $impex_phrases['import_phrases']							= 'Import phrases';
 $impex_phrases['phrases_cleared']							= 'Imported phrases have been cleared';
@@ -481,6 +498,7 @@ $impex_phrases['no_phrase_to_import']						= 'There is no phrase to import.';
 
 $impex_phrases['subscription']								= 'Subscription';
 $impex_phrases['subscriptions']								= 'Subscriptions';
+$impex_phrases['subscriptions_lower']						= 'subscriptions';
 $impex_phrases['import_subscription']						= 'Import subscription';
 $impex_phrases['import_subscriptions']						= 'Import subscriptions';
 $impex_phrases['subscriptions_cleared']						= 'Imported subscriptions have been cleared';
@@ -496,6 +514,7 @@ $impex_phrases['subscriptionlogs']							= 'Subscription logs';
 
 $impex_phrases['pm']										= 'Private message';
 $impex_phrases['pms']										= 'Private messages';
+$impex_phrases['pms_lower']									= 'private messages';
 $impex_phrases['import_pm']									= 'Import private message';
 $impex_phrases['import_pms']								= 'Import private messages';
 $impex_phrases['pms_cleared']								= 'Imported Import Private have been cleared';
