@@ -62,34 +62,45 @@ $impex_phrases['finished_import_url']						= 'http://www.vbulletin.com/docs/html
 
 $impex_phrases['help_page']									= 'Impex Help page';
 $impex_phrases['action_1']									= '<p>These links will allow you to restart an import, remove a session or remove the importid\'s to allow consecutive imports.</p>';
-$impex_phrases['action_2']									= '<br /><strong>Cancel</strong><br /><a href="index.php">To cancel and return to the import, click here.</a><br />';
-$impex_phrases['action_3']									= '<br /><strong>Delete Session</strong><br /><a href="help.php?action=delsess">To delete the import session and continue with the import, click here.</a><br />';
-$impex_phrases['action_4']									= '<br />FORUM data - <a href="help.php?action=delall">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_5']									= '<br />FORUM importids - <a href="help.php?action=delids">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
-$impex_phrases['action_6']									= '<br /><strong>Remove duplicate forums/threads/posts.</strong><br /><a href="help.php?action=deldupe">This will remove anything that has a duplicate importid and a diffrent vBulletin id. Use with EXTREME caution, results will vary between source systems, <b>ALWAYS TAKE A BACK UP BEFORE USING</b></a><br />';
 
-$impex_phrases['action_7']									= '<br />CMS data - <a href="help.php?action=delall&amp;type=cms">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_8']									= '<br />CMS importids - <a href="help.php?action=delids&amp;type=cms">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
-$impex_phrases['action_9']									= '<br />BLOG data - <a href="help.php?action=delall&amp;type=blog">To delete the import session and all imported data for a clean retry, click here.</a><br />';
-$impex_phrases['action_10']									= '<br />BLOG importids - <a href="help.php?action=delids&amp;type=blog">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a><br />';
+$impex_phrases['action_2_title']							= 'Cancel';
+$impex_phrases['action_2_desc']								= '<a href="index.php">To cancel and return to the import, click here.</a>';
 
-$impex_phrases['dell_session_1']							= '<p><b>Deleteing Impex Session.</b></p>';
+$impex_phrases['action_3_title']							= 'Delete Session';
+$impex_phrases['action_3_desc']								= '<a href="help.php?action=delsess">To delete the import session and continue with the import, click here.</a>';
+
+$impex_phrases['delete_session_and_data']					= '<strong>Delete Session and all <em>imported</em> data</strong>';
+
+$impex_phrases['action_4']									= 'FORUM data - <a href="help.php?action=delall">To delete the import session and all imported data for a clean retry, click here.</a>';
+$impex_phrases['action_7']									= 'CMS data - <a href="help.php?action=delall&amp;type=cms">To delete the import session and all imported data for a clean retry, click here.</a>';
+$impex_phrases['action_9']									= 'BLOG data - <a href="help.php?action=delall&amp;type=blog">To delete the import session and all imported data for a clean retry, click here.</a>';
+
+$impex_phrases['action_5']									= 'FORUM importids - <a href="help.php?action=delids">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a>';
+$impex_phrases['action_8']									= 'CMS importids - <a href="help.php?action=delids&amp;type=cms">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a>';
+$impex_phrases['action_10']									= 'BLOG importids - <a href="help.php?action=delids&amp;type=blog">To delete the importids in the database, click here, also removes the session. This will allow you to do consecutive imports</a>';
+
+$impex_phrases['action_6_title']							= '<strong>Remove duplicate forums/threads/posts.</strong>';
+$impex_phrases['action_6_desc']								= '<a href="help.php?action=deldupe">This will remove anything that has a duplicate importid and a diffrent vBulletin id. Use with EXTREME caution, results will vary between source systems, <b>ALWAYS TAKE A BACK UP BEFORE USING</b></a><br />';
+
+
+$impex_phrases['dell_session_1']							= '<b>Deleteing Impex Session.</b>';
 $impex_phrases['dell_session_2']							= '<p>After this is complete any previously imported data will be left in the data base so it is advised that you re run any modules that you already have twice to ensure that data is cleaned up.</p>';
 $impex_phrases['dell_session_3']							= '<p>For instance, if the import timed out on the users import and you have come here to delete the session, once that is done and you restart the import run the import users module <b>twice</b>, that will ensure that on the start up of the second pass that <b>all</b> of the previously imported data will be removed.</p>';
 $impex_phrases['dell_session_4']							= '<p>This happens with all modules, running them more that once will clear out and data for that module that has an import id</p>';
 $impex_phrases['dell_session_5']							= '<p><b>Session deleted</b></p>';
 $impex_phrases['dell_session_6']							= '<p><a href="index.php">Click here to return to the import page.</a></p>';
 
-$impex_phrases['deleting_session']							= '<p><b>Deleteing Impex Session.</b></p>';
+
+$impex_phrases['deleting_session']							= '<b>Deleteing Impex Session.</b>';
 $impex_phrases['session_deleted']							= '<p><b>Session deleted</b></p>';
-$impex_phrases['deleting_duplicates']						= '<p><b>Deleting duplicates</b></p>';
+$impex_phrases['deleting_from']								= 'Deleting imported data from ';
 
-$impex_phrases['delete_session_and_data']					= '<br /><strong>Delete Session and all <em>imported</em> data</strong>';
-$impex_phrases['remove_importids']							= '<br /><strong>Remove Importids</strong>';
 
-$impex_phrases['deleting_from']								= '<p>Deleting imported data from ';
-
+$impex_phrases['deleting_duplicates']						= '<b>Deleting duplicates</b>';
 $impex_phrases['click_to_return']							= '<p><a href="index.php">Click here to return to the import page.</a></p>';
+
+
+$impex_phrases['remove_importids']							= '<strong>Remove Importids</strong>';
 
 $impex_phrases['del_ids_1']									= 'Setting';
 $impex_phrases['del_ids_2']									= 'in table';

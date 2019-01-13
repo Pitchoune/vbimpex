@@ -47,6 +47,11 @@ class ImpExDisplayWrapper extends ImpExDisplay
 		$this->call('print_table_start', array($echobr, $width, $cellspacing, $id, $border_collapse));
 	}
 
+	public function table_break($insert = '', $echobr = true, $width = '90%', $cellspacing = 0, $id = '', $border_collapse = false)
+	{
+		$this->call('print_table_break', array($insert, $width));
+	}
+
 	public function table_footer($colspan = 2, $rowhtml = '', $tooltip = '', $echoform = true)
 	{
 		$this->call('print_table_footer', array($colspan, $rowhtml, $tooltip, $echoform));
@@ -64,7 +69,7 @@ class ImpExDisplayWrapper extends ImpExDisplay
 			global $vbphrase;
 			if (isset($vbphrase['import']))
 			{
-				$outtitle = "$vbphrase[import] / $vbphrase[export]";
+				$outtitle = $vbphrase['import'] . '/' . $vbphrase['export'];
 			}
 			else
 			{
@@ -131,7 +136,7 @@ class ImpExDisplayWrapper extends ImpExDisplay
 
 	public function make_description($text, $htmlise = 0, $colspan = 2, $class = '', $align = '')
 	{
-		$this->call('print_description_row', array($text, $htmlise = 0, $colspan = 2, $class = '', $align = ''));
+		$this->call('print_description_row', array($text, $htmlise, $colspan, $class, $align));
 	}
 
 	public function make_yesno_code($title, $name, $value = 1, $onclick = '')

@@ -679,7 +679,7 @@ class ImpExDatabaseCore extends ImpExFunction
 	*
 	* @return	boolean
 	*/
-	public function import_smilie($Db_object, $databasetype, $tableprefix, $prepend_path = true)
+	public function import_smilie($Db_object, $databasetype, $tableprefix, $overwrite, $prepend_path = true)
 	{
 		if (dupe_checking AND !($this->_dupe_checking === false OR $this->_dupe_checking['smilie'] === false))
 		{
@@ -707,39 +707,44 @@ class ImpExDatabaseCore extends ImpExFunction
 		{
 			$Db_object->query("
 				INSERT INTO	" . $tableprefix . "smilie
-				(
-					title, smilietext, smiliepath,
-					imagecategoryid, displayorder, importsmilieid
-				)
+					(title, smilietext, smiliepath, imagecategoryid, displayorder, importsmilieid)
 				VALUES
-				(
-					'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
+					('" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "',
 					'" . $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "',
 					'" . $smilie_path . $Db_object->escape_string($this->get_value('nonmandatory', 'smiliepath')) . "',
 					" . intval($this->get_value('nonmandatory', 'imagecategoryid')) . ",
 					" . intval($this->get_value('nonmandatory', 'displayorder')) . ",
-					" . intval($this->get_value('mandatory', 'importsmilieid')) . "
-				)
+					" . intval($this->get_value('mandatory', 'importsmilieid')) . ")
 			");
 		}
 		else
 		{
-			// Don't change the smilie title if it is the same as the smilietext
-			if ($this->get_value('nonmandatory', 'title') == $this->get_value('mandatory', 'smilietext'))
+			// Import/update only if overwrite is allowed, or return false
+			if ($overwrite)
 			{
-				$title = 'title';
+				// Don't change the smilie title if it is the same as the smilietext
+				if ($this->get_value('nonmandatory', 'title') == $this->get_value('mandatory', 'smilietext'))
+				{
+					$title = 'title';
+				}
+				else
+				{
+					$title = "'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "'";
+				}
+
+				$Db_object->query("
+					UPDATE " . $tableprefix . "smilie SET
+						title = $title,
+						smiliepath = '" . $smilie_path . $Db_object->escape_string($this->get_value('nonmandatory', 'smiliepath')) . "'
+					WHERE smilietext = '" . $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "'
+				");
+
+				return true;
 			}
 			else
 			{
-				$title = "'" . $Db_object->escape_string($this->get_value('nonmandatory', 'title')) . "'";
+				return false;
 			}
-
-			$Db_object->query("
-				UPDATE " . $tableprefix . "smilie SET
-					title = $title,
-					smiliepath = '" . $smilie_path . $Db_object->escape_string($this->get_value('nonmandatory', 'smiliepath')) . "'
-				WHERE smilietext = '" . $Db_object->escape_string($this->get_value('mandatory', 'smilietext')) . "'
-			");
 		}
 
 		return ($Db_object->affected_rows() > 0);

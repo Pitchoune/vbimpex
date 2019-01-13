@@ -202,7 +202,7 @@ if (is_file(IDIR . '/ImpExConfig.php'))
 	else
 	{
 		echo $ImpExDisplay->table_header();
-		echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['help_error'] );
+		echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['help_error']);
 		echo $ImpExDisplay->make_description($ImpExDisplay->phrases['cant_read_config']);
 		echo $ImpExDisplay->table_footer();
 		echo $ImpExDisplay->page_footer();
@@ -212,7 +212,7 @@ else
 {
 	// No config
 	echo $ImpExDisplay->table_header();
-	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['help_error'] );
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['help_error']);
 	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['cant_find_config']);
 	echo $ImpExDisplay->table_footer();
 	echo $ImpExDisplay->page_footer();
@@ -280,63 +280,74 @@ switch ($_GET['type'])
 	case 'blog':
 		$target = $blogfields;
 		break;
+	case 'forum':
 	default:
 		$target = $forumfields;
+		break;
 }
 
 if (empty($_GET['action']))
 {
-
-	echo $ImpExDisplay->phrases['action_1'];
+	echo $ImpExDisplay->table_header();
 
 	if ($using_local_config)
 	{
-		echo '<p>' . $ImpExDisplay->phrases['using_local_config'] . '</p>';
+		echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['using_local_config']);
 	}
 
-	echo $ImpExDisplay->phrases['action_2'];
-	echo $ImpExDisplay->phrases['action_3'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_1']);
+	echo $ImpExDisplay->table_footer();
 
-
-	echo $ImpExDisplay->phrases['delete_session_and_data'];
-	echo $ImpExDisplay->phrases['action_4'];
-	echo $ImpExDisplay->phrases['action_7'];
-	echo $ImpExDisplay->phrases['action_9'];
-
-	echo $ImpExDisplay->phrases['remove_importids'];
-	echo $ImpExDisplay->phrases['action_5'];
-	echo $ImpExDisplay->phrases['action_8'];
-	echo $ImpExDisplay->phrases['action_10'];
-
-	echo $ImpExDisplay->phrases['action_6'];
+	echo $ImpExDisplay->table_header();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['action_2_title']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_2_desc']);
+	echo $ImpExDisplay->table_break();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['action_3_title']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_3_desc']);
+	echo $ImpExDisplay->table_break();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['delete_session_and_data'], false);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_4']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_7']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_9']);
+	echo $ImpExDisplay->table_break();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['remove_importids'], false);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_5']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_8']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_10']);
+	echo $ImpExDisplay->table_break();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['action_6_title'], false);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['action_6_desc']);
+	echo $ImpExDisplay->table_footer();
 }
 
 if ($_GET['action'] == 'delsess')
 {
-	echo $ImpExDisplay->phrases['dell_session_1'];
-	echo $ImpExDisplay->phrases['dell_session_2'];
-	echo $ImpExDisplay->phrases['dell_session_3'];
-	echo $ImpExDisplay->phrases['dell_session_4'];
+	echo $ImpExDisplay->table_header();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['dell_session_1'], false);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['dell_session_2'] . $ImpExDisplay->phrases['dell_session_3'] . $ImpExDisplay->phrases['dell_session_4']);
 
 	$Db_target->query("
 		DELETE FROM " . $targettableprefix . "datastore
 		WHERE title='ImpExSession'
 	");
 
-	echo $ImpExDisplay->phrases['dell_session_5'];
-	echo $ImpExDisplay->phrases['dell_session_6'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['dell_session_5']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['dell_session_6']);
+	echo $ImpExDisplay->table_footer();
 }
 
 if ($_GET['action'] == 'delall')
 {
-	echo $ImpExDisplay->phrases['deleting_session'];
+	echo '<br />';
+	echo $ImpExDisplay->table_header();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['deleting_session'], false);
 
 	$Db_target->query("
 		DELETE FROM " . $targettableprefix . "datastore
 		WHERE title = 'ImpExSession'
 	");
 
-	echo $ImpExDisplay->phrases['session_deleted'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['session_deleted']);
 
 	foreach ($target AS $tablename => $colname)
 	{
@@ -350,33 +361,35 @@ if ($_GET['action'] == 'delall')
 
 		if ($is_it_there)
 		{
-			echo $ImpExDisplay->phrases['deleting_from'] . " " . $targettableprefix . "" . $tablename . " ....";
-			flush();
-
 			$Db_target->query("
 				DELETE FROM " . $targettableprefix . "" . $tablename . "
 				WHERE " . $colname . " <> 0
 			");
 
-			echo "...<b>" . $ImpExDisplay->phrases['completed'] . "</b></p>";
-			flush();
-		}
+			$Db_target->query("
+				ALTER TABLE " . $targettableprefix . "" . $tablename . " AUTO_INCREMENT = 0;
+			");
 
+			echo $ImpExDisplay->table_row($ImpExDisplay->table_cell('<blockquote>' . $ImpExDisplay->phrases['deleting_from'] . ' ' . $targettableprefix . '' . $tablename . ' .......<b>' . $ImpExDisplay->phrases['completed'] . '</b></blockquote>'));
+		}
 	}
 
-	echo $ImpExDisplay->phrases['click_to_return'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['click_to_return'], false, 2, 'alt1');
+	echo $ImpExDisplay->table_footer();
 }
 
 if ($_GET['action'] == 'delids')
 {
-	echo $ImpExDisplay->phrases['deleting_session'];
+	echo '<br />';
+	echo $ImpExDisplay->table_header();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['deleting_session'], false);
 
 	$Db_target->query("
 		DELETE FROM " . $targettableprefix . "datastore
 		WHERE title = 'ImpExSession'
 	");
 
-	echo $ImpExDisplay->phrases['session_deleted'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['session_deleted']);
 
 	foreach ($target AS $tablename => $colname)
 	{
@@ -390,26 +403,25 @@ if ($_GET['action'] == 'delids')
 
 		if ($is_it_there)
 		{
-			echo "<p>" . $ImpExDisplay->phrases['del_ids_1'] . " " . $colname . " " . $ImpExDisplay->phrases['del_ids_2'] . " " . $tablename . " " . $ImpExDisplay->phrases['del_ids_3'] . "";
-			flush();
-
 			$Db_target->query("
 				UPDATE " . $targettableprefix . $tablename . " SET
 					" . $colname . "= 0
 				WHERE " . $colname . " <> 0
 			");
 
-			echo "...<b>" . $ImpExDisplay->phrases['completed'] . "</b></p>";
-			flush();
+			echo $ImpExDisplay->table_row($ImpExDisplay->table_cell('<blockquote>' . $ImpExDisplay->phrases['del_ids_1'] . ' ' . $colname . ' ' . $ImpExDisplay->phrases['del_ids_2'] . ' ' . $tablename . ' ' . $ImpExDisplay->phrases['del_ids_3'] . '...<b>' . $ImpExDisplay->phrases['completed'] . '</b></blockquote>'));
 		}
 	}
 
-	echo $ImpExDisplay->phrases['click_to_return'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['click_to_return'], false, 2, 'alt1');
+	echo $ImpExDisplay->table_footer();
 }
 
 if ($_GET['action'] == 'deldupe')
 {
-	echo $ImpExDisplay->phrases['deleting_duplicates'];
+	echo '<br />';
+	echo $ImpExDisplay->table_header();
+	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['deleting_duplicates'], false);
 
 	// Users
 	$dupe_users = $Db_target->query("
@@ -535,13 +547,13 @@ if ($_GET['action'] == 'deldupe')
 		");
 	}
 
-	echo '<br />' . $ImpExDisplay->phrases['users'] . ' :: ' . $users_found . '';
-	echo '<br />' . $ImpExDisplay->phrases['forums'] . ' :: ' . $forums_found . '';
-	echo '<br />' . $ImpExDisplay->phrases['threads'] . ' :: ' . $threads_found . '';
-	echo '<br />' . $ImpExDisplay->phrases['posts'] . ' :: ' . $posts_found . '';
-
-	echo '<br /><br />...<b>' . $ImpExDisplay->phrases['completed'] . '</b></p>';
-	echo $ImpExDisplay->phrases['click_to_return'];
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['users'] . ' :: ' . $users_found);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['forums'] . ' :: ' . $forums_found, false, 2, 'alt1');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['threads'] . ' :: ' . $threads_found, false, 2, 'alt1');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['posts'] . ' :: ' . $posts_found, false, 2, 'alt1');
+	echo $ImpExDisplay->make_description('...<b>' . $ImpExDisplay->phrases['completed'] . '</b>', false, 2, 'alt2');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['click_to_return']);
+	echo $ImpExDisplay->table_footer();
 }
 
 echo $ImpExDisplay->page_footer();

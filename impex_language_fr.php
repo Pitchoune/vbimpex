@@ -62,34 +62,45 @@ $impex_phrases['finished_import_url']						= 'http://www.vbulletin.com/docs/html
 
 $impex_phrases['help_page']									= 'Aide ImpEx';
 $impex_phrases['action_1']									= '<p>Les liens suivants vous permettront de recommencer une importation, supprimer la session actuelle ou de supprimer les identifiants d\'importations pour effectuer une nouvelle importation consécutive.</p>';
-$impex_phrases['action_2']									= '<br /><strong>Annuler</strong><br /><a href="index.php">Pour effectuer aucune action et revenir à l\'importation, cliquez ici.</a><br />';
-$impex_phrases['action_3']									= '<br /><strong>Supprimer la session</strong><br /><a href="help.php?action=delsess">Pour supprimer la session actuelle et continuer l\'importation, cliquez ici.</a><br />';
-$impex_phrases['action_4']									= '<br />Données du Forum - <a href="help.php?action=delall">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
-$impex_phrases['action_5']									= '<br />Identifiants du Forum - <a href="help.php?action=delids">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
-$impex_phrases['action_6']									= '<br /><strong>Supprimer les forums / discussions / messages en double</strong><br /><a href="help.php?action=deldupe">Ceci va supprimer toute donnée qui a un identifiant d\'importation en double. À utiliser avec une EXTRÊME précaution, les résultats peuvent varier selon les sources. <b>EFFECTUEZ UNE SAUVEGARDE DE VOTRE BASE DE DONNÉES AVANT D\'UTILISER CECI !</b></a><br />';
 
-$impex_phrases['action_7']									= '<br />Données du Cms - <a href="help.php?action=delall&amp;type=cms">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
-$impex_phrases['action_8']									= '<br />Identifiants du Cms - <a href="help.php?action=delids&amp;type=cms">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
-$impex_phrases['action_9']									= '<br />Données du Blog - <a href="help.php?action=delall&amp;type=blog">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a><br />';
-$impex_phrases['action_10']									= '<br />Identifiants du Blog - <a href="help.php?action=delids&amp;type=blog">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a><br />';
+$impex_phrases['action_2_title']							= 'Annuler';
+$impex_phrases['action_2_desc']								= '<a href="index.php">Pour effectuer aucune action et revenir à l\'importation, cliquez ici.</a>';
 
-$impex_phrases['dell_session_1']							= '<p><b>Suppression de la session ImpEx.</b></p>';
+$impex_phrases['action_3_title']							= 'Supprimer la session';
+$impex_phrases['action_3_desc']								= '<a href="help.php?action=delsess">Pour supprimer la session actuelle et continuer l\'importation, cliquez ici.</a>';
+
+$impex_phrases['delete_session_and_data']					= '<strong>Suppression de la session et de toutes les données <em>importées</em></strong>';
+
+$impex_phrases['action_4']									= 'Données du Forum - <a href="help.php?action=delall">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a>';
+$impex_phrases['action_7']									= 'Données du Cms - <a href="help.php?action=delall&amp;type=cms">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a>';
+$impex_phrases['action_9']									= 'Données du Blog - <a href="help.php?action=delall&amp;type=blog">Pour supprimer la session d\'importation actuelle ainsi que les données importées pour une nouvelle tentative propre, cliquez ici.</a>';
+
+$impex_phrases['action_5']									= 'Identifiants du Forum - <a href="help.php?action=delids">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a>';
+$impex_phrases['action_8']									= 'Identifiants du Cms - <a href="help.php?action=delids&amp;type=cms">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a>';
+$impex_phrases['action_10']									= 'Identifiants du Blog - <a href="help.php?action=delids&amp;type=blog">Pour supprimer les identifiants d\'importation de la base de données ainsi que la session actuelle, cliquez ici. Ceci vous permettra d\'effectuer plusieurs importations consécutives.</a>';
+
+$impex_phrases['action_6_title']							= '<strong>Supprimer les forums / discussions / messages en double</strong>';
+$impex_phrases['action_6_desc']								= '<a href="help.php?action=deldupe">Ceci va supprimer toute donnée qui a un identifiant d\'importation en double. À utiliser avec une EXTRÊME précaution, les résultats peuvent varier selon les sources. <b>EFFECTUEZ UNE SAUVEGARDE DE VOTRE BASE DE DONNÉES AVANT D\'UTILISER CECI !</b></a>';
+
+
+$impex_phrases['dell_session_1']							= '<b>Suppression de la session ImpEx.</b>';
 $impex_phrases['dell_session_2']							= '<p>Après avoir exécuté ceci, les données déjà importées seront laissés dans la base de données. Il est recommandé d\'exécuter de nouveau deux fois chaque module déjà terminé pour vous assurer que les données ont bien été nettoyéees.</p>';
 $impex_phrases['dell_session_3']							= '<p>Par exemple, si l\'importation a mis trop de temps sur l\'importation des utilisateurs et que vous êtes venus ici pour supprimer la session, une fois effectué, exécutez le module correspondant <b>deux fois</b>, ceci vous permettra d\'être certain qu\'à sa seconde exécution, <b>toutes</b> les données importées précédemment seront supprimées.</p>';
 $impex_phrases['dell_session_4']							= '<p>Ceci peut arriver avec tous les modules, les exécuter plus d\'une fois nettoiera les données précédentes qui ont un identifiant d\'importation.</p>';
 $impex_phrases['dell_session_5']							= '<p><b>Session supprimée avec succès !</b></p>';
 $impex_phrases['dell_session_6']							= '<p><a href="index.php">Cliquez ici pour retourner sur la page d\'importation.</a></p>';
 
-$impex_phrases['deleting_session']							= '<p><b>Suppression de la session ImpEx</b></p>';
+
+$impex_phrases['deleting_session']							= '<b>Suppression de la session ImpEx</b>';
 $impex_phrases['session_deleted']							= '<p><b>Session supprimée avec succès !</b></p>';
-$impex_phrases['deleting_duplicates']						= '<p><b>Suppression des doublons</b></p>';
+$impex_phrases['deleting_from']								= 'Suppression des données importées depuis ';
 
-$impex_phrases['delete_session_and_data']					= '<br /><strong>Suppression de la session et de toutes les données <em>importées</em></strong>';
-$impex_phrases['remove_importids']							= '<br /><strong>Supprimer les identifiants d\'importation</strong>';
 
-$impex_phrases['deleting_from']								= '<p>Suppression des données importées depuis ';
-
+$impex_phrases['deleting_duplicates']						= '<b>Suppression des doublons</b>';
 $impex_phrases['click_to_return']							= '<p><a href="index.php">Cliquez ici pour retourner sur la page d\'importation.</a></p>';
+
+
+$impex_phrases['remove_importids']							= '<strong>Supprimer les identifiants d\'importation</strong>';
 
 $impex_phrases['del_ids_1']									= 'Paramètre';
 $impex_phrases['del_ids_2']									= 'dans la table';

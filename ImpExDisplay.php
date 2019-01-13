@@ -65,7 +65,7 @@ class ImpExDisplay extends ImpExFunction
 	/**
 	* Store for display HTML.
 	*
-	* Hold all the HTML during the life of the object till display is called.
+	* Hold all the HTML during the life of the object until display is called.
 	*
 	* @var    string
 	*/
@@ -211,6 +211,34 @@ class ImpExDisplay extends ImpExFunction
 	}
 
 	/**
+	* HTML Page code - single table row line
+	*
+	* @param	string		mixed	Text
+	*
+	* @return	string		mixed	The formed HTML
+	*/
+	public function table_row($code)
+	{
+		$return_string = '<tr>' . $code . '</td>';
+
+		return $return_string;
+	}
+
+	/**
+	* HTML Page code - single table cell line
+	*
+	* @param	string		mixed	Text
+	*
+	* @return	string		mixed	The formed HTML
+	*/
+	public function table_cell($text, $alt = 'alt2')
+	{
+		$return_string = '<td class="' . $alt . '" colspan="2">' . $text . '</td>';
+
+		return $return_string;
+	}
+
+	/**
 	* HTML Page code - single table header.
 	*
 	* @param	boolean		mixed	Whether or not to place a <br /> before the opening table tag.
@@ -229,6 +257,25 @@ class ImpExDisplay extends ImpExFunction
 		$return_string .= ($echobr ? '<br />' : '') . '<table cellpadding="1" cellspacing="' . $cellspacing . '" border="0" align="center" width="' . $width . '" style="border-collapse:' . ($border_collapse ? 'collapse' : 'separate') . '" class="tblborder"' . ($id == '' ? '' : ' id="' . $id . '"') . '>';
 
 		return $return_string;
+	}
+
+	/**
+	* HTML Page code - Prints out a closing table tag and opens another for page layout purposes.
+	*
+	* @param	string	Code to be inserted between the two tables
+	* @param	string	Width for the new table - default = '90%'
+	*/
+	function table_break($insert = '', $echobr = true, $width = '90%', $cellspacing = 0, $id = '', $border_collapse = false)
+	{
+		// ends the current table, leaves a break and starts it again.
+		echo "</table>\n<br />\n\n";
+
+		if ($insert)
+		{
+			echo "<!-- start mid-table insert -->\n$insert\n<!-- end mid-table insert -->\n\n<br />\n";
+		}
+
+		echo '<table cellpadding="1" cellspacing="' . $cellspacing . '" border="0" align="center" width="' . $width . '" style="border-collapse:' . ($border_collapse ? 'collapse' : 'separate') . '" class="tblborder"' . ($id == '' ? '' : ' id="' . $id . '"') . '>';
 	}
 
 	/**
@@ -326,9 +373,9 @@ class ImpExDisplay extends ImpExFunction
 	*
 	* @return	string 	mixed	The formed HTML.
 	*/
-	public function make_description($text, $htmlise = 0)
+	public function make_description($text, $htmlise = 0, $colspan = 2, $class = '', $align = '')
 	{
-		$return_string = '<tr class="' . $this->get_row_bg() . '" valign="top"><td colspan="2">' . ($htmlise == 0 ? $text : htmlspecialchars($text)) . '</td></tr>';
+		$return_string = '<tr class="' . ($class ? $class : $this->get_row_bg()) . '" valign="top"><td colspan="2">' . ($htmlise == 0 ? $text : htmlspecialchars($text)) . '</td></tr>';
 		return $return_string;
 	}
 
