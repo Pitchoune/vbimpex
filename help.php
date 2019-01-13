@@ -422,6 +422,7 @@ if ($_GET['action'] == 'deldupe')
 	echo '<br />';
 	echo $ImpExDisplay->table_header();
 	echo $ImpExDisplay->make_table_header($ImpExDisplay->phrases['deleting_duplicates'], false);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['refresh_deletion_if_needed'], false);
 
 	// Users
 	$dupe_users = $Db_target->query("
@@ -548,11 +549,11 @@ if ($_GET['action'] == 'deldupe')
 	}
 
 	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['users'] . ' :: ' . $users_found);
-	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['forums'] . ' :: ' . $forums_found, false, 2, 'alt1');
-	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['threads'] . ' :: ' . $threads_found, false, 2, 'alt1');
-	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['posts'] . ' :: ' . $posts_found, false, 2, 'alt1');
-	echo $ImpExDisplay->make_description('...<b>' . $ImpExDisplay->phrases['completed'] . '</b>', false, 2, 'alt2');
-	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['click_to_return']);
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['forums'] . ' :: ' . $forums_found, false, 2, 'alt2');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['threads'] . ' :: ' . $threads_found, false, 2, 'alt2');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['posts'] . ' :: ' . $posts_found, false, 2, 'alt2');
+	echo $ImpExDisplay->make_description('...<b>' . $ImpExDisplay->phrases['completed'] . '</b>', false, 2, 'alt1');
+	echo $ImpExDisplay->make_description($ImpExDisplay->phrases['click_to_return'], false, 2, 'alt2');
 	echo $ImpExDisplay->table_footer();
 }
 

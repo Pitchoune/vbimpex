@@ -98,6 +98,11 @@ class vb4_007 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($forum_per_page) == 0)
+		{
+			$forum_per_page = 20;
+		}
+
 		$forum_array 	= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $forum_start_at, $forum_per_page, 'forum', 'forumid');
 		$users_ids 		= $this->get_user_ids($Db_target, $target_database_type, $target_table_prefix);
 

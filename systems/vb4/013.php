@@ -39,13 +39,13 @@ class vb4_013 extends vb4_000
 				}
 				else
 				{
-					$sessionobject->add_error(substr(get_class($this), -3), $displayobject->phrases['smmile_restart_failed'], $displayobject->phrases['check_db_permissions']);
+					$sessionobject->add_error(substr(get_class($this), -3), $displayobject->phrases['smilie_restart_failed'], $displayobject->phrases['check_db_permissions']);
 				}
 			}
 
 			// Start up the table
 			$displayobject->update_basic('title', $displayobject->phrases['import_smiles']);
-			$displayobject->update_html($displayobject->do_form_header('index',substr(get_class($this), -3)));
+			$displayobject->update_html($displayobject->do_form_header('index', substr(get_class($this), -3)));
 			$displayobject->update_html($displayobject->make_hidden_code(substr(get_class($this), -3), 'WORKING'));
 			$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
 
@@ -91,19 +91,19 @@ class vb4_013 extends vb4_000
 		$smilie_start_at		= $sessionobject->get_session_var('smiliesstartat');
 		$smilie_per_page		= $sessionobject->get_session_var('smiliesperpage');
 		$over_write_smilies		= $sessionobject->get_session_var('over_write_smilies');
-		$class_num				= substr(get_class($this) , -3);
+		$class_num				= substr(get_class($this), -3);
 
 		$smilie_array 			= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $smilie_start_at, $smilie_per_page, 'smilie', 'smilieid');
 
-		// Start the timings.
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		if (intval($smilies_per_page) == 0)
+		if (intval($smilie_per_page) == 0)
 		{
-			$smilies_per_page = 50;
+			$smilie_per_page = 20;
 		}
 
 		// If the image category dosn't exsist for the imported smilies, create it
@@ -117,7 +117,7 @@ class vb4_013 extends vb4_000
 
 		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());
-		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['importing'] . ' ' . $displayobject->phrases['smilies']));
+		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_smilies']));
 
 		$displayobject->update_html($displayobject->print_per_page_pass(count($smilie_array), $displayobject->phrases['smilies_lower'], $smilie_start_at));
 

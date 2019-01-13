@@ -97,6 +97,7 @@ $impex_phrases['deleting_from']								= 'Deleting imported data from ';
 
 
 $impex_phrases['deleting_duplicates']						= '<b>Deleting duplicates</b>';
+$impex_phrases['refresh_deletion_if_needed']				= 'Until all counters are all set to 0, you can refresh the page.';
 $impex_phrases['click_to_return']							= '<p><a href="index.php">Click here to return to the import page.</a></p>';
 
 

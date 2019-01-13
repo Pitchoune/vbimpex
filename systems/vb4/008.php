@@ -14,7 +14,6 @@
 *
 * @package 		ImpEx.vb4
 */
-
 class vb4_008 extends vb4_000
 {
 	var $_dependent 	= '007';
@@ -98,7 +97,7 @@ class vb4_008 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
-		if (intval($pthread_per_page) == 0)
+		if (intval($thread_per_page) == 0)
 		{
 			$thread_per_page = 150;
 		}

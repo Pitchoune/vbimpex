@@ -94,7 +94,7 @@ class vb4_011 extends vb4_000
 		$pm_text_object 		= new ImpExData($Db_target, $sessionobject, 'pmtext');
 		$pm_object 				= new ImpExData($Db_target, $sessionobject, 'pm');
 
-		// Start the timings.
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));

@@ -95,6 +95,11 @@ class vb4_004 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($user_per_page) == 0)
+		{
+			$user_per_page = 50;
+		}
+
 		// Check and clear the NON admin users
 		if ($sessionobject->get_session_var('clear_non_admin_users') == 1)
 		{

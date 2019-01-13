@@ -110,6 +110,7 @@ class vb4_002 extends vb4_000
 			if ($counter == 1)
 			{
 				$displayobject->update_html($displayobject->make_description($displayobject->phrases['no_users']));
+				$displayobject->update_html($displayobject->table_footer());
 			}
 			else
 			{

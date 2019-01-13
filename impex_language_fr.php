@@ -97,6 +97,7 @@ $impex_phrases['deleting_from']								= 'Suppression des données importées de
 
 
 $impex_phrases['deleting_duplicates']						= '<b>Suppression des doublons</b>';
+$impex_phrases['refresh_deletion_if_needed']				= 'Tant que les compteurs ne sont pas tous à 0, vous pouvez rafraîchir la page.';
 $impex_phrases['click_to_return']							= '<p><a href="index.php">Cliquez ici pour retourner sur la page d\'importation.</a></p>';
 
 

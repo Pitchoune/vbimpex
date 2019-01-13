@@ -83,15 +83,15 @@ class vb4_012 extends vb4_000
 		$target_table_prefix  	= $sessionobject->get_session_var('targettableprefix');
 		$source_database_type 	= $sessionobject->get_session_var('sourcedatabasetype');
 		$source_table_prefix  	= $sessionobject->get_session_var('sourcetableprefix');
-		$modulestring			= $sessionobject->get_session_var('modulestring');
+		$modulestring         	= $sessionobject->get_session_var('modulestring');
 
 		// Get some usable variables
 		$moderator_start_at		= $sessionobject->get_session_var('moderatorstartat');
 		$moderator_per_page		= $sessionobject->get_session_var('moderatorperpage');
 
 		$class_num				= substr(get_class($this), -3);
-		$moderator_object 		= new ImpExData($Db_target, $sessionobject, 'moderator');
-		$idcache 				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
+		$moderator_object		= new ImpExData($Db_target, $sessionobject, 'moderator');
+		$idcache				= new ImpExCache($Db_target, $target_database_type, $target_table_prefix);
 
 		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
@@ -104,10 +104,10 @@ class vb4_012 extends vb4_000
 			$moderator_per_page = 200;
 		}
 
-		$moderator_array 		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $moderator_start_at, $moderator_per_page, 'moderator', 'moderatorid');
+		$moderator_array		= $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $moderator_start_at, $moderator_per_page, 'moderator', 'moderatorid');
 		$forumids_array			= $this->get_forum_ids($Db_target, $target_database_type, $target_table_prefix);
 
-		$last_pass 				= $sessionobject->get_session_var('last_pass');
+		$last_pass				= $sessionobject->get_session_var('last_pass');
 
 		// Give the user some info
 		$displayobject->update_html($displayobject->table_header());

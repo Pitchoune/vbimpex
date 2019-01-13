@@ -96,6 +96,11 @@ class vb4_005 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($avatar_per_page) == 0)
+		{
+			$avatar_per_page = 20;
+		}
+
 		if ($sessionobject->get_session_var('normal_avatars_done') != 'yes')
 		{
 			$avatar_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, 0, -1, 'avatar', 'avatarid');

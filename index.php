@@ -61,7 +61,7 @@ require_once (IDIR . '/ImpExDisplayWrapper.php');
 
 
 // #############################################################################
-// Checking for standalnoe
+// Checking for standalone
 // #############################################################################
 
 if (file_exists('../includes/config.php')) // If that is there then its installed
@@ -80,9 +80,9 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 	{
 		if (is_dir("../" . $config['Misc']['admincpdir'] . "/"))
 		{
-			// Version 3.6.x
+			// Version 3.5.0 - 4.2.5
 			chdir("../");
-			require_once('./includes/adminfunctions.php'); // Only for 3.6.x
+			require_once('./includes/adminfunctions.php'); // Only for 3.5.0 - 4.2.5
 		}
 		else
 		{

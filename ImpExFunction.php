@@ -287,8 +287,8 @@ class ImpExFunction
 		// do smilies
 		if ($parse_smilies == 1)
 		{
-			$htmlcode = preg_replace('#<img[^>]*src=("|\')(.*)\\1[^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\2', '\\0', \$smilies)", $htmlcode);
-			$htmlcode = preg_replace('#<img[^>]*src=([^"\' ]*) [^>]*/??>#iUe', "\$this->parse_smilie_callback_php5('\\1', '\\0', \$smilies)", $htmlcode);
+			$htmlcode = preg_replace('#<img[^>]*src=("|\')(.*)\\1[^>]*/??>#iU', "\$this->parse_smilie_callback_php5('\\2', '\\0', \$smilies)", $htmlcode);
+			$htmlcode = preg_replace('#<img[^>]*src=([^"\' ]*) [^>]*/??>#iU', "\$this->parse_smilie_callback_php5('\\1', '\\0', \$smilies)", $htmlcode);
 		}
 
 		// images (beyond any smilies stripped above)

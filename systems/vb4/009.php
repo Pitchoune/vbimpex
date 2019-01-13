@@ -33,13 +33,13 @@ class vb4_009 extends vb4_000
 				{
 					$displayobject->update_html($displayobject->table_header());
 					$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
-					$displayobject->update_html($displayobject->make_description($displayobject->phrases['post_restart_ok']));
+					$displayobject->update_html($displayobject->make_description($displayobject->phrases['posts_cleared']));
 					$displayobject->update_html($displayobject->table_footer());
 					$this->_restart = true;
 				}
 				else
 				{
-					$sessionobject->add_error(substr(get_class($this) , -3), $displayobject->phrases['post_restart_failed'], $displayobject->phrases['check_db_permissions']);
+					$sessionobject->add_error(substr(get_class($this), -3), $displayobject->phrases['post_restart_failed'], $displayobject->phrases['check_db_permissions']);
 				}
 			}
 
@@ -108,7 +108,7 @@ class vb4_009 extends vb4_000
 		$displayobject->update_html($displayobject->table_header());
 		$displayobject->update_html($displayobject->make_table_header($displayobject->phrases['import_posts']));
 
-		$displayobject->update_html($displayobject->print_per_page_pass(count($post_array), $displayobject->phrases['post_lower'], $post_start_at));
+		$displayobject->update_html($displayobject->print_per_page_pass(count($post_array), $displayobject->phrases['posts_lower'], $post_start_at));
 
 		$post_object = new ImpExData($Db_target, $sessionobject, 'post');
 

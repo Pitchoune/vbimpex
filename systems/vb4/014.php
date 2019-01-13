@@ -25,7 +25,7 @@ class vb4_014 extends vb4_000
 
 	public function init(&$sessionobject, &$displayobject, &$Db_target, &$Db_source, $resume = false)
 	{
-		if ($this->check_order($sessionobject,$this->_dependent))
+		if ($this->check_order($sessionobject, $this->_dependent))
 		{
 			if ($this->_restart)
 			{
@@ -38,7 +38,7 @@ class vb4_014 extends vb4_000
 				{
 					$displayobject->update_html($displayobject->table_header());
 					$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
-					$displayobject->update_html($displayobject->make_description($displayobject->phrases['attachment_cleaned']));
+					$displayobject->update_html($displayobject->make_description($displayobject->phrases['attachments_cleaned']));
 					$displayobject->update_html($displayobject->table_footer());
 					$this->_restart = true;
 				}
@@ -79,7 +79,7 @@ class vb4_014 extends vb4_000
 		}
 	}
 
-	function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
+	public function resume(&$sessionobject, &$displayobject, &$Db_target, &$Db_source)
 	{
 		// Turn off the modules display
 		$displayobject->update_basic('displaymodules', 'FALSE');
@@ -98,7 +98,7 @@ class vb4_014 extends vb4_000
 		$attachment_object 		= new ImpExData($Db_target, $sessionobject, 'attachment');
 		$class_num				= substr(get_class($this) , -3);
 
-		// Start the timings.
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));

@@ -97,6 +97,11 @@ class vb4_006 extends vb4_000
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
 		}
 
+		if (intval($custom_pics_per_page) == 0)
+		{
+			$custom_pics_per_page = 20;
+		}
+
 		$customprofilepic_array = $this->get_details($Db_source, $source_database_type, $source_table_prefix, $displayobject, $custom_pics_start_at, $custom_pics_per_page, 'customprofilepic', 'userid');
 
 		$customprofilepic_object = new ImpExData($Db_target, $sessionobject, 'customprofilepic');

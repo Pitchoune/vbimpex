@@ -33,7 +33,7 @@ class vb4_010 extends vb4_000
 				{
 					$displayobject->update_html($displayobject->table_header());
 					$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
-					$displayobject->update_html($displayobject->make_description($displayobject->phrases['poll_restart_ok']));
+					$displayobject->update_html($displayobject->make_description($displayobject->phrases['polls_cleared']));
 					$displayobject->update_html($displayobject->table_footer());
 					$this->_restart = true;
 				}
@@ -45,7 +45,7 @@ class vb4_010 extends vb4_000
 
 			// Start up the table
 			$displayobject->update_basic('title', $displayobject->phrases['import_polls']);
-			$displayobject->update_html($displayobject->do_form_header('index',substr(get_class($this), -3)));
+			$displayobject->update_html($displayobject->do_form_header('index', substr(get_class($this), -3)));
 			$displayobject->update_html($displayobject->make_hidden_code(substr(get_class($this), -3), 'WORKING'));
 			$displayobject->update_html($displayobject->make_table_header($this->_modulestring));
 
@@ -89,9 +89,8 @@ class vb4_010 extends vb4_000
 		$poll_start_at 			= $sessionobject->get_session_var('pollstartat');
 		$poll_per_page 			= $sessionobject->get_session_var('pollperpage');
 		$class_num				= substr(get_class($this), -3);
-		$displayobject->update_basic('displaymodules', 'FALSE');
 
-
+		// Start the timing
 		if (!$sessionobject->get_session_var($class_num . '_start'))
 		{
 			$sessionobject->timing($class_num, 'start', $sessionobject->get_session_var('autosubmit'));
