@@ -262,12 +262,12 @@ class smf_000 extends ImpExModule
 
 		$table = null;
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'pm_recipients'), $displayobject)
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'pm_recipients', $displayobject))
 		{
 			$table = 'pm_recipients';
 		}
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'im_recipients'), $displayobject)
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'im_recipients', $displayobject))
 		{
 			$table = 'im_recipients';
 		}
@@ -406,12 +406,12 @@ class smf_000 extends ImpExModule
 
 		$table = null;
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'personal_messages'), $displayobject)
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'personal_messages', $displayobject))
 		{
 			$table = 'personal_messages';
 		}
 
-		if($this->check_table($Db_object, $databasetype, $tableprefix, 'instant_messages'), $displayobject)
+		if($this->check_table($Db_object, $databasetype, $tableprefix, 'instant_messages', $displayobject))
 		{
 			$table = 'instant_messages';
 		}
@@ -720,7 +720,7 @@ class smf_000 extends ImpExModule
 		// Check that there is not a empty value
 		if(empty($per_page)) { return $return_array; }
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "membergroups"), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "membergroups", $displayobject))
 		{
 			return $return_array;
 		}
@@ -786,7 +786,7 @@ class smf_000 extends ImpExModule
 			'votes'		=> 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_choices", $req_fields), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "poll_choices", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}
@@ -819,7 +819,7 @@ class smf_000 extends ImpExModule
 			'filename' => 'mandatory'
 		);
 
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $req_fields), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, "attachments", $displayobject, $req_fields))
 		{
 			return $return_array;
 		}

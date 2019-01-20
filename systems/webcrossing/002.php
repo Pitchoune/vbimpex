@@ -20,7 +20,7 @@ class webcrossing_002 extends webcrossing_000
 	var $_dependent 	= '001';
 	var $_modulestring 	= 'Import Forum';
 
-	function webcrossing_003()
+	function webcrossing_002()
 	{
 		// Constructor
 	}
@@ -93,10 +93,10 @@ class webcrossing_002 extends webcrossing_000
 		}
 		else
 		{
-			$parser_handler =& new ParserHandler();
+			$parser_handler = new ParserHandler();
 		}
 		
-		$parser =& new Webcrossing_Parser();
+		$parser = new Webcrossing_Parser();
 		// ########
 		
 		// Grab the file 

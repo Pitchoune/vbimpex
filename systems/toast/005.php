@@ -92,7 +92,7 @@ class toast_005 extends toast_000
 		}
 
 		// Get an array data
-		$data_array = $this->get_toast_threads_details($Db_source, $s_db_type, &$s_tb_prefix, &$start_at, &$per_page);
+		$data_array = $this->get_toast_threads_details($Db_source, $s_db_type, $s_tb_prefix, $start_at, $per_page);
 
 		$idcache = new ImpExCache($Db_target, $t_db_type, $t_tb_prefix);
 

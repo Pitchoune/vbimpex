@@ -284,7 +284,7 @@ class phorum3_000 extends ImpExModule
 		if(empty($per_page) OR empty($sourceforumtablename)) { return $return_array; }
 
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename, $displayobject))
 		{
 			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
@@ -437,7 +437,7 @@ class phorum3_000 extends ImpExModule
 		if(empty($per_page) OR empty($sourceforumtablename)) { return $return_array; }
 		
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename, $displayobject))
 		{
 			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{
@@ -483,7 +483,7 @@ class phorum3_000 extends ImpExModule
 		if(empty($sourceforumtablename)) { return $return_array; }
 
 		//Check it its there and has it been strtolower()'ed
-		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename), $displayobject)
+		if(!$this->check_table($Db_object, $databasetype, $tableprefix, $sourceforumtablename, $displayobject))
 		{
 			if($this->check_table($Db_object, $databasetype, $tableprefix, strtolower($sourceforumtablename), $displayobject))
 			{

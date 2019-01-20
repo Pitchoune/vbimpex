@@ -91,10 +91,12 @@ define('dupe_checking', false);
 $impexconfig['target']['databasetype']	= 'mysqli';	// mysql / mysqli
 $impexconfig['target']['charset']		= '';
 $impexconfig['target']['persistent']	= false; 	// (true/false) use mysql_pconnect
+$impexconfig['target']['port']			= 3306;
 
 // Advanced Source
 $impexconfig['source']['charset']		= '';
 $impexconfig['source']['persistent']	= false;
+$impexconfig['source']['port']			= 3306;
 
 //pagespeed is the second(s) wait before the page refreshes.
 

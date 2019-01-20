@@ -64,6 +64,8 @@ require_once (IDIR . '/ImpExDisplayWrapper.php');
 // Checking for standalone
 // #############################################################################
 
+$vbVersion = '';
+
 if (file_exists('../includes/config.php')) // If that is there then its installed
 {
 	// If the admincp was renamed, lets try and find it depending on vBulletin version
@@ -75,6 +77,7 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 	{
 		// Version 3.0.x
 		chdir("../" . $admincpdir . "/");
+		$vbVersion = 30;
 	}
 	else if (!empty($config['Misc']['admincpdir']))
 	{
@@ -83,6 +86,7 @@ if (file_exists('../includes/config.php')) // If that is there then its installe
 			// Version 3.5.0 - 4.2.5
 			chdir("../");
 			require_once('./includes/adminfunctions.php'); // Only for 3.5.0 - 4.2.5
+			$vbVersion = 35;
 		}
 		else
 		{
@@ -130,17 +134,37 @@ if ($usewrapper)
 
 	$using_local_config = '<p>' . $impex_phrases['using_local_config'] . '</p>';
 
-	// Only if it is all there or a 3.5 config file
-	if ($config['Database']['dbtype'] AND $config['MasterServer']['servername'] AND $config['MasterServer']['username']	AND $config['MasterServer']['password'] AND $config['Database']['dbname'])
+	if ($vbVersion == 30)
 	{
-		// Over write ImpExConfig.php
-		$impexconfig['target']['databasetype']	= 'mysqli';
-		$impexconfig['target']['server']		= trim($config['MasterServer']['servername']) . ":" . trim($config['MasterServer']['port']);
-		$impexconfig['target']['user']			= trim($config['MasterServer']['username']);
-		$impexconfig['target']['password']		= trim($config['MasterServer']['password']);
-		$impexconfig['target']['database']		= trim($config['Database']['dbname']);
-		$impexconfig['target']['tableprefix']	= trim($config['Database']['tableprefix']);
-		$impexconfig['target']['charset']		= trim($config['Mysqli']['charset']);
+		// Only if it is all there or a 3.0.x config file
+		if ($config['Database']['dbtype'] AND $config['MasterServer']['servername'] AND $config['MasterServer']['username']	AND $config['MasterServer']['password'] AND $config['Database']['dbname'])
+		{
+			// Over write ImpExConfig.php
+			$impexconfig['target']['databasetype']	= 'mysql'; # No Mysqli support on vB 3.0.x
+			$impexconfig['target']['server']		= trim($servername);
+			$impexconfig['target']['user']			= trim($dbusername);
+			$impexconfig['target']['password']		= trim($dbpassword);
+			$impexconfig['target']['database']		= trim($dbname);
+			$impexconfig['target']['tableprefix']	= trim($tableprefix);
+			$impexconfig['target']['charset']		= '';
+			$impexconfig['target']['port']			= '3306';
+		}
+	}
+	else if ($vbVersion == 35)
+	{
+		// Only if it is all there or a 3.5.0 - 4.2.5 config file
+		if ($config['Database']['dbtype'] AND $config['MasterServer']['servername'] AND $config['MasterServer']['username']	AND $config['MasterServer']['password'] AND $config['Database']['dbname'])
+		{
+			// Over write ImpExConfig.php
+			$impexconfig['target']['databasetype']	= 'mysqli';
+			$impexconfig['target']['server']		= trim($config['MasterServer']['servername']);
+			$impexconfig['target']['user']			= trim($config['MasterServer']['username']);
+			$impexconfig['target']['password']		= trim($config['MasterServer']['password']);
+			$impexconfig['target']['database']		= trim($config['Database']['dbname']);
+			$impexconfig['target']['tableprefix']	= trim($config['Database']['tableprefix']);
+			$impexconfig['target']['charset']		= trim($config['Mysqli']['charset']);
+			$impexconfig['target']['port']			= intval($config['MasterServer']['port']);
+		}
 	}
 }
 else
@@ -173,7 +197,7 @@ $Db_target->appshortname 	= 'ImpEx Target';
 $Db_target->connect(
 	$impexconfig['target']['database'],
 	$impexconfig['target']['server'],
-	3306,
+	$impexconfig['target']['port'],
 	$impexconfig['target']['user'],
 	$impexconfig['target']['password'],
 	$impexconfig['target']['persistent'],

@@ -355,7 +355,6 @@ class ipb_000 extends ImpExModule
 
 		return $return_array;
 	}
-	*/
 
 	/**
 	* Regex call back
