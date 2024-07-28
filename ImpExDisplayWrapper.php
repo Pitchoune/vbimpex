@@ -33,13 +33,20 @@ class ImpExDisplayWrapper extends ImpExDisplay
 	{
 		// If NULL, set it to an empty array
 		$params = (is_null($params) == true ? array() : $params);
-		
+
 		return call_user_func_array($function_name, $params);
 	}
 
 	public function display_now($var)
 	{
-		echo $var;
+		$string = $this->page_header();
+
+		$this->_screenbasic['displaymodules'] = FALSE;
+
+		$string .= $var;
+		echo "\n" . $string;
+		$string .= $this->page_footer();
+		flush();
 	}
 
 	public function table_header($echobr = true, $width = '90%', $cellspacing = 0, $id = '', $border_collapse = false)
@@ -87,7 +94,7 @@ class ImpExDisplayWrapper extends ImpExDisplay
 		$this->_screenbasic['donehead'] = 'TRUE';
 
 		$string .= "\n" . '<b>' . $this->phrases['build_version'] . $this->_build_version . '</b>';
-		
+
 		return $string;
 	}
 
